@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to the Linode Cloud Manager!
+ Thanks for your interest in contributing to the Linode Cloud Manager!
 
 You can contribute by [opening an issue](https://github.com/linode/manager/issues/new) or submitting a pull request.
 
