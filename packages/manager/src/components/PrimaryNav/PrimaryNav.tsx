@@ -24,6 +24,7 @@ import TooltipIcon from 'src/assets/icons/get_help.svg';
 import Longview from 'src/assets/icons/longview.svg';
 import AkamaiLogo from 'src/assets/logo/akamai-logo.svg';
 import { BetaChip } from 'src/components/BetaChip/BetaChip';
+import { Box } from 'src/components/Box';
 import { Divider } from 'src/components/Divider';
 import { useIsACLBEnabled } from 'src/features/LoadBalancers/utils';
 import { useAccountManagement } from 'src/hooks/useAccountManagement';
@@ -34,6 +35,7 @@ import {
   useObjectStorageBuckets,
   useObjectStorageClusters,
 } from 'src/queries/objectStorage';
+import { useRegionsQuery } from 'src/queries/regions/regions';
 import { useStackScriptsOCA } from 'src/queries/stackscripts';
 import { isFeatureEnabled } from 'src/utilities/accountCapabilities';
 
@@ -99,6 +101,18 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
 
   const { _isManagedAccount, account, accountError } = useAccountManagement();
 
+  const isObjMultiClusterEnabled = isFeatureEnabled(
+    'Object Storage Access Key Regions',
+    Boolean(flags.objMultiCluster),
+    account?.capabilities ?? []
+  );
+
+  const { data: regions } = useRegionsQuery();
+
+  const regionsSupportingObjectStorage = regions?.filter((region) =>
+    region.capabilities.includes('Object Storage')
+  );
+
   const {
     data: oneClickApps,
     error: oneClickAppsError,
@@ -109,13 +123,28 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
     data: clusters,
     error: clustersError,
     isLoading: clustersLoading,
-  } = useObjectStorageClusters(enableObjectPrefetch);
+  } = useObjectStorageClusters(
+    enableObjectPrefetch && !isObjMultiClusterEnabled
+  );
 
+  /*
+   @TODO OBJ Multicluster:'region' will become required, and the
+   'cluster' field will be deprecated once the feature is fully rolled out in production.
+   As part of the process of cleaning up after the 'objMultiCluster' feature flag, we will
+   remove 'cluster' and retain 'regions'.
+  */
   const {
     data: buckets,
     error: bucketsError,
     isLoading: bucketsLoading,
-  } = useObjectStorageBuckets(clusters, enableObjectPrefetch);
+  } = useObjectStorageBuckets({
+    clusters: isObjMultiClusterEnabled ? undefined : clusters,
+    enabled: enableObjectPrefetch,
+    isObjMultiClusterEnabled,
+    regions: isObjMultiClusterEnabled
+      ? regionsSupportingObjectStorage
+      : undefined,
+  });
 
   const allowObjPrefetch =
     !buckets &&
@@ -142,14 +171,7 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
     ) ||
     (checkRestrictedUser && !enginesLoading && !enginesError);
 
-  const showVPCs = isFeatureEnabled(
-    'VPCs',
-    Boolean(flags.vpc),
-    account?.capabilities ?? []
-  );
-
   const showCloudView = Boolean(flags.cloudView);
-
   const { isACLBEnabled } = useIsACLBEnabled();
 
   const prefetchObjectStorage = () => {
@@ -209,10 +231,8 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
         },
         {
           display: 'VPC',
-          hide: !showVPCs,
           href: '/vpcs',
           icon: <VPC />,
-          isBeta: flags.vpc, // @TODO VPC: after VPC enters GA, remove this property entirely
         },
         {
           display: 'Firewalls',
@@ -313,7 +333,6 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
       flags.databaseBeta,
       isACLBEnabled,
       flags.placementGroups,
-      showVPCs,
     ]
   );
 
@@ -331,7 +350,7 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
       wrap="nowrap"
     >
       <Grid>
-        <div
+        <Box
           className={cx(classes.logoItemAkamai, {
             [classes.logoItemAkamaiCollapsed]: isCollapsed,
           })}
@@ -339,6 +358,7 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
           <Link
             className={cx({
               [classes.logoContainer]: isCollapsed,
+              [classes.navLinkItem]: !isCollapsed,
             })}
             aria-label="Akamai - Dashboard"
             onClick={closeMenu}
@@ -352,10 +372,10 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
                 },
                 classes.logo
               )}
-              width={128}
+              width={83}
             />
           </Link>
-        </div>
+        </Box>
       </Grid>
       <div
         className={cx({
@@ -371,9 +391,11 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
           return (
             <div key={idx}>
               <Divider
+                spacingTop={
+                  _isManagedAccount ? (idx === 0 ? 0 : 11) : idx === 1 ? 0 : 11
+                }
                 className={classes.divider}
-                spacingBottom={12}
-                spacingTop={12}
+                spacingBottom={11}
               />
               {filteredLinks.map((thisLink) => {
                 const props = {
@@ -469,12 +491,16 @@ const PrimaryLink = React.memo((props: PrimaryLinkProps) => {
           {icon}
         </div>
       )}
-      <p
+      <Box
         className={cx({
           [classes.linkItem]: true,
           hiddenWhenCollapsed: isCollapsed,
           primaryNavLink: true,
         })}
+        sx={{
+          justifyContent: 'space-between',
+          width: '100%',
+        }}
       >
         {display}
         {isBeta ? (
@@ -486,19 +512,19 @@ const PrimaryLink = React.memo((props: PrimaryLinkProps) => {
             component="span"
           />
         ) : null}
-      </p>
+      </Box>
     </Link>
   );
 });
 
-interface PrefetchPrimaryLinkProps {
+interface PrefetchPrimaryLinkProps extends PrimaryLinkProps {
   prefetchRequestCondition: boolean;
   prefetchRequestFn: () => void;
 }
 
 // Wrapper around PrimaryLink that includes the usePrefetchHook.
 export const PrefetchPrimaryLink = React.memo(
-  (props: PrimaryLinkProps & PrefetchPrimaryLinkProps) => {
+  (props: PrefetchPrimaryLinkProps) => {
     const { cancelRequest, makeRequest } = usePrefetch(
       props.prefetchRequestFn,
       props.prefetchRequestCondition
