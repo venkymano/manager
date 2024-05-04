@@ -10,6 +10,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import React from 'react';
 
 import { CircleProgress } from 'src/components/CircleProgress';
+import { useFlags } from 'src/hooks/useFlags';
 import { useCloudViewMetricsQuery } from 'src/queries/cloudview/metrics';
 import { useProfile } from 'src/queries/profile';
 import { isToday as _isToday } from 'src/utilities/isToday';
@@ -30,6 +31,10 @@ export interface CloudViewWidgetProperties {
   globalFilters?: FiltersObject; // this is dashboard level global filters, its also optional
   // any change in the current widget, call and pass this function and handle in parent component
   handleWidgetChange: (widget: Widgets) => void;
+  instances: {
+    key: string;
+    value: string;
+  }[];
   metricDefinition: MetricDefinitions;
 
   unit: string; // this should come from dashboard, which maintains map for service types in a separate API call
@@ -51,6 +56,8 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
   const [widget, setWidget] = React.useState<Widgets>({ ...props.widget }); // any change in agg_functions, step, group_by, will be published to dashboard component for save
 
   const theme = useTheme();
+
+  const flags = useFlags();
 
   // const getShowToday = () => {
   //   if (props.globalFilters) {
@@ -102,6 +109,51 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
       : '';
   };
 
+  const mapInstanceIdToName = (id: string) => {
+    if (!props.instances || props.instances.length == 0) {
+      return id;
+    }
+    const results = props.instances.filter(
+      (instanceObj) => instanceObj.key == id
+    );
+
+    if (results.length > 0) {
+      return results[0].value;
+    }
+
+    return id;
+  };
+
+  const getLabelName = (metric: any, serviceType: string) => {
+    flags.cloudPulseResourceTypeMap = [
+      {
+        metricKey: 'LINODE_ID',
+        serviceName: 'linode',
+      },
+    ];
+    if (Object.keys(metric).length == 0) {
+      return props.widget.label + ' (' + props.widget.unit + ')';
+    }
+
+    metric.state = 'venkat';
+
+    const results = flags.cloudPulseResourceTypeMap?.filter(
+      (obj) => obj.serviceName == serviceType
+    );
+
+    const flag = results && results.length > 0 ? results[0] : undefined;
+    let labelName = '';
+    Object.keys(metric).forEach((key) => {
+      if (flag && key == flag.metricKey) {
+        labelName = labelName + metric[flag.metricKey] + '_';
+      } else {
+        labelName = labelName + metric[key] + '_';
+      }
+    });
+
+    return labelName.slice(0, -1);
+  };
+
   const {
     data: metricsList,
     isLoading,
@@ -147,9 +199,7 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
             props.globalFilters?.timeRange.start,
             props.globalFilters?.timeRange.end
           ),
-          label: graphData.metric.LINODE_ID
-            ? graphData.metric.LINODE_ID
-            : props.widget.label + ' (' + props.widget.unit + ')',
+          label: getLabelName(graphData.metric, props.widget.service_type),
         };
 
         // construct a legend row with the dimension

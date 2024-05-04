@@ -42,12 +42,18 @@ interface PlacementGroupsFlag {
   enabled: boolean;
 }
 
+interface CloudPulseResourceTypeMap {
+  metricKey: string;
+  serviceName: string;
+}
+
 type OneClickApp = Record<string, string>;
 
 export interface Flags {
   aclb: boolean;
   aclbFullCreateFlow: boolean;
   apiMaintenance: APIMaintenance;
+  cloudPulseResourceTypeMap: CloudPulseResourceTypeMap[];
   cloudView: boolean;
   databaseBeta: boolean;
   databaseResize: boolean;
