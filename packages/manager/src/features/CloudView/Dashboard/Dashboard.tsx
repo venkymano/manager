@@ -1,4 +1,10 @@
-import { Dashboard, GetJWETokenPayload, Widgets } from '@linode/api-v4';
+import {
+  Dashboard,
+  GetJWETokenPayload,
+  TimeDuration,
+  TimeGranularity,
+  Widgets,
+} from '@linode/api-v4';
 import { Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -6,55 +12,39 @@ import * as React from 'react';
 
 import CloudViewIcon from 'src/assets/icons/entityIcons/cv_overview.svg';
 import { Placeholder } from 'src/components/Placeholder/Placeholder';
+import { WithStartAndEnd } from 'src/features/Longview/request.types';
 import { useCloudViewJWEtokenQuery } from 'src/queries/cloudview/dashboards';
-import {
-  useLinodeResourcesQuery,
-  useLoadBalancerResourcesQuery,
-} from 'src/queries/cloudview/resources';
+import { useResourcesQuery } from 'src/queries/cloudview/resources';
 
 import { FiltersObject } from '../Models/GlobalFilterProperties';
 import {
   CloudViewWidget,
   CloudViewWidgetProperties,
 } from '../Widget/CloudViewWidget';
+import { getResourceIDsPayload } from '../Widget/Utils/CloudPulseUtils';
 
 export interface DashboardProperties {
-  dashbaord: Dashboard; // this will be done in upcoming sprint
-  dashboardFilters: FiltersObject;
-
+  dashbaord: Dashboard; // this will be done in upcoming sprint, from dashboard to dashboard id
+  duration: TimeDuration;
   // on any change in dashboard
-  onDashboardChange: (dashboard: Dashboard) => void;
+  onDashboardChange?: (dashboard: Dashboard) => void;
+  resource: string[];
+  step?: TimeGranularity; // will be moved to widget level
 }
 
 export const CloudPulseDashboard = (props: DashboardProperties) => {
-  const resourceOptions: any = {};
-
-  // returns a list of resource IDs to be passed as part of getJWEToken call
-  const getResourceIDsPayload = () => {
-    const jweTokenPayload: GetJWETokenPayload = {
-      resource_id: [],
-    };
-    jweTokenPayload.resource_id = resourceOptions[
-      props?.dashbaord?.service_type
-    ]?.data?.map((resource: any) => resource.id);
-    return jweTokenPayload;
-  };
-
-  ({ data: resourceOptions['linode'] } = useLinodeResourcesQuery(
-    props?.dashbaord?.service_type === 'linode'
-  ));
-
-  ({ data: resourceOptions['aclb'] } = useLoadBalancerResourcesQuery(
-    props?.dashbaord?.service_type === 'aclb'
-  ));
-
-  const { data: jweToken, isError, isSuccess } = useCloudViewJWEtokenQuery(
-    props?.dashbaord?.service_type,
-    getResourceIDsPayload(),
-    resourceOptions[props?.dashbaord?.service_type] ? true : false
+  const { data: resources } = useResourcesQuery(
+    props?.dashbaord?.service_type != undefined,
+    {},
+    {},
+    props?.dashbaord?.service_type
   );
 
-  // todo define a proper properties class
+  const { data: jweToken, isError } = useCloudViewJWEtokenQuery(
+    props?.dashbaord?.service_type,
+    getResourceIDsPayload(resources),
+    resources?.data ? true : false
+  );
 
   const [
     cloudViewGraphProperties,
@@ -67,10 +57,10 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
     // set as dashboard filter
     setCloudViewGraphProperties({
       ...cloudViewGraphProperties,
-      globalFilters: props.dashboardFilters,
+      globalFilters: constructGlobalFilterConstraint(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.dashboardFilters]); // execute every time when there is dashboardFilters change
+  }, [props.duration, props.resource, props.step]); // execute every time when there is dashboardFilters change
 
   const StyledErrorState = styled(Placeholder, {
     label: 'StyledErrorState',
@@ -86,10 +76,18 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
     );
   }
 
+  const constructGlobalFilterConstraint = () => {
+    const filter = {} as FiltersObject;
+    filter.duration = props.duration;
+    filter.resource = props.resource;
+    filter.step = props.step;
+    return filter;
+  };
+
   const getCloudViewGraphProperties = (widget: Widgets) => {
     const graphProp: CloudViewWidgetProperties = {} as CloudViewWidgetProperties;
     graphProp.widget = { ...widget };
-    graphProp.globalFilters = props.dashboardFilters;
+    graphProp.globalFilters = constructGlobalFilterConstraint();
     graphProp.unit = widget.unit ? widget.unit : '%';
     graphProp.ariaLabel = widget.label;
     graphProp.errorLabel = 'Error While loading data';
@@ -98,6 +96,10 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
   };
 
   const handleWidgetChange = (widget: Widgets) => {
+    if (!props.onDashboardChange) {
+      // service owners might not use this, so undefined check is needed here
+      return;
+    }
     const dashboard = { ...props.dashbaord };
 
     const index = dashboard.widgets.findIndex(
@@ -114,7 +116,6 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
     if (props.dashbaord != undefined) {
       if (
         props.dashbaord?.service_type &&
-        cloudViewGraphProperties.globalFilters?.region &&
         cloudViewGraphProperties.globalFilters?.resource &&
         cloudViewGraphProperties.globalFilters?.resource.length > 0 &&
         jweToken?.token
@@ -129,6 +130,7 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
                     {...getCloudViewGraphProperties(element)}
                     authToken={jweToken?.token}
                     handleWidgetChange={handleWidgetChange}
+                    resources={resources!.data!}
                     useColorIndex={colorIndex++} // todo, remove the color index
                   />
                 );
@@ -139,28 +141,23 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
           </Grid>
         );
       } else {
-        return (
-          <Paper>
-            <StyledPlaceholder
-              icon={CloudViewIcon}
-              subtitle="Select Service Type, Region and Resource to visualize metrics"
-              title=""
-            />
-          </Paper>
+        return renderPlaceHolder(
+          'Select Service Type, Region and Resource to visualize metrics'
         );
       }
     } else {
-      return (
-        <Paper>
-          <StyledPlaceholder
-            subtitle="No visualizations are available at this moment.
-        Create Dashboards to list here."
-            icon={CloudViewIcon}
-            title=""
-          />
-        </Paper>
+      return renderPlaceHolder(
+        'No visualizations are available at this moment. Create Dashboards to list here.'
       );
     }
+  };
+
+  const renderPlaceHolder = (subtitle: string) => {
+    return (
+      <Paper>
+        <StyledPlaceholder icon={CloudViewIcon} subtitle={subtitle} title="" />
+      </Paper>
+    );
   };
 
   const StyledPlaceholder = styled(Placeholder, {

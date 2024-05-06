@@ -14,11 +14,15 @@ export const DashBoardLanding = () => {
   const updatedDashboard = React.useRef<Dashboard>();
 
   const handleGlobalFilterChange = (globalFilter: FiltersObject) => {
-    // set as dashboard filter
+    // set dashboard filters
+    dashboardProp.duration = globalFilter.duration!;
+    dashboardProp.resource = globalFilter.resource;
+    dashboardProp.step = globalFilter.step;
+
+    // update the state
     setDashboardProp({
       ...dashboardProp,
       dashbaord: updatedDashboard.current!,
-      dashboardFilters: globalFilter,
     });
   };
 

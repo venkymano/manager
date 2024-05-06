@@ -5,7 +5,7 @@ import {
   Widgets,
 } from '@linode/api-v4';
 import { Paper } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import React from 'react';
 
@@ -21,6 +21,7 @@ import { FiltersObject } from '../Models/GlobalFilterProperties';
 import { CloudViewLineGraph } from './CloudViewLineGraph';
 import { ZoomIcon } from './Components/Zoomer';
 import { seriesDataFormatter } from './Formatters/CloudViewFormatter';
+import { getDimensionName } from './Utils/CloudPulseUtils';
 import { COLOR_MAP } from './Utils/WidgetColorPalettes';
 
 export interface CloudViewWidgetProperties {
@@ -31,12 +32,8 @@ export interface CloudViewWidgetProperties {
   globalFilters?: FiltersObject; // this is dashboard level global filters, its also optional
   // any change in the current widget, call and pass this function and handle in parent component
   handleWidgetChange: (widget: Widgets) => void;
-  instances: {
-    key: string;
-    value: string;
-  }[];
   metricDefinition: MetricDefinitions;
-
+  resources: any[]; // list of resources in a service type
   unit: string; // this should come from dashboard, which maintains map for service types in a separate API call
   useColorIndex?: number;
   widget: Widgets; // this comes from dashboard, has inbuilt metrics, agg_func,group_by,filters,gridsize etc , also helpful in publishing any changes
@@ -53,25 +50,11 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
 
   const [error, setError] = React.useState<boolean>(false);
 
+  const [today, setToday] = React.useState<boolean>(false);
+
   const [widget, setWidget] = React.useState<Widgets>({ ...props.widget }); // any change in agg_functions, step, group_by, will be published to dashboard component for save
 
-  const theme = useTheme();
-
   const flags = useFlags();
-
-  // const getShowToday = () => {
-  //   if (props.globalFilters) {
-  //     return (
-  //       (props.globalFilters?.timeRange.start -
-  //         props.globalFilters?.timeRange.end) /
-  //         3600 <=
-  //       24
-  //     );
-  //   } else {
-  //     // take from widgets itself
-  //     return false;
-  //   }
-  // };
 
   const getCloudViewMetricsRequest = (): CloudViewMetricsRequest => {
     const request = {} as CloudViewMetricsRequest;
@@ -89,12 +72,6 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     request.time_granularity = props.globalFilters
       ? props.globalFilters.step!
       : widget.time_granularity; // todo, move to widgets
-
-    // if (props.globalFilters) {
-    //   // this has been kept because for mocking data, we will remove this
-    //   request.startTime = props.globalFilters?.timeRange.start;
-    //   request.endTime = props.globalFilters?.timeRange.end;
-    // }
     return request;
   };
 
@@ -109,21 +86,6 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
       : '';
   };
 
-  const mapInstanceIdToName = (id: string) => {
-    if (!props.instances || props.instances.length == 0) {
-      return id;
-    }
-    const results = props.instances.filter(
-      (instanceObj) => instanceObj.key == id
-    );
-
-    if (results.length > 0) {
-      return results[0].value;
-    }
-
-    return id;
-  };
-
   const getLabelName = (metric: any, serviceType: string) => {
     flags.cloudPulseResourceTypeMap = [
       {
@@ -131,27 +93,20 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
         serviceName: 'linode',
       },
     ];
+
+    // aggregated metric, where metric keys will be 0
     if (Object.keys(metric).length == 0) {
+      // in this case retrurn widget label and unit
       return props.widget.label + ' (' + props.widget.unit + ')';
     }
-
-    metric.state = 'venkat';
 
     const results = flags.cloudPulseResourceTypeMap?.filter(
       (obj) => obj.serviceName == serviceType
     );
 
     const flag = results && results.length > 0 ? results[0] : undefined;
-    let labelName = '';
-    Object.keys(metric).forEach((key) => {
-      if (flag && key == flag.metricKey) {
-        labelName = labelName + metric[flag.metricKey] + '_';
-      } else {
-        labelName = labelName + metric[key] + '_';
-      }
-    });
 
-    return labelName.slice(0, -1);
+    return getDimensionName(metric, flag, props.resources);
   };
 
   const {
@@ -196,8 +151,8 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
           borderColor: color,
           data: seriesDataFormatter(
             graphData.values,
-            props.globalFilters?.timeRange.start,
-            props.globalFilters?.timeRange.end
+            graphData.values[0][0],
+            graphData.values[graphData.values.length - 1][0]
           ),
           label: getLabelName(graphData.metric, props.widget.service_type),
         };
@@ -212,6 +167,12 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
         legendRowsData.push(legendRow);
         dimensions.push(dimension);
         index = index + 1;
+        setToday(
+          _isToday(
+            graphData.values[0][0],
+            graphData.values[graphData.values.length - 1][0]
+          )
+        );
       });
 
       // chart dimensions
@@ -292,20 +253,13 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
                   : 'Error while rendering widget'
                 : undefined
             }
-            showToday={_isToday(
-              props.globalFilters?.timeRange.start
-                ? props.globalFilters.timeRange.start
-                : 0,
-              props.globalFilters?.timeRange.end
-                ? props.globalFilters.timeRange.end
-                : 0
-            )}
             ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
             data={data}
             gridSize={props.widget.size}
             legendRows={legendRows}
             loading={isLoading}
             nativeLegend={true}
+            showToday={today}
             subtitle={props.unit}
             timezone={timezone}
             title={props.widget.label}
