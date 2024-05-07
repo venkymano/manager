@@ -18,11 +18,11 @@ import { roundTo } from 'src/utilities/roundTo';
 import { getMetrics } from 'src/utilities/statMetrics';
 
 import { FiltersObject } from '../Models/GlobalFilterProperties';
+import { getDimensionName } from '../Utils/CloudPulseUtils';
+import { COLOR_MAP } from '../Utils/WidgetColorPalettes';
 import { CloudViewLineGraph } from './CloudViewLineGraph';
 import { ZoomIcon } from './Components/Zoomer';
 import { seriesDataFormatter } from './Formatters/CloudViewFormatter';
-import { getDimensionName } from './Utils/CloudPulseUtils';
-import { COLOR_MAP } from './Utils/WidgetColorPalettes';
 
 export interface CloudViewWidgetProperties {
   // we can try renaming this CloudViewWidget
@@ -35,7 +35,6 @@ export interface CloudViewWidgetProperties {
   metricDefinition: MetricDefinitions;
   resources: any[]; // list of resources in a service type
   unit: string; // this should come from dashboard, which maintains map for service types in a separate API call
-  useColorIndex?: number;
   widget: Widgets; // this comes from dashboard, has inbuilt metrics, agg_func,group_by,filters,gridsize etc , also helpful in publishing any changes
 }
 
@@ -79,8 +78,8 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     `${roundTo(value)} ${unit}`;
 
   const getServiceType = () => {
-    return props.widget.serviceType
-      ? props.widget.serviceType!
+    return props.widget.service_type
+      ? props.widget.service_type!
       : props.globalFilters
       ? props.globalFilters.serviceType
       : '';
@@ -137,7 +136,11 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     // for now we will use this guy, but once we decide how to work with coloring, it should be dynamic
     const colors: string[] = COLOR_MAP.get(props.widget.color)!;
 
-    if (status == 'success') {
+    if (
+      status == 'success' &&
+      metricsList.data &&
+      metricsList.data.result.length > 0
+    ) {
       let index = 0;
 
       metricsList.data.result.forEach((graphData) => {
@@ -189,7 +192,7 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, metricsList]);
 
-  if (isLoading || (status == 'success' && data.length == 0)) {
+  if (isLoading) {
     return (
       <Grid xs={widget.size}>
         <Paper style={{ height: '98%', width: '100%' }}>

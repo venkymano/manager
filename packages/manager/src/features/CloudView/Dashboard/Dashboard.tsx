@@ -1,6 +1,5 @@
 import {
   Dashboard,
-  GetJWETokenPayload,
   TimeDuration,
   TimeGranularity,
   Widgets,
@@ -12,7 +11,6 @@ import * as React from 'react';
 
 import CloudViewIcon from 'src/assets/icons/entityIcons/cv_overview.svg';
 import { Placeholder } from 'src/components/Placeholder/Placeholder';
-import { WithStartAndEnd } from 'src/features/Longview/request.types';
 import { useCloudViewJWEtokenQuery } from 'src/queries/cloudview/dashboards';
 import { useResourcesQuery } from 'src/queries/cloudview/resources';
 
@@ -21,12 +19,12 @@ import {
   CloudViewWidget,
   CloudViewWidgetProperties,
 } from '../Widget/CloudViewWidget';
-import { getResourceIDsPayload } from '../Widget/Utils/CloudPulseUtils';
+import { getResourceIDsPayload } from '../Utils/CloudPulseUtils';
 
 export interface DashboardProperties {
   dashbaord: Dashboard; // this will be done in upcoming sprint, from dashboard to dashboard id
   duration: TimeDuration;
-  // on any change in dashboard
+  // on any change in dashboard, this is optional
   onDashboardChange?: (dashboard: Dashboard) => void;
   resource: string[];
   step?: TimeGranularity; // will be moved to widget level
@@ -112,13 +110,13 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
   };
 
   const RenderWidgets = () => {
-    let colorIndex = 0;
     if (props.dashbaord != undefined) {
       if (
         props.dashbaord?.service_type &&
         cloudViewGraphProperties.globalFilters?.resource &&
         cloudViewGraphProperties.globalFilters?.resource.length > 0 &&
-        jweToken?.token
+        jweToken?.token &&
+        resources?.data
       ) {
         return (
           <Grid columnSpacing={1.5} container rowSpacing={0} spacing={2}>
@@ -130,8 +128,7 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
                     {...getCloudViewGraphProperties(element)}
                     authToken={jweToken?.token}
                     handleWidgetChange={handleWidgetChange}
-                    resources={resources!.data!}
-                    useColorIndex={colorIndex++} // todo, remove the color index
+                    resources={resources.data}
                   />
                 );
               } else {
