@@ -18,7 +18,10 @@ import { roundTo } from 'src/utilities/roundTo';
 import { getMetrics } from 'src/utilities/statMetrics';
 
 import { FiltersObject } from '../Models/GlobalFilterProperties';
-import { getDimensionName } from '../Utils/CloudPulseUtils';
+import {
+  convertTimeDurationToStartAndEndTimeRange,
+  getDimensionName,
+} from '../Utils/CloudPulseUtils';
 import { COLOR_MAP } from '../Utils/WidgetColorPalettes';
 import { CloudViewLineGraph } from './CloudViewLineGraph';
 import { ZoomIcon } from './Components/Zoomer';
@@ -149,13 +152,16 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
           return;
         }
         const color = colors[index];
+        const startEnd = convertTimeDurationToStartAndEndTimeRange(
+          props.globalFilters!.duration!
+        );
         const dimension = {
           backgroundColor: color,
           borderColor: color,
           data: seriesDataFormatter(
             graphData.values,
-            graphData.values[0][0],
-            graphData.values[graphData.values.length - 1][0]
+            startEnd.start,
+            startEnd.end
           ),
           label: getLabelName(graphData.metric, props.widget.service_type),
         };
@@ -170,12 +176,7 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
         legendRowsData.push(legendRow);
         dimensions.push(dimension);
         index = index + 1;
-        setToday(
-          _isToday(
-            graphData.values[0][0],
-            graphData.values[graphData.values.length - 1][0]
-          )
-        );
+        setToday(_isToday(startEnd.start, startEnd.end));
       });
 
       // chart dimensions

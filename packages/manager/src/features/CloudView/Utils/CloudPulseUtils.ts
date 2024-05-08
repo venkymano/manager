@@ -1,4 +1,6 @@
-import { GetJWETokenPayload } from '@linode/api-v4';
+import { GetJWETokenPayload, TimeDuration } from '@linode/api-v4';
+
+import { WithStartAndEnd } from 'src/features/Longview/request.types';
 
 export const mapResourceIdToName = (id: string, resources: any[]) => {
   if (!resources || resources.length == 0) {
@@ -19,6 +21,8 @@ export const mapResourceIdToName = (id: string, resources: any[]) => {
 
 export const getDimensionName = (metric: any, flag: any, resources: any[]) => {
   let labelName = '';
+  metric.state = 'test'
+  metric.anyKey = 'tester'
   Object.keys(metric).forEach((key) => {
     if (flag && key == flag.metricKey) {
       const mappedName = mapResourceIdToName(metric[flag.metricKey], resources);
@@ -49,4 +53,25 @@ export const getResourceIDsPayload = (resources: any) => {
     );
   }
   return jweTokenPayload;
+};
+
+export const convertTimeDurationToStartAndEndTimeRange = (
+  timeDuration: TimeDuration
+) => {
+  const startEnd: WithStartAndEnd = { end: 0, start: 0 };
+  const nowInSeconds = Date.now() / 1000;
+  startEnd.end = nowInSeconds;
+  if (timeDuration.unit == 'hr') {
+    startEnd.start = nowInSeconds - timeDuration.value * 60 * 60;
+  }
+
+  if (timeDuration.unit == 'min') {
+    startEnd.start = nowInSeconds - timeDuration.value * 60;
+  }
+
+  if (timeDuration.unit == 'day') {
+    startEnd.start = nowInSeconds - timeDuration.value * 24 * 60 * 60;
+  }
+
+  return startEnd;
 };

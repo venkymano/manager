@@ -48,7 +48,6 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
     globalFilters.interval = selectedInterval!;
     globalFilters.resource = selectedResourceId;
     globalFilters.serviceType = selectedService!;
-    globalFilters.timeRange = time;
     globalFilters.step = apiGranularity;
     globalFilters.duration = apiTimeDuration;
     props.handleAnyFilterChange(globalFilters);

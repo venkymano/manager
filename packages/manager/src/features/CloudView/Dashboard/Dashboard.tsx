@@ -11,15 +11,19 @@ import * as React from 'react';
 
 import CloudViewIcon from 'src/assets/icons/entityIcons/cv_overview.svg';
 import { Placeholder } from 'src/components/Placeholder/Placeholder';
+import { WithStartAndEnd } from 'src/features/Longview/request.types';
 import { useCloudViewJWEtokenQuery } from 'src/queries/cloudview/dashboards';
 import { useResourcesQuery } from 'src/queries/cloudview/resources';
 
 import { FiltersObject } from '../Models/GlobalFilterProperties';
 import {
+  convertTimeDurationToStartAndEndTimeRange,
+  getResourceIDsPayload,
+} from '../Utils/CloudPulseUtils';
+import {
   CloudViewWidget,
   CloudViewWidgetProperties,
 } from '../Widget/CloudViewWidget';
-import { getResourceIDsPayload } from '../Utils/CloudPulseUtils';
 
 export interface DashboardProperties {
   dashbaord: Dashboard; // this will be done in upcoming sprint, from dashboard to dashboard id
@@ -31,6 +35,18 @@ export interface DashboardProperties {
 }
 
 export const CloudPulseDashboard = (props: DashboardProperties) => {
+  const StyledErrorState = styled(Placeholder, {
+    label: 'StyledErrorState',
+  })({
+    height: '100%',
+  });
+
+  const StyledPlaceholder = styled(Placeholder, {
+    label: 'StyledPlaceholder',
+  })({
+    flex: 'auto',
+  });
+
   const { data: resources } = useResourcesQuery(
     props?.dashbaord?.service_type != undefined,
     {},
@@ -59,12 +75,6 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.duration, props.resource, props.step]); // execute every time when there is dashboardFilters change
-
-  const StyledErrorState = styled(Placeholder, {
-    label: 'StyledErrorState',
-  })({
-    height: '100%',
-  });
 
   if (isError) {
     return (
@@ -156,12 +166,6 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
       </Paper>
     );
   };
-
-  const StyledPlaceholder = styled(Placeholder, {
-    label: 'StyledPlaceholder',
-  })({
-    flex: 'auto',
-  });
 
   return <RenderWidgets />;
 };
