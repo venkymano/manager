@@ -137,13 +137,13 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
       : '';
   };
 
-  const getWidgetPrefrences = (currentWidgetPrefs: any) => {
+  const getWidgetPrefrences = (currentWidgetPrefs: any, sizest: number) => {
     if (!currentWidgetPrefs) return [];
     console.log("widget prefs", currentWidgetPrefs);
     let tempWidgets = currentWidgetPrefs.filter((obj: any) => obj.label!=widget.label);
     tempWidgets.push({
       label: widget.label,
-      size: widget.size
+      size: sizest
     });
     console.log("tempwidgets",tempWidgets);
     return tempWidgets;
@@ -250,7 +250,9 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     setWidget((widget) => {
       return { ...widget, size: zoomInValue ? 12 : 6 };
     });
-    aclpWidgetPreferenceRef.current = getWidgetPrefrences(aclpWidgetPreferenceRef.current);
+    aclpWidgetPreferenceRef.current = getWidgetPrefrences(aclpWidgetPreferenceRef.current.current, 
+      zoomInValue ? 12 : 6 
+    );
     handleAclpPreferenceChange();
   };
 
