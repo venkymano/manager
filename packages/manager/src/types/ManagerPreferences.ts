@@ -1,5 +1,6 @@
 import { UserPreferences } from '@linode/api-v4';
 
+import { AclpConfig, AclpPreference } from 'src/features/CloudView/Models/UserPreferences';
 import { ThemeChoice } from 'src/utilities/theme';
 
 import type { Order } from 'src/hooks/useOrder';
@@ -17,6 +18,7 @@ export interface DismissedNotification {
 }
 
 export interface ManagerPreferences extends UserPreferences {
+  aclpPreference: AclpPreference;
   backups_cta_dismissed?: boolean;
   desktop_sidebar_open?: boolean;
   dismissed_notifications?: Record<string, DismissedNotification>;
