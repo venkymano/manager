@@ -17,10 +17,12 @@ import {
   CloudViewWidget,
   CloudViewWidgetProperties,
 } from '../Widget/CloudViewWidget';
+import { AclpWidgetPreferences } from '../Models/UserPreferences';
 
 export interface DashboardProperties {
   dashbaord: Dashboard; // this will be done in upcoming sprint
   dashboardFilters: FiltersObject;
+  widgetPreferences: AclpWidgetPreferences[]
 
   // on any change in dashboard
   onDashboardChange: (dashboard: Dashboard) => void;
@@ -63,6 +65,20 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
     {} as CloudViewWidgetProperties
   );
 
+  // React.useEffect(()=>{
+  //     if(props.widgetPreferences){
+  //       props.dashbaord?.widgets?.forEach((widget)=>{
+  //           const updatedWidget = {...widget};
+  //           const prefWidget = props?.widgetPreferences?.find((element)=> element.label === updatedWidget.label )
+
+  //           if(prefWidget){
+  //             updatedWidget.size = prefWidget.size;
+  //             handleWidgetChange(updatedWidget);
+  //           }
+  //       });
+  //     }
+  // }, [props.widgetPreferences, props.dashbaord?.widgets])
+
   React.useEffect(() => {
     // set as dashboard filter
     setCloudViewGraphProperties({
@@ -89,6 +105,12 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
   const getCloudViewGraphProperties = (widget: Widgets) => {
     const graphProp: CloudViewWidgetProperties = {} as CloudViewWidgetProperties;
     graphProp.widget = { ...widget };
+
+    const widgetPref  = props.widgetPreferences?.find((element) => element.label === graphProp.widget.label);
+    if(widgetPref){
+      graphProp.widget.size = widgetPref.size;
+    }
+
     graphProp.globalFilters = props.dashboardFilters;
     graphProp.unit = widget.unit ? widget.unit : '%';
     graphProp.ariaLabel = widget.label;
@@ -122,7 +144,7 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
         return (
           <Grid columnSpacing={1.5} container rowSpacing={0} spacing={2}>
             {props.dashbaord.widgets.map((element, index) => {
-              if (element && element != undefined) {
+              if (element) {
                 return (
                   <CloudViewWidget
                     key={index}

@@ -48,7 +48,7 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
     is a valid time window.
   */
   const [selectedTimeRange, setTimeRange] = React.useState<Labels>(
-    'Past 30 Minutes'
+    defaultValue ?? 'Past 30 Minutes'
   );
 
   const [apiTimeDuration, setApiTimeDuration] = React.useState<TimeDuration>({
