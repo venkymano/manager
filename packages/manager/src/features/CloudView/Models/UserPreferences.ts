@@ -5,8 +5,8 @@ export interface AclpPreference {
 export interface AclpConfig {
   aggregation_interval: string;
   dashboard_id: number;
-  region_id: string;
-  resources_ids: number[];
+  region: string;
+  resources: string[];
   time_duration: string;
   widgets: AclpWidgetPreferences[];
 }

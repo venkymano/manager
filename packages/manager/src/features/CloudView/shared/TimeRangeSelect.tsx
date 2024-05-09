@@ -15,7 +15,8 @@ interface Props
   handleStatsChange?: (
     start: number,
     end: number,
-    timeDuration: TimeDuration
+    timeDuration: TimeDuration,
+    timeRangeLabel: string
   ) => void;
 }
 
@@ -70,10 +71,11 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
     // (in most cases the consumer has passed defaultValue={'last 30 minutes'}
     // but the calcs to turn that into start/end numbers live here)
     if (!!handleStatsChange) {
-      handleStatsChange(        
+      handleStatsChange(
         Math.round(generateStartTime(selectedTimeRange, nowInSeconds)),
         Math.round(nowInSeconds),
-        apiTimeDuration
+        apiTimeDuration,
+        selectedTimeRange
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

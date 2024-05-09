@@ -29,6 +29,11 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
 
   const [apiTimeDuration, setApiTimeDuration] = React.useState<TimeDuration>();
 
+  const [
+    apiTimeDurationLabel,
+    setApiTimeDurationLabel,
+  ] = React.useState<string>();
+
   const [selectedRegion, setRegion] = React.useState<string>();
 
   const [selectedResourceId, setResourceId] = React.useState<any>();
@@ -51,10 +56,12 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
     globalFilters.timeRange = time;
     globalFilters.step = apiGranularity;
     globalFilters.duration = apiTimeDuration;
+    globalFilters.timeRangeLabel = apiTimeDurationLabel!;
     props.handleAnyFilterChange(globalFilters);
   };
 
   React.useEffect(() => {
+    console.log(props.aclpPreferences);
     emitGlobalFilterChange();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -73,10 +80,12 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
   const handleTimeRangeChange = (
     start: number,
     end: number,
-    timeDuration?: TimeDuration
+    timeDuration?: TimeDuration,
+    timeRangeLabel: string
   ) => {
     console.log('TimeRange: ', start, end);
     setTimeBox({ end, start });
+    setApiTimeDurationLabel(timeRangeLabel);
     if (timeDuration) {
       setApiTimeDuration(timeDuration);
     }
@@ -102,6 +111,7 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
     console.log('Selected Dashboard: ', dashboard);
     setDashboard(dashboard);
     setService(dashboard?.service_type);
+    setRegion(undefined);
   };
 
   const convertIntervalToGranularity = (interval: string | undefined) => {
