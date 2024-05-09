@@ -51,9 +51,9 @@ export const CloudViewMultiResourceSelect = (
     props.resourceType === 'aclb'
   ));
 
-  const prefResourceIds = JSON.parse(localStorage.getItem('resources')!).map(
+  const prefResourceIds = localStorage.getItem('resources') ? JSON.parse(localStorage.getItem('resources')!).map(
     (resource: any) => resource.id
-  );
+  ): [];
   const getPreferredResources = () => {
     const preferredResources = getResourceList().filter((resource: any) =>
       prefResourceIds?.includes(resource.id)

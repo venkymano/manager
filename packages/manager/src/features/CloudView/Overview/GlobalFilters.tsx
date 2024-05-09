@@ -142,13 +142,13 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
         <Grid sx={{ width: 300 }}>
           <CloudViewDashboardSelect
             handleDashboardChange={handleDashboardChange}
-            preferredOption={1}
+            preferredOption={props.aclpPreferences?.aclp_config.dashboard_id}
           />
         </Grid>
         <Grid sx={{ marginLeft: 2, width: 200 }}>
           <StyledCloudViewRegionSelect
             handleRegionChange={handleRegionChange}
-            preferredRegionId={'us-east'}
+            preferredRegionId={props.aclpPreferences?.aclp_config.region}
           />
         </Grid>
         <Grid sx={{ marginLeft: 3, width: 450 }}>

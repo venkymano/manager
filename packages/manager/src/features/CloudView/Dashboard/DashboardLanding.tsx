@@ -23,7 +23,7 @@ export const DashBoardLanding = () => {
     preferences && preferences.aclpPreference
       ? JSON.parse(JSON.stringify(preferences.aclpPreference))
       : undefined!
-  ); 
+  );
 
   const updatedDashboard = React.useRef<Dashboard>();
 
@@ -33,13 +33,13 @@ export const DashBoardLanding = () => {
     if (
       aclpPreference != undefined &&
       JSON.stringify(aclpPreference.aclp_config) != '{}'
-      ) {
+    ) {
       refetchPreferences()
         .then(({ data: response }) => response ?? Promise.reject())
         .then((response) => {
           updatePreferences({
             ...response,
-            aclpPreference: aclpPreference
+            aclpPreference: aclpPreference,
           });
         })
         .catch();
@@ -55,12 +55,16 @@ export const DashBoardLanding = () => {
     });
 
     // set updated preferences
-    setAclpPreference({...constructDashboardPreference(globalFilter)});
+    setAclpPreference({ ...constructDashboardPreference(globalFilter) });
   };
 
   const handleDashboardChange = (dashboard: Dashboard) => {
     setDashboardProp({ ...dashboardProp, dashbaord: dashboard });
     updatedDashboard.current = { ...dashboard };
+    if (dashboard) {
+    const aclpPref = { ...aclpPreference };
+    aclpPref.aclp_config.dashboard_id = dashboard.id;
+    setAclpPreference({ ...aclpPref });}
   };
 
   const constructDashboardPreference = (globalFilter: FiltersObject) => {
@@ -116,11 +120,9 @@ export const DashBoardLanding = () => {
     updatedDashboard.current = { ...dashboardObj };
 
     if (aclpPreference) {
-      const newCopyPref = {...aclpPreference};
-      let newWidgets = {...newCopyPref.aclp_config.widgets};
-      newWidgets = [
-        ...constructWidgetsPreference({ ...dashboardObj }),
-      ];
+      const newCopyPref = { ...aclpPreference };
+      let newWidgets = { ...newCopyPref.aclp_config.widgets };
+      newWidgets = [...constructWidgetsPreference({ ...dashboardObj })];
       newCopyPref.aclp_config.widgets = [...newWidgets];
       // setAclpPreference({...newCopyPref});
     } else {
