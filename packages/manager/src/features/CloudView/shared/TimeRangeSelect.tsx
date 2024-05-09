@@ -52,10 +52,31 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
     defaultValue ?? 'Past 30 Minutes'
   );
 
-  const [apiTimeDuration, setApiTimeDuration] = React.useState<TimeDuration>({
-    unit: 'min',
-    value: 30,
-  });
+  const getTimeDurationFromTimeRange = (label: string) => {
+    if (label == _PAST_30_MINUTES) {
+      return { unit: 'min', value: 30 };
+    }
+
+    if (label == _PAST_24_HOURS) {
+      return { unit: 'hr', value: 24 };
+    }
+
+    if (label == _PAST_12_HOURS) {
+      return { unit: 'hr', value: 12 };
+    }
+
+    if (label == _PAST_7_DAYS) {
+      return { unit: 'day', value: 7 };
+    }
+
+    if (label == _PAST_30_DAYS) {
+      return { unit: 'day', value: 30 };
+    }
+  };
+
+  const [apiTimeDuration, setApiTimeDuration] = React.useState<TimeDuration>(
+    getTimeDurationFromTimeRange(defaultValue!)!
+  );
 
   /*
     Why division by 1000?

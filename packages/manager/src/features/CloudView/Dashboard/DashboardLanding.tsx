@@ -23,8 +23,7 @@ export const DashBoardLanding = () => {
     preferences && preferences.aclpPreference
       ? JSON.parse(JSON.stringify(preferences.aclpPreference))
       : undefined!
-  );
-  console.log("initial api pref",preferences.aclpPreference); // this is the initial preferences
+  ); 
 
   const updatedDashboard = React.useRef<Dashboard>();
 

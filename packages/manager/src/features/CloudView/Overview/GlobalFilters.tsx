@@ -170,7 +170,7 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
         </Grid>
         <Grid sx={{ marginLeft: 12, width: 250 }}>
           <StyledCloudViewTimeRangeSelect
-            defaultValue={'Past 30 Minutes'}
+            defaultValue={props.aclpPreferences?.aclp_config.time_duration}
             handleStatsChange={handleTimeRangeChange}
             hideLabel
             label="Select Time Range"
