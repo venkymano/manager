@@ -1,6 +1,6 @@
 import { UserPreferences } from '@linode/api-v4';
 
-import { AclpConfig, AclpPreference } from 'src/features/CloudView/Models/UserPreferences';
+import { AclpConfig, AclpPreference, AclpWidgetPreferences } from 'src/features/CloudView/Models/UserPreferences';
 import { ThemeChoice } from 'src/utilities/theme';
 
 import type { Order } from 'src/hooks/useOrder';
@@ -36,4 +36,5 @@ export interface ManagerPreferences extends UserPreferences {
   theme?: ThemeChoice;
   type_to_confirm?: boolean;
   volumes_group_by_tag?: boolean;
+  aclpWidgetPreferences: AclpWidgetPreferences[];
 }

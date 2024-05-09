@@ -29,7 +29,7 @@ export const CloudViewIntervalSelect = React.memo(
       },
     ];
 
-    const defaultValue = intervalOptions.find((interval, index) => interval.label===props.defaultValue)
+    const defaultValue = intervalOptions.find((interval, index) => interval.value===props.defaultValue)
 
     const [selectedInterval, setInterval] = React.useState<string>(defaultValue?.value ?? '1minute');
 

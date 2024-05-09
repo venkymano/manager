@@ -17,12 +17,13 @@ export const DashBoardLanding = () => {
     {} as DashboardProperties
   );
 
-  const [aclpPreference, setAclpPreference] = React.useState<AclpPreference>(
-    undefined!
-  );
-
   const { data: preferences, refetch: refetchPreferences } = usePreferences();
   const { mutateAsync: updatePreferences } = useMutatePreferences();
+  const [aclpPreference, setAclpPreference] = React.useState<AclpPreference>(
+    preferences && preferences.aclpPreference
+      ? JSON.parse(JSON.stringify(preferences.aclpPreference))
+      : undefined!
+  );
   console.log("initial api pref",preferences.aclpPreference); // this is the initial preferences
 
   const updatedDashboard = React.useRef<Dashboard>();
@@ -55,36 +56,12 @@ export const DashBoardLanding = () => {
     });
 
     // set updated preferences
-    setAclpPreference(constructDashboardPreference(globalFilter));
+    setAclpPreference({...constructDashboardPreference(globalFilter)});
   };
 
   const handleDashboardChange = (dashboard: Dashboard) => {
     setDashboardProp({ ...dashboardProp, dashbaord: dashboard });
     updatedDashboard.current = { ...dashboard };
-
-    let aclpPreferencObj: AclpPreference = {} as AclpPreference;
-
-    if (aclpPreference) {
-      aclpPreferencObj = { ...aclpPreference };
-    }
-    // copy initial set of properties
-    if (dashboard) {
-      aclpPreferencObj.aclp_config.dashboard_id = dashboard.id;
-
-      const widgets: AclpWidgetPreferences[] = [];
-
-      const currentWidgets = updatedDashboard.current?.widgets;
-
-      if (currentWidgets) {
-        currentWidgets.forEach((widget) => {
-          widgets.push({ label: widget.label, size: widget.size });
-        });
-      }
-
-      aclpPreferencObj.aclp_config.widgets = [...widgets];
-
-      setAclpPreference({ ...aclpPreferencObj });
-    }
   };
 
   const constructDashboardPreference = (globalFilter: FiltersObject) => {
@@ -140,10 +117,13 @@ export const DashBoardLanding = () => {
     updatedDashboard.current = { ...dashboardObj };
 
     if (aclpPreference) {
-      aclpPreference!.aclp_config.widgets = [
+      const newCopyPref = {...aclpPreference};
+      let newWidgets = {...newCopyPref.aclp_config.widgets};
+      newWidgets = [
         ...constructWidgetsPreference({ ...dashboardObj }),
       ];
-      setAclpPreference(aclpPreference);
+      newCopyPref.aclp_config.widgets = [...newWidgets];
+      // setAclpPreference({...newCopyPref});
     } else {
       const newPreference =
         localStorage.getItem('aclp_config') != null &&
@@ -153,10 +133,12 @@ export const DashBoardLanding = () => {
       newPreference.aclp_config.widgets = constructWidgetsPreference({
         ...dashboardObj,
       });
-      setAclpPreference(newPreference);
+      // setAclpPreference(newPreference);
     }
   };
-
+  if (!preferences) {
+    return <></>;
+  }
   return (
     <>
       <Paper>

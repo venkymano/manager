@@ -160,6 +160,9 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
         <Grid sx={{ marginLeft: 5 }}>
           <StyledCloudViewIntervalSelect
             handleIntervalChange={handleIntervalChange}
+            defaultValue={
+              props.aclpPreferences?.aclp_config.aggregation_interval
+            }
           />
         </Grid>
         <Grid sx={{ marginLeft: 12, width: 250 }}>

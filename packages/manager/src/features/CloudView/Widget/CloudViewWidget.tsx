@@ -21,6 +21,8 @@ import { CloudViewLineGraph } from './CloudViewLineGraph';
 import { ZoomIcon } from './Components/Zoomer';
 import { seriesDataFormatter } from './Formatters/CloudViewFormatter';
 import { COLOR_MAP } from './Utils/WidgetColorPalettes';
+import { useMutatePreferences, usePreferences } from 'src/queries/preferences';
+import { AclpWidgetPreferences } from '../Models/UserPreferences';
 
 export interface CloudViewWidgetProperties {
   // we can try renaming this CloudViewWidget
@@ -38,6 +40,11 @@ export interface CloudViewWidgetProperties {
 }
 
 export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
+
+  const aclpWidgetPreferenceRef = React.useRef<AclpWidgetPreferences[]>();
+  const { data: preferences, refetch: refetchPreferences } = usePreferences();
+  const { mutateAsync: updatePreferences } = useMutatePreferences();
+
   const { data: profile } = useProfile();
 
   const timezone = profile?.timezone || 'US/Eastern';
@@ -51,6 +58,34 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
   const [widget, setWidget] = React.useState<Widgets>({ ...props.widget }); // any change in agg_functions, step, group_by, will be published to dashboard component for save
 
   const theme = useTheme();
+  React.useEffect(() => {
+    // localStorage.setItem('aclp_config', JSON.stringify(aclpPreference));
+    // Todo, make an API call
+    if (preferences && preferences.aclpWidgetPreferenceRef) {
+      aclpWidgetPreferenceRef.current = JSON.parse(
+        JSON.stringify(preferences.aclpWidgetPreferenceRef)
+      );
+    }
+  }, [preferences]);
+  const handleAclpPreferenceChange = () => {
+    // localStorage.setItem('aclp_config', JSON.stringify(aclpPreference));
+    // Todo, make an API call
+    if (
+      aclpWidgetPreferenceRef.current != undefined &&
+      (aclpWidgetPreferenceRef.current.length !=0)
+    ) {
+      refetchPreferences()
+        .then(({ data: response }) => response ?? Promise.reject())
+        .then((response) => {
+          updatePreferences({
+            ...response,
+            aclpWidgetPreferenceRef,
+          });
+        })
+        .catch();
+    }
+  };
+
 
   // const getShowToday = () => {
   //   if (props.globalFilters) {
@@ -102,6 +137,18 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
       : '';
   };
 
+  const getWidgetPrefrences = (currentWidgetPrefs: any) => {
+    if (!currentWidgetPrefs) return [];
+    console.log("widget prefs", currentWidgetPrefs);
+    let tempWidgets = currentWidgetPrefs.filter((obj: any) => obj.label!=widget.label);
+    tempWidgets.push({
+      label: widget.label,
+      size: widget.size
+    });
+    console.log("tempwidgets",tempWidgets);
+    return tempWidgets;
+  };
+
   const {
     data: metricsList,
     isLoading,
@@ -114,6 +161,15 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
   ); // fetch the metrics on any property change
 
   React.useEffect(() => {
+    // refetchPreferences()
+    //     .then(({ data: response }) => response ?? Promise.reject())
+    //     .then((response) => {
+    //       updatePreferences({
+    //         ...response,
+    //         aclpWidgetPreferenceRef,
+    //       });
+    //     })
+    //     .catch();
     // on any change in the widget object, just publish the changes to parent component using a callback function
     props.handleWidgetChange(widget);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -194,6 +250,8 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     setWidget((widget) => {
       return { ...widget, size: zoomInValue ? 12 : 6 };
     });
+    aclpWidgetPreferenceRef.current = getWidgetPrefrences(aclpWidgetPreferenceRef.current);
+    handleAclpPreferenceChange();
   };
 
   const handleAggregateFunctionChange = (aggregateValue: string) => {
@@ -216,6 +274,16 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     // todo, add implementation
   };
 
+  const getWidgetSize = () => {
+    if (preferences?.aclpWidgetPreferenceRef){
+      let index = preferences.aclpWidgetPreferenceRef.current.findIndex((obj) => obj.label == widget.label);
+      if (index > -1) {
+        return preferences.aclpWidgetPreferenceRef.current[index].size;
+      }
+    }
+    return widget.size;
+  };
+
   const StyledZoomIcon = styled(ZoomIcon, {
     label: 'StyledZoomIcon',
   })({
@@ -225,14 +293,17 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     marginTop: '10px',
   });
 
+  if (!preferences) {
+    return <></>;
+  }
   return (
-    <Grid xs={widget.size}>
+    <Grid xs={getWidgetSize()}>
       <Paper style={{ height: '98%', width: '100%' }}>
         {/* add further components like group by resource, aggregate_function, step here , for sample added zoom icon here*/}
         <div className={widget.metric} style={{ margin: '1%' }}>
           <StyledZoomIcon
             handleZoomToggle={handleZoomToggle}
-            zoomIn={widget.size == 12 ? true : false}
+            zoomIn={getWidgetSize() == 12 ? true : false}
           />
           <CloudViewLineGraph // rename where we have cloudview to cloudpulse
             error={
@@ -252,7 +323,7 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
             )}
             ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
             data={data}
-            gridSize={props.widget.size}
+            gridSize={getWidgetSize()}
             legendRows={legendRows}
             loading={isLoading}
             nativeLegend={true}
