@@ -10,19 +10,40 @@ import {
 } from '../Models/UserPreferences';
 import { GlobalFilters } from '../Overview/GlobalFilters';
 import { CloudPulseDashboard, DashboardProperties } from './Dashboard';
+import { useMutatePreferences, usePreferences } from 'src/queries/preferences';
 
 export const DashBoardLanding = () => {
   const [dashboardProp, setDashboardProp] = React.useState<DashboardProperties>(
     {} as DashboardProperties
   );
 
-  const [aclpPreference, setAclpPreference] = React.useState<AclpPreference>();
+  const [aclpPreference, setAclpPreference] = React.useState<AclpPreference>(
+    undefined!
+  );
+
+  const { data: preferences, refetch: refetchPreferences } = usePreferences();
+  const { mutateAsync: updatePreferences } = useMutatePreferences();
+  console.log("initial api pref",preferences.aclpPreference); // this is the initial preferences
 
   const updatedDashboard = React.useRef<Dashboard>();
 
   React.useEffect(() => {
     // localStorage.setItem('aclp_config', JSON.stringify(aclpPreference));
     // Todo, make an API call
+    if (
+      aclpPreference != undefined &&
+      JSON.stringify(aclpPreference.aclp_config) != '{}'
+      ) {
+      refetchPreferences()
+        .then(({ data: response }) => response ?? Promise.reject())
+        .then((response) => {
+          updatePreferences({
+            ...response,
+            aclpPreference: aclpPreference
+          });
+        })
+        .catch();
+    }
   }, [aclpPreference]);
 
   const handleGlobalFilterChange = (globalFilter: FiltersObject) => {

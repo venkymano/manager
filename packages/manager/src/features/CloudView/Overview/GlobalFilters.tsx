@@ -103,8 +103,9 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
   };
 
   const handleResourceChange = (resourceId: any[]) => {
+    if(resourceId && resourceId.length > 0) {
     console.log('Resource ID: ', resourceId);
-    setResourceId(resourceId.map((obj) => obj.id));
+    setResourceId(resourceId.map((obj) => obj.id));}
   };
 
   const handleDashboardChange = (dashboard: Dashboard | undefined) => {
