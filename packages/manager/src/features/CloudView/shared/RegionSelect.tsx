@@ -7,22 +7,24 @@ import { useRegionsQuery } from 'src/queries/regions';
 
 export interface CloudViewRegionSelectProps {
   handleRegionChange: (region: string | undefined) => void;
-  preferredRegionId?: string;
+  preferredRegionId?: any;
 }
 
 export const CloudViewRegionSelect = React.memo(
   (props: CloudViewRegionSelectProps) => {
+    console.log('region pref', props.preferredRegionId);
     const { data: regions, error, isLoading } = useRegionsQuery();
 
     const errorText: string = error ? 'Error loading regions' : '';
 
     const getPreferredRegion = () => {
+      const prefRegion = localStorage.getItem('region') ? JSON.parse(localStorage.getItem('region')!): undefined;
       console.log(regions);
       const preferredOption = regions?.find(
-        (region: any) => region?.id === props.preferredRegionId
+        (region: any) => region?.id === prefRegion
       );
-      if (props.preferredRegionId) {
-        props.handleRegionChange(preferredOption?.id);
+      if (prefRegion) {
+        props.handleRegionChange(prefRegion);
       }
       return preferredOption;
     };
@@ -50,6 +52,8 @@ export const CloudViewRegionSelect = React.memo(
       <RegionSelect
         handleSelection={(value) => {
           setRegion(value);
+          console.log('region pref select:', value);
+          localStorage.setItem('region', JSON.stringify(value));
         }}
         currentCapability={undefined}
         errorText={errorText}
@@ -59,6 +63,11 @@ export const CloudViewRegionSelect = React.memo(
         noMarginTop
         regions={regions ? regions : []}
         selectedId={getPreferredRegion()?.id}
+        // onChange={(_: any, value: any) => {
+        //   setRegion(value);
+        //   // console.log('resources:', resource);
+        //   localStorage.setItem('region', JSON.stringify(value));
+        // }}
       />
     );
   }

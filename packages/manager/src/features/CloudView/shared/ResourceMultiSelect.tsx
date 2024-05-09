@@ -58,7 +58,7 @@ export const CloudViewMultiResourceSelect = (
     const preferredResources = getResourceList().filter((resource: any) =>
       prefResourceIds?.includes(resource.id)
     );
-    // if (preferredResources) props.handleResourceChange(preferredResources);
+    // if (preferredResources) setResource([...preferredResources]);
     console.log(preferredResources);
     return preferredResources;
   };
@@ -98,10 +98,13 @@ export const CloudViewMultiResourceSelect = (
       }}
       onInputChange={(event, newInputValue) => {
         setResourceInputValue(newInputValue);
+        setResource(newInputValue);
+        // console.log('resources:', resource);
+        localStorage.setItem('resources', JSON.stringify(newInputValue));
       }}
       autoHighlight
       clearOnBlur
-      // defaultValue={getPreferredResources()}
+      // defaultValue={getResourceList()}
       disabled={props.disabled}
       inputValue={resourceInputValue}
       isOptionEqualToValue={(option, value) => option.label === value.label}
@@ -111,6 +114,11 @@ export const CloudViewMultiResourceSelect = (
       options={getResourceList()}
       placeholder="Select a resource"
       value={getPreferredResources()}
+      onMouseMove={() => {
+        // setResourceInputValue(newInputValue);
+        setResource(getPreferredResources());
+        // console.log('resources:', resource);
+      }}
     />
   );
 };
