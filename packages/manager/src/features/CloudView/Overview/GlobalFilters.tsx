@@ -31,7 +31,7 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
 
   const [selectedRegion, setRegion] = React.useState<string>();
 
-  const [selectedResourceId, setResourceId] = React.useState<any>();
+  const [selectedResourceId, setResourceId] = React.useState<any>([]);
 
   const [selectedDashboard, setDashboard] = React.useState<
     Dashboard | undefined
@@ -131,11 +131,13 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
         <Grid sx={{ width: 300 }}>
           <CloudViewDashboardSelect
             handleDashboardChange={handleDashboardChange}
+            preferredOption={1}
           />
         </Grid>
         <Grid sx={{ marginLeft: 2, width: 200 }}>
           <StyledCloudViewRegionSelect
             handleRegionChange={handleRegionChange}
+            preferredRegionId={'us-east'}
           />
         </Grid>
         <Grid sx={{ marginLeft: 3, width: 450 }}>
@@ -143,6 +145,7 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
             disabled={!selectedService}
             handleResourceChange={handleResourceChange}
             region={selectedRegion}
+            resourceIds={[1, 2, 57352521]}
             resourceType={selectedService}
           />
         </Grid>
