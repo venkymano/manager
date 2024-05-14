@@ -21,8 +21,6 @@ export const mapResourceIdToName = (id: string, resources: any[]) => {
 
 export const getDimensionName = (metric: any, flag: any, resources: any[]) => {
   let labelName = '';
-  metric.state = 'test'
-  metric.anyKey = 'tester'
   Object.keys(metric).forEach((key) => {
     if (flag && key == flag.metricKey) {
       const mappedName = mapResourceIdToName(metric[flag.metricKey], resources);

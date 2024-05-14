@@ -10,6 +10,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import React from 'react';
 
 import { CircleProgress } from 'src/components/CircleProgress';
+import { CloudPulseResourceTypeMap } from 'src/featureFlags';
 import { useFlags } from 'src/hooks/useFlags';
 import { useCloudViewMetricsQuery } from 'src/queries/cloudview/metrics';
 import { useProfile } from 'src/queries/profile';
@@ -89,12 +90,6 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
   };
 
   const getLabelName = (metric: any, serviceType: string) => {
-    flags.cloudPulseResourceTypeMap = [
-      {
-        metricKey: 'LINODE_ID',
-        serviceName: 'linode',
-      },
-    ];
 
     // aggregated metric, where metric keys will be 0
     if (Object.keys(metric).length == 0) {
@@ -102,9 +97,12 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
       return props.widget.label + ' (' + props.widget.unit + ')';
     }
 
-    const results = flags.cloudPulseResourceTypeMap?.filter(
-      (obj) => obj.serviceName == serviceType
-    );
+    const results =
+      flags.aclpResourceTypeMap && flags.aclpResourceTypeMap.value.length > 0
+        ? flags.aclpResourceTypeMap.value.filter(
+            (obj: CloudPulseResourceTypeMap) => obj.serviceName == serviceType
+          )
+        : [];
 
     const flag = results && results.length > 0 ? results[0] : undefined;
 
