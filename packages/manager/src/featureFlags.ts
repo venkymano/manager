@@ -47,16 +47,12 @@ export interface CloudPulseResourceTypeMap {
   serviceName: string;
 }
 
-export interface CloudPulseResourceTypeValue {
-  value: CloudPulseResourceTypeMap[];
-}
-
 type OneClickApp = Record<string, string>;
 
 export interface Flags {
   aclb: boolean;
   aclbFullCreateFlow: boolean;
-  aclpResourceTypeMap: CloudPulseResourceTypeValue;
+  aclpResourceTypeMap: CloudPulseResourceTypeMap[];
   apiMaintenance: APIMaintenance;
   cloudView: boolean;
   databaseBeta: boolean;

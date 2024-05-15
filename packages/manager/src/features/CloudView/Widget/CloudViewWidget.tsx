@@ -98,8 +98,8 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     }
 
     const results =
-      flags.aclpResourceTypeMap && flags.aclpResourceTypeMap.value.length > 0
-        ? flags.aclpResourceTypeMap.value.filter(
+      flags.aclpResourceTypeMap && flags.aclpResourceTypeMap.length > 0
+        ? flags.aclpResourceTypeMap.filter(
             (obj: CloudPulseResourceTypeMap) => obj.serviceName == serviceType
           )
         : [];
