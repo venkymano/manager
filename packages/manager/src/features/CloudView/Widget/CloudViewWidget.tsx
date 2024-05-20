@@ -16,11 +16,13 @@ import { isToday as _isToday } from 'src/utilities/isToday';
 import { roundTo } from 'src/utilities/roundTo';
 import { getMetrics } from 'src/utilities/statMetrics';
 
+import Event from '../Dashboard/ListenerUtils';
 import { FiltersObject } from '../Models/GlobalFilterProperties';
 import { CloudViewLineGraph } from './CloudViewLineGraph';
 import { ZoomIcon } from './Components/Zoomer';
 import { seriesDataFormatter } from './Formatters/CloudViewFormatter';
 import { COLOR_MAP } from './Utils/WidgetColorPalettes';
+import { CloudPulseListener } from '../Dashboard/DummyListener';
 
 export interface CloudViewWidgetProperties {
   // we can try renaming this CloudViewWidget
@@ -105,6 +107,7 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
   React.useEffect(() => {
     // on any change in the widget object, just publish the changes to parent component using a callback function
     if (props.widget.size != widget.size) {
+      Event.emit('widgetChange', { ...widget });
       props.handleWidgetChange(widget);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

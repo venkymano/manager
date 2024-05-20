@@ -2,9 +2,6 @@ import { Dashboard } from '@linode/api-v4';
 import { Paper } from '@mui/material';
 import * as React from 'react';
 
-import { CircleProgress } from 'src/components/CircleProgress';
-import { useMutatePreferences, usePreferences } from 'src/queries/preferences';
-
 import { AclpConfig } from '../Models/CloudPulsePreferences';
 import { FiltersObject } from '../Models/GlobalFilterProperties';
 import { GlobalFilters } from '../Overview/GlobalFilters';
@@ -55,23 +52,23 @@ export const DashBoardLanding = () => {
   );
 
   // since preference is mutable and savable
-  const preferenceRef = React.useRef<any>();
+  // const preferenceRef = React.useRef<any>();
 
-  const { data: preferences, refetch: refetchPreferences } = usePreferences();
-  const { mutateAsync: updatePreferences } = useMutatePreferences();
+  // const { data: preferences, refetch: refetchPreferences } = usePreferences();
+  // const { mutateAsync: updatePreferences } = useMutatePreferences();
 
   const updatedDashboard = React.useRef<Dashboard>();
 
   const handlPrefChange = (item: AclpConfig) => {
-    refetchPreferences()
-      .then(({ data: response }) => response ?? Promise.reject())
-      .then((response) => {
-        updatePreferences({
-          ...response,
-          aclpPreference: item,
-        });
-      })
-      .catch(); // swallow the error, it's nbd if the choice isn't saved
+    // refetchPreferences()
+    //   .then(({ data: response }) => response ?? Promise.reject())
+    //   .then((response) => {
+    //     updatePreferences({
+    //       ...response,
+    //       aclpPreference: item,
+    //     });
+    //   })
+    //   .catch(); // swallow the error, it's nbd if the choice isn't saved
   };
 
   const handleGlobalFilterChange = (
@@ -87,8 +84,8 @@ export const DashBoardLanding = () => {
         globalFilter.duration;
       dashbboardPropRef.current.dashboardFilters.timeRange =
         globalFilter.timeRange;
-      preferenceRef.current.aclpPreference.timeDuration =
-        globalFilter.durationLabel;
+      // preferenceRef.current.aclpPreference.timeDuration =
+      //   globalFilter.durationLabel;
     }
 
     if (
@@ -96,56 +93,60 @@ export const DashBoardLanding = () => {
       dashbboardPropRef.current.dashboardFilters.region != globalFilter.region
     ) {
       dashbboardPropRef.current.dashboardFilters.region = globalFilter.region;
-      preferenceRef.current.aclpPreference.region = globalFilter.region;
-      if (
-        preferences &&
-        preferences.aclpPreference.region !=
-          preferenceRef.current.aclpPreference.region
-      ) {
-        preferenceRef.current.aclpPreference.resources = [];
-        dashbboardPropRef.current.dashboardFilters.resource = [];
-      }
+      // preferenceRef.current.aclpPreference.region = globalFilter.region;
+      // if (
+      //   preferences &&
+      //   preferences.aclpPreference.region !=
+      //     preferenceRef.current.aclpPreference.region
+      // ) {
+      //   preferenceRef.current.aclpPreference.resources = [];
+      //   dashbboardPropRef.current.dashboardFilters.resource = [];
+      // }
+      dashbboardPropRef.current.dashboardFilters.resource = [];
     }
 
     if (changedFilter == 'resource') {
       dashbboardPropRef.current.dashboardFilters.resource =
         globalFilter.resource;
-      preferenceRef.current.aclpPreference.dashboardId = dashbboardPropRef
-        .current.dashbaord
-        ? dashbboardPropRef.current.dashbaord.id
-        : undefined!;
-      preferenceRef.current.aclpPreference.region =
-        dashbboardPropRef.current.dashboardFilters.region;
-      preferenceRef.current.aclpPreference.resources = globalFilter.resource;
+      // preferenceRef.current.aclpPreference.dashboardId = dashbboardPropRef
+      //   .current.dashboardId
+      //   ? dashbboardPropRef.current.dashboardId
+      //   : undefined!;
+      // preferenceRef.current.aclpPreference.region =
+      //   dashbboardPropRef.current.dashboardFilters.region;
+      // preferenceRef.current.aclpPreference.resources = globalFilter.resource;
     }
 
     if (changedFilter == 'timestep') {
       dashbboardPropRef.current.dashboardFilters.interval =
         globalFilter.interval;
       dashbboardPropRef.current.dashboardFilters.step = globalFilter.step;
-      preferenceRef.current.aclpPreference.interval = globalFilter.interval;
+      // preferenceRef.current.aclpPreference.interval = globalFilter.interval;
     }
     // set as dashboard filter
     setDashboardProp({
       ...dashboardProp,
-      dashbaord: updatedDashboard.current!,
       dashboardFilters: { ...dashbboardPropRef.current.dashboardFilters },
+      dashboardId:
+        updatedDashboard && updatedDashboard.current
+          ? updatedDashboard.current!.id
+          : undefined!,
     });
 
-    handlPrefChange(preferenceRef.current.aclpPreference);
+    // handlPrefChange(preferenceRef.current.aclpPreference);
   };
 
   const handleDashboardChange = (dashboard: Dashboard) => {
     if (!dashboard) {
-      dashbboardPropRef.current.dashbaord = undefined!;
+      dashbboardPropRef.current.dashboardId = undefined!;
       dashbboardPropRef.current.dashboardFilters.serviceType = undefined!;
       updatedDashboard.current = undefined!;
       setDashboardProp({ ...dashbboardPropRef.current });
 
-      preferenceRef.current.aclpPreference.dashboardId = undefined!;
-      preferenceRef.current.aclpPreference.resources = [];
+      // preferenceRef.current.aclpPreference.dashboardId = undefined!;
+      // preferenceRef.current.aclpPreference.resources = [];
 
-      handlPrefChange(preferenceRef.current.aclpPreference);
+      // handlPrefChange(preferenceRef.current.aclpPreference);
       return;
     }
 
@@ -154,41 +155,44 @@ export const DashBoardLanding = () => {
     }
 
     // update prefs if any
-    if (preferences && preferences.aclpPreference.widgets) {
-      for (let i = 0; i < dashboard.widgets.length; i++) {
-        for (let j = 0; j < preferences.aclpPreference.widgets.length; j++) {
-          if (
-            preferences.aclpPreference.widgets[j].label ==
-            dashboard.widgets[i].label
-          ) {
-            dashboard.widgets[i].size =
-              preferences.aclpPreference.widgets[j].size;
-            break;
-          }
-        }
-      }
-    }
-    dashbboardPropRef.current.dashbaord = dashboard;
+    // if (preferences && preferences.aclpPreference.widgets) {
+    //   for (let i = 0; i < dashboard.widgets.length; i++) {
+    //     for (let j = 0; j < preferences.aclpPreference.widgets.length; j++) {
+    //       if (
+    //         preferences.aclpPreference.widgets[j].label ==
+    //         dashboard.widgets[i].label
+    //       ) {
+    //         dashboard.widgets[i].size =
+    //           preferences.aclpPreference.widgets[j].size;
+    //         break;
+    //       }
+    //     }
+    //   }
+    // }
+    dashbboardPropRef.current.dashboardId = dashboard.id;
     dashbboardPropRef.current.dashboardFilters.serviceType =
       dashboard.service_type;
 
     setDashboardProp({ ...dashbboardPropRef.current });
     updatedDashboard.current = { ...dashboard };
 
-    if (dashboard && dashboard.id) {
-      preferenceRef.current.aclpPreference.dashboardId = dashboard.id;
+    // if (dashboard && dashboard.id) {
+    //   preferenceRef.current.aclpPreference.dashboardId = dashboard.id;
 
-      if (
-        preferences &&
-        preferences.aclpPreference.dashboardId !=
-          preferenceRef.current.aclpPreference.dashboardId
-      ) {
-        preferenceRef.current.aclpPreference.resources = [];
-        dashbboardPropRef.current.dashboardFilters.resource = [];
-      }
-    }
+    //   if (
+    //     preferences &&
+    //     preferences.aclpPreference.dashboardId !=
+    //       preferenceRef.current.aclpPreference.dashboardId
+    //   ) {
+    //     preferenceRef.current.aclpPreference.resources = [];
+    //     dashbboardPropRef.current.dashboardFilters.resource = [];
+    //   }
+    // }
 
-    handlPrefChange(preferenceRef.current.aclpPreference);
+    // preferenceRef.current.aclpPreference.resources = [];
+    dashbboardPropRef.current.dashboardFilters.resource = [];
+
+    // handlPrefChange(preferenceRef.current.aclpPreference);
   };
 
   const saveOrEditDashboard = (dashboard: Dashboard) => {
@@ -212,23 +216,23 @@ export const DashBoardLanding = () => {
     updatedDashboard.current = { ...dashboardObj };
 
     if (dashboardObj.widgets) {
-      preferenceRef.current.aclpPreference.widgets = dashboardObj.widgets.map(
-        (obj) => {
-          return { label: obj.label, size: obj.size };
-        }
-      );
+      // preferenceRef.current.aclpPreference.widgets = dashboardObj.widgets.map(
+      //   (obj) => {
+      //     return { label: obj.label, size: obj.size };
+      //   }
+      // );
       // call preferences
-      handlPrefChange(preferenceRef.current.aclpPreference);
+      // handlPrefChange(preferenceRef.current.aclpPreference);
     }
   };
 
-  if (!preferences) {
-    return <CircleProgress></CircleProgress>;
-  } else {
-    if (!preferenceRef || !preferenceRef.current) {
-      preferenceRef.current = preferences;
-    }
-  }
+  // if (!preferences) {
+  //   return <CircleProgress></CircleProgress>;
+  // } else {
+  //   if (!preferenceRef || !preferenceRef.current) {
+  //     preferenceRef.current = preferences;
+  //   }
+  // }
   return (
     <>
       <Paper>
@@ -247,14 +251,15 @@ export const DashBoardLanding = () => {
               handleDashboardChange={(dashboardObj: Dashboard) =>
                 handleDashboardChange(dashboardObj)
               }
-              filterPreferences={preferences.aclpPreference}
+              // filterPreferences={preferences.aclpPreference}
             ></GlobalFilters>
           </div>
         </div>
       </Paper>
       <CloudPulseDashboard
-        {...dashboardProp}
+        {...dashbboardPropRef.current}
         onDashboardChange={dashbaordChange}
+        // widgetPreferences={preferenceRef.current.aclpPreference.widgets}
       />
     </>
   );

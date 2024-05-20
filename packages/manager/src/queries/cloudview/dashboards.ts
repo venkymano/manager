@@ -23,12 +23,12 @@ export const useCloudViewDashboardByIdQuery = (
   );
 };
 
-export const useCloudViewDashboardsQuery = () => {
+export const useCloudViewDashboardsQuery = (enabledObj?: boolean) => {
   return useQuery<ResourcePage<Dashboard>, APIError[]>(
     [queryKey], // querykey and dashboardId makes this uniquely identifiable
     () => getDashboards(),
     {
-      enabled: true,
+      enabled: enabledObj != undefined ? enabledObj : true,
     } // run this only if dashboarID is valid one
   );
 };
