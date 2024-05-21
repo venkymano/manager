@@ -11,18 +11,19 @@ import React from 'react';
 
 import { CircleProgress } from 'src/components/CircleProgress';
 import { useCloudViewMetricsQuery } from 'src/queries/cloudview/metrics';
+import { usePreferences } from 'src/queries/preferences';
 import { useProfile } from 'src/queries/profile';
 import { isToday as _isToday } from 'src/utilities/isToday';
 import { roundTo } from 'src/utilities/roundTo';
 import { getMetrics } from 'src/utilities/statMetrics';
 
+import { CloudPulseListener } from '../Dashboard/DummyListener';
 import Event from '../Dashboard/ListenerUtils';
 import { FiltersObject } from '../Models/GlobalFilterProperties';
 import { CloudViewLineGraph } from './CloudViewLineGraph';
 import { ZoomIcon } from './Components/Zoomer';
 import { seriesDataFormatter } from './Formatters/CloudViewFormatter';
 import { COLOR_MAP } from './Utils/WidgetColorPalettes';
-import { CloudPulseListener } from '../Dashboard/DummyListener';
 
 export interface CloudViewWidgetProperties {
   // we can try renaming this CloudViewWidget
@@ -51,6 +52,15 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
   const [error, setError] = React.useState<boolean>(false);
 
   const [widget, setWidget] = React.useState<Widgets>({ ...props.widget }); // any change in agg_functions, step, group_by, will be published to dashboard component for save
+
+  const [isPrefDone, setPrefDone] = React.useState(false);
+
+  // const [preferences, setPreferences] = React.useState<any>();
+
+  const {
+    data: { ...preferences },
+    refetch: refetchPreferences,
+  } = usePreferences();
 
   const getCloudViewMetricsRequest = (): CloudViewMetricsRequest => {
     const request = {} as CloudViewMetricsRequest;
@@ -112,6 +122,12 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widget]);
+
+  // React.useEffect(() => {
+  //   Event.addListener('emitWidgetPreferences', (preferencesObj) => {
+  //     setPreferences({ ...preferencesObj });
+  //   });
+  // });
 
   /**
    * This will be executed, each time when we receive response from metrics api
@@ -219,14 +235,39 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     marginTop: '10px',
   });
 
+  const getPreferredWidgetSize = () => {
+    if (
+      preferences &&
+      preferences.aclpPreference &&
+      preferences.aclpPreference.widgets &&
+      widget &&
+      !isPrefDone
+    ) {
+      for (const widgetObj of preferences.aclpPreference.widgets) {
+        if (widgetObj.label == widget.label) {
+          widget.size = widgetObj.size;
+          break;
+        }
+      }
+
+      setPrefDone(true);
+    }
+
+    return widget.size;
+  };
+
+  if (!preferences) {
+    return <></>;
+  }
+
   return (
-    <Grid xs={widget.size}>
+    <Grid xs={getPreferredWidgetSize()}>
       <Paper style={{ height: '98%', width: '100%' }}>
         {/* add further components like group by resource, aggregate_function, step here , for sample added zoom icon here*/}
         <div className={widget.metric} style={{ margin: '1%' }}>
           <StyledZoomIcon
             handleZoomToggle={handleZoomToggle}
-            zoomIn={widget.size == 12 ? true : false}
+            zoomIn={getPreferredWidgetSize() == 12 ? true : false}
           />
           <CloudViewLineGraph // rename where we have cloudview to cloudpulse
             error={
@@ -246,7 +287,7 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
             )}
             ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
             data={data}
-            gridSize={widget.size}
+            gridSize={getPreferredWidgetSize()}
             legendRows={legendRows}
             loading={isLoading}
             nativeLegend={true}

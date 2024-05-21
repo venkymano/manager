@@ -7,6 +7,9 @@ import {
   useLinodeResourcesQuery,
   useLoadBalancerResourcesQuery,
 } from 'src/queries/cloudview/resources';
+import { usePreferences } from 'src/queries/preferences';
+
+import Event from '../Dashboard/ListenerUtils';
 
 interface CloudViewResourceSelectProps {
   defaultValue?: any[];
@@ -25,6 +28,11 @@ export const CloudViewMultiResourceSelect = (
 
   const selectedResources = React.useRef<any>([]);
 
+  const {
+    data: { ...preferences },
+    refetch: refetchPreferences,
+  } = usePreferences();
+
   const getResourceList = () => {
     if (props.region && props.resourceType) {
       return props.resourceType && resourceOptions[props.resourceType]
@@ -37,7 +45,9 @@ export const CloudViewMultiResourceSelect = (
   const getSelectedResources = () => {
     const selectedResourceObj = getResourceList().filter(
       (obj) =>
-        (props.defaultValue && props.defaultValue?.includes(obj.id)) ||
+        (preferences &&
+          preferences.aclpPreference &&
+          preferences.aclpPreference.resources?.includes(obj.id)) ||
         (selectedResources.current && selectedResources.current.includes(obj))
     );
 
@@ -72,7 +82,7 @@ export const CloudViewMultiResourceSelect = (
   if (
     props.disabled ||
     !resourceOptions[props.resourceType!] ||
-    !props.region
+    !props.region || !preferences
   ) {
     return (
       <Select
@@ -89,6 +99,10 @@ export const CloudViewMultiResourceSelect = (
     <Autocomplete
       onChange={(_: any, resource: any, reason) => {
         selectedResources.current = resource;
+        Event.emit(
+          'resourceChange',
+          selectedResources.current.map((obj: any) => obj.id)
+        );
         props.handleResourceChange(resource, reason);
       }}
       autoHighlight

@@ -7,6 +7,9 @@ import { Box } from 'src/components/Box';
 import Select from 'src/components/EnhancedSelect/Select';
 import { Typography } from 'src/components/Typography';
 import { useCloudViewDashboardsQuery } from 'src/queries/cloudview/dashboards';
+import { usePreferences } from 'src/queries/preferences';
+
+import Event from '../Dashboard/ListenerUtils';
 
 export interface CloudViewDashbboardSelectProps {
   defaultValue?: number;
@@ -24,8 +27,13 @@ export const CloudViewDashboardSelect = React.memo(
       isLoading,
     } = useCloudViewDashboardsQuery();
 
+    const {
+      data: { ...preferences },
+      refetch: refetchPreferences,
+    } = usePreferences();
+
     const [defaultSet, setDefaultSet] = React.useState<boolean>(
-      props.defaultValue ? false : true
+      false
     );
 
     const errorText: string = error ? 'Error loading dashboards' : '';
@@ -35,6 +43,10 @@ export const CloudViewDashboardSelect = React.memo(
     >();
 
     React.useEffect(() => {
+
+      if(defaultSet) {
+        Event.emit('dashboardChange', selectedDashboard?.id);
+      }      
       props.handleDashboardChange(selectedDashboard, !defaultSet);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDashboard]);
@@ -50,11 +62,13 @@ export const CloudViewDashboardSelect = React.memo(
       if (
         !selectedDashboard &&
         dashboardsList?.data &&
-        props.defaultValue &&
+        preferences &&
+        preferences.aclpPreference &&
+        preferences.aclpPreference.dashboardId &&
         !defaultSet
       ) {
         const match = dashboardsList?.data.find(
-          (obj) => obj.id == props.defaultValue
+          (obj) => obj.id == preferences.aclpPreference.dashboardId
         );
         setDashboard(match);
         setDefaultSet(true);
@@ -64,7 +78,7 @@ export const CloudViewDashboardSelect = React.memo(
       return selectedDashboard;
     };
 
-    if (!dashboardsList) {
+    if (!dashboardsList || !preferences) {
       return (
         <Select
           disabled={true}

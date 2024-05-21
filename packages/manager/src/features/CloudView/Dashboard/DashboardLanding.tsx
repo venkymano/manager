@@ -7,7 +7,7 @@ import { FiltersObject } from '../Models/GlobalFilterProperties';
 import { GlobalFilters } from '../Overview/GlobalFilters';
 import { CloudPulseDashboard, DashboardProperties } from './Dashboard';
 
-export const DashBoardLanding = () => {
+export const DashBoardLanding = React.memo(() => {
   const generateStartTime = (modifier: string, nowInSeconds: number) => {
     switch (modifier) {
       case 'Past 30 Minutes':
@@ -52,7 +52,7 @@ export const DashBoardLanding = () => {
   );
 
   // since preference is mutable and savable
-  // const preferenceRef = React.useRef<any>();
+  const preferenceRef = React.useRef<any>();
 
   // const { data: preferences, refetch: refetchPreferences } = usePreferences();
   // const { mutateAsync: updatePreferences } = useMutatePreferences();
@@ -263,4 +263,4 @@ export const DashBoardLanding = () => {
       />
     </>
   );
-};
+});

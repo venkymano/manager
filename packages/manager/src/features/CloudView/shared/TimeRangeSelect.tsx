@@ -5,6 +5,9 @@ import Select, {
   BaseSelectProps,
   Item,
 } from 'src/components/EnhancedSelect/Select';
+import { usePreferences } from 'src/queries/preferences';
+
+import Event from '../Dashboard/ListenerUtils';
 
 interface Props
   extends Omit<
@@ -60,6 +63,11 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
 
   const { defaultValue, handleStatsChange, ...restOfSelectProps } = props;
 
+  const {
+    data: { ...preferences },
+    refetch: refetchPreferences,
+  } = usePreferences();
+
   /*
     the time range is the label instead of the value because it's a lot harder
     to keep Date.now() consistent with this state. We can get the actual
@@ -73,12 +81,18 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
     is a valid time window.
   */
   const [selectedTimeRange, setTimeRange] = React.useState<Labels>(
-    props.defaultValue ?? 'Past 30 Minutes'
+    preferences &&
+      preferences.aclpPreference &&
+      preferences.aclpPreference.timeDuration
+      ? preferences.aclpPreference.timeDuration
+      : 'Past 30 Minutes'
   );
 
   const [apiTimeDuration, setApiTimeDuration] = React.useState<TimeDuration>(
-    props.defaultValue
-      ? getTimeDurationFromTimeRange(props.defaultValue)
+    preferences &&
+      preferences.aclpPreference &&
+      preferences.aclpPreference.timeDuration
+      ? getTimeDurationFromTimeRange(preferences.aclpPreference.timeDuration)
       : {
           unit: 'min',
           value: 30,
@@ -111,6 +125,7 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
   const options = generateSelectOptions();
 
   const handleChange = (item: Item<Labels, Labels>) => {
+    Event.emit('timeDurationChange', item.value);
     setTimeRange(item.value);
     setTimeDurationFromTimeRange(item.value);
   };
@@ -136,6 +151,10 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
       setApiTimeDuration({ unit: 'day', value: 30 });
     }
   };
+
+  if(!preferences) {
+    return <></>
+  }
 
   return (
     <Select

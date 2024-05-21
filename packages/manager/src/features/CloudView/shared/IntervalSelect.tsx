@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 
+import Event from '../Dashboard/ListenerUtils';
+import { usePreferences } from 'src/queries/preferences.js';
 export interface CloudViewIntervalSelectProps {
   className?: string;
   defaultValue?: string;
@@ -33,16 +35,27 @@ export const CloudViewIntervalSelect = React.memo(
       props.defaultValue ?? '1minute'
     );
 
+    const {
+      data: { ...preferences },
+      refetch: refetchPreferences,
+    } = usePreferences();
+
     React.useEffect(() => {
+      Event.emit('intervalChange', selectedInterval);
       props.handleIntervalChange(selectedInterval);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedInterval]);
 
+    if (!preferences) {
+      return <></>;
+    }
+
     return (
       <Autocomplete
         defaultValue={
-          intervalOptions.find((obj) => obj.value == props.defaultValue) ??
-          intervalOptions[0]
+          intervalOptions.find(
+            (obj) => obj.value == preferences.aclpPreference.interval
+          ) ?? intervalOptions[0]
         }
         onChange={(_: any, timeInterval: any) => {
           setInterval(timeInterval.value);
