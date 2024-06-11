@@ -300,7 +300,7 @@ export const LineGraph = (props: LineGraphProps) => {
       const timeData = dataSet.data.reduce((acc: any, point: any) => {
         acc.push({
           t: point[0],
-          y: formatData ? formatData(point[1]) : point[1],
+          y: formatData && point[1] ? formatData(point[1]) : point[1],
         });
         return acc;
       }, []);
