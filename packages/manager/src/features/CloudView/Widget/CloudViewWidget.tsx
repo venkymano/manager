@@ -78,6 +78,8 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
 
   const isBytes = props.unit === "Bytes";
 
+  const jweTokenExpiryError = 'JWE Decrypt: expired';
+
   const [
     selectedInterval,
     setSelectedInterval,
@@ -327,7 +329,13 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
     // todo, add implementation once component is ready
   };
 
-  if (isLoading) {
+  if (
+    isLoading ||
+    (status == 'error' &&
+      error &&
+      error.length > 0 &&
+      error[0].reason == jweTokenExpiryError)
+  ) {
     return (
       <Grid xs={widget.size}>
         <Paper style={{ height: '98%', width: '100%' }}>
@@ -395,19 +403,19 @@ export const CloudViewWidget = (props: CloudViewWidgetProperties) => {
                   : 'Error while rendering widget'
                 : undefined
             }
+            loading={isLoading}
             ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
             data={data}
+            formatData={isBytes ? (data: number) => convertBytesToUnit(data * 8, currentUnit) : undefined}
+            formatTooltip={isBytes ? formatToolTip : undefined}
             gridSize={widget.size}
             legendRows={legendRows}
-            loading={isLoading}
             nativeLegend={true}
             showToday={today}
             subtitle={currentUnit}
             timezone={timezone}
             title={convertStringToCamelCasesWithSpaces(props.widget.label)}
             unit={!isBytes ? ` ${currentUnit}` : undefined}
-            formatTooltip={isBytes ? formatToolTip : undefined}
-            formatData={isBytes ? (data: number) => convertBytesToUnit(data * 8, currentUnit) : undefined}
           />
         </div>
       </Paper>

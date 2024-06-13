@@ -39,7 +39,7 @@ export const useCloudViewJWEtokenQuery = (
   runQuery: boolean
 ) => {
   return useQuery<JWEToken, APIError[]>(
-    [queryKey, 'jwe-token', serviceType, request],
+    ['jwe-token', serviceType],
     () => getJWEToken(request, serviceType),
     {
       enabled: runQuery,
