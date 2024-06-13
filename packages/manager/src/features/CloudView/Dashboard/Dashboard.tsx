@@ -2,6 +2,7 @@ import {
   AvailableMetrics,
   Dashboard,
   GetJWETokenPayload,
+  TimeDuration,
   Widgets,
 } from '@linode/api-v4';
 import { Paper } from '@mui/material';
@@ -20,23 +21,26 @@ import {
 import { useResourcesQuery } from 'src/queries/cloudview/resources';
 import { useGetCloudViewMetricDefinitionsByServiceType } from 'src/queries/cloudview/services';
 
-import { AclpWidget } from '../Models/CloudPulsePreferences';
-import { FiltersObject } from '../Models/GlobalFilterProperties';
 import {
   CloudViewWidget,
   CloudViewWidgetProperties,
 } from '../Widget/CloudViewWidget';
+import { fetchUserPrefObject } from '../Utils/UserPreference';
 
 export interface DashboardProperties {
-  dashboardFilters: FiltersObject;
   dashboardId: number; // need to pass the dashboardId
+  duration: TimeDuration;
+
+  manualRefreshTimeStamp?: number | undefined;
   // on any change in dashboard
   onDashboardChange?: (dashboard: Dashboard) => void;
-
-  widgetPreferences?: AclpWidget[]; // this is optional
+  region?: string;
+  resources: string[];
+  // widgetPreferences?: AclpWidget[]; // this is optional
+  savePref? : boolean | undefined;
 }
 
-export const CloudPulseDashboard = (props: DashboardProperties) => {
+export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   // const resourceOptions: any = {};
 
   // returns a list of resource IDs to be passed as part of getJWEToken call
@@ -50,12 +54,11 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
 
     return jweTokenPayload;
   };
-
   const {
     data: dashboard,
     isError: isDashboardFetchError,
     isSuccess: isDashboardSuccess,
-  } = useCloudViewDashboardByIdQuery(props.dashboardId!);
+  } = useCloudViewDashboardByIdQuery(props.dashboardId!, props.savePref);
 
   const { data: resources } = useResourcesQuery(
     dashboard && dashboard.service_type ? true : false,
@@ -73,25 +76,8 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
     getResourceIDsPayload(),
     resources && dashboard ? true : false
   );
-  // todo define a proper properties class
-
-  const [
-    cloudViewGraphProperties,
-    setCloudViewGraphProperties,
-  ] = React.useState<CloudViewWidgetProperties>(
-    {} as CloudViewWidgetProperties
-  );
 
   const dashboardRef = React.useRef(dashboard);
-
-  React.useEffect(() => {
-    // set as dashboard filter
-    setCloudViewGraphProperties({
-      ...cloudViewGraphProperties,
-      globalFilters: props.dashboardFilters,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.dashboardFilters]); // execute every time when there is dashboardFilters change
 
   const StyledErrorState = styled(Placeholder, {
     label: 'StyledErrorState',
@@ -103,7 +89,7 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
     isError: isMetricDefinitionError,
     isLoading,
   } = useGetCloudViewMetricDefinitionsByServiceType(
-    dashboard? dashboard!.service_type: undefined!,
+    dashboard ? dashboard!.service_type : undefined!,
     dashboard && dashboard!.service_type !== undefined ? true : false
   );
 
@@ -125,36 +111,37 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
   const getCloudViewGraphProperties = (widget: Widgets) => {
     const graphProp: CloudViewWidgetProperties = {} as CloudViewWidgetProperties;
     graphProp.widget = { ...widget };
-    setPrefferedWidgetPlan(graphProp.widget);
-    graphProp.globalFilters = props.dashboardFilters;
+    if(props.savePref){
+      setPrefferedWidgetPlan(graphProp.widget);
+    }
+    graphProp.serviceType = dashboard?.service_type ?? '';
+    graphProp.resourceIds = props.resources;
+    graphProp.duration = props.duration;
     graphProp.unit = widget.unit ? widget.unit : '%';
     graphProp.ariaLabel = widget.label;
     graphProp.errorLabel = 'Error While loading data';
+    graphProp.timeStamp = props.manualRefreshTimeStamp!;
 
     return graphProp;
   };
 
   const setPrefferedWidgetPlan = (widgetObj: Widgets) => {
-    if (props.widgetPreferences && props.widgetPreferences.length > 0) {
-      for (const pref of props.widgetPreferences) {
-        if (pref.label == widgetObj.label) {
-          widgetObj.size = pref.size;
-          widgetObj.aggregate_function = pref.aggregateFunction;
-          //interval from pref
-          widgetObj.time_granularity = {...pref.time_granularity};
+    const widgetPreferences = fetchUserPrefObject().widgets;
+    if (widgetPreferences && widgetPreferences[widgetObj.label]) {
+      const pref = widgetPreferences[widgetObj.label];
+      widgetObj.size = pref.size;
+      widgetObj.aggregate_function = pref.aggregateFunction;
+      // interval from pref
+      widgetObj.time_granularity = { ...pref.time_granularity };
 
-          // update ref
-          dashboardRef.current?.widgets.forEach((obj) => {
-            if (obj.label == widgetObj.label) {
-              obj.size = widgetObj.size;
-              obj.aggregate_function = widgetObj.aggregate_function;
-              obj.time_granularity = {...widgetObj.time_granularity};
-            }
-          });
-
-          break;
+      // update ref
+      dashboardRef.current?.widgets.forEach((obj) => {
+        if (obj.label == widgetObj.label) {
+          obj.size = widgetObj.size;
+          obj.aggregate_function = widgetObj.aggregate_function;
+          obj.time_granularity = { ...widgetObj.time_granularity };
         }
-      }
+      });
     }
   };
 
@@ -178,13 +165,11 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
     if (dashboard != undefined) {
       if (
         dashboard.service_type &&
-        cloudViewGraphProperties.globalFilters?.region &&
-        cloudViewGraphProperties.globalFilters?.resource &&
-        cloudViewGraphProperties.globalFilters?.resource.length > 0 &&
+        props.resources &&
+        props.resources.length > 0 &&
         jweToken?.token &&
         resources?.data
       ) {
-
         // maintain a copy
         dashboardRef.current = dashboard;
         return (
@@ -198,12 +183,13 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
 
                 return (
                   <CloudViewWidget
-                    key={index}
+                    key={element.label}
                     {...getCloudViewGraphProperties(element)}
                     authToken={jweToken?.token}
                     availableMetrics={availMetrics}
                     handleWidgetChange={handleWidgetChange}
                     resources={resources.data}
+                    savePref = {props.savePref}
                   />
                 );
               } else {
@@ -243,4 +229,18 @@ export const CloudPulseDashboard = (props: DashboardProperties) => {
       <RenderWidgets />;
     </>
   );
-};
+});
+
+// function compareProps(
+//   prevProps: DashboardProperties,
+//   newProps: DashboardProperties
+// ) {
+//   // this component should re-render only if the following properties changes
+//   return (
+//     prevProps.dashboardId == newProps.dashboardId &&
+//     prevProps.duration == newProps.duration &&
+//     prevProps.region == newProps.region &&
+//     prevProps.resources == newProps.resources &&
+//     prevProps.manualRefreshTimeStamp == newProps.manualRefreshTimeStamp
+//   );
+// }
