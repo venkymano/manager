@@ -6,9 +6,9 @@ let userPreference: AclpConfig;
 
 export const getUserPreference = async () => {
   const data = await fetchUserPreference();
-  if(!data || !data.aclpPreference){
-    userPreference = {} as AclpConfig
-  }else{
+  if (!data || !data.aclpPreference) {
+    userPreference = {} as AclpConfig;
+  } else {
     userPreference = { ...data.aclpPreference };
   }
   return data;
@@ -40,15 +40,31 @@ export const updateWidgetPreference = (label: string, data: {}) => {
     userPreference = {} as AclpConfig;
   }
   let widgets = userPreference.widgets;
-  if(!widgets) {
-    widgets = {}
+  if (!widgets) {
+    widgets = {};
     userPreference.widgets = widgets;
   }
 
-  if(widgets[label]){
-    widgets[label] = {...widgets[label], ...data};
-  }else{
-    widgets[label] = {label: label, ...data} as AclpWidget;
+  if (Array.isArray(widgets)) {
+    const widgetObj = {};
+    widgets.forEach((wid) => {
+      widgetObj[wid.label] = { ...wid };
+
+      if (wid.label == label) {
+        widgetObj[wid.label] = { ...data };
+      }
+    });
+
+    userPreference.widgets = widgetObj;
+
+    updateUserPreference(userPreference);
+    return;
+  }
+
+  if (widgets[label]) {
+    widgets[label] = { ...widgets[label], ...data };
+  } else {
+    widgets[label] = { label, ...data } as AclpWidget;
   }
   updateUserPreference(userPreference);
 };
