@@ -71,8 +71,28 @@ export const PINK = [
   '#A80F5480',
 ];
 
+export const DEFAULT = [
+  // the colors according to color blindness proposed here -- https://stackoverflow.com/questions/65013406/how-to-generate-30-distinct-colors-that-are-color-blind-friendly
+  '#ffff6d80',
+  '#24ff2480',
+  '#db6d0080',
+  '#92490080',
+  '#92000080',
+  '#b6dbff80',
+  '#6db6ff80',
+  '#b66dff80',
+  '#006ddb80',
+  '#49009280',
+  '#ffb6db80',
+  '#ff6db680',
+  '#00929280',
+  '#00494980',
+  '#00000080',
+];
+
 export const COLOR_MAP = new Map<string, string[]>([
   ['blue', BLUE],
+  ['default', DEFAULT],
   ['green', GREEN],
   ['pink', PINK],
   ['red', RED],

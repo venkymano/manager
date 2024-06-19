@@ -35,7 +35,10 @@ import {
   formatToolTip,
   generateUnitByByteValue,
 } from '../Utils/UnitConversion';
-import { fetchUserPrefObject, updateWidgetPreference } from '../Utils/UserPreference';
+import {
+  fetchUserPrefObject,
+  updateWidgetPreference,
+} from '../Utils/UserPreference';
 import { COLOR_MAP } from '../Utils/WidgetColorPalette';
 import { CloudViewLineGraph } from './CloudViewLineGraph';
 import { AggregateFunctionComponent } from './Components/AggregateFunctionComponent';
@@ -55,12 +58,12 @@ export interface CloudViewWidgetProperties {
 
   resourceIds: string[];
   resources: any[]; // list of resources in a service type
+  savePref?: boolean;
   serviceType: string;
   timeStamp: number;
   unit: string; // this should come from dashboard, which maintains map for service types in a separate API call
   useColorIndex?: number;
   widget: Widgets; // this comes from dashboard, has inbuilt metrics, agg_func,group_by,filters,gridsize etc , also helpful in publishing any changes
-  savePref?: boolean;
 }
 
 const StyledZoomIcon = styled(ZoomIcon, {
@@ -124,8 +127,8 @@ export const CloudViewWidget = React.memo(
       return props.widget.service_type
         ? props.widget.service_type!
         : props.serviceType
-          ? props.serviceType
-          : '';
+        ? props.serviceType
+        : '';
     };
 
     const getLabelName = (metric: any, serviceType: string) => {
@@ -138,9 +141,9 @@ export const CloudViewWidget = React.memo(
       const results =
         flags.aclpResourceTypeMap && flags.aclpResourceTypeMap.length > 0
           ? flags.aclpResourceTypeMap.filter(
-            (obj: CloudPulseResourceTypeMap) =>
-              obj.serviceName === serviceType
-          )
+              (obj: CloudPulseResourceTypeMap) =>
+                obj.serviceName === serviceType
+            )
           : [];
 
       const flag = results && results.length > 0 ? results[0] : undefined;
@@ -158,16 +161,16 @@ export const CloudViewWidget = React.memo(
       getCloudViewMetricsRequest(),
       props,
       widget.aggregate_function +
-      '_' +
-      widget.group_by +
-      '_' +
-      widget.time_granularity +
-      '_' +
-      widget.metric +
-      '_' +
-      widget.label +
-      '_' +
-      props.timeStamp ?? '',
+        '_' +
+        widget.group_by +
+        '_' +
+        widget.time_granularity +
+        '_' +
+        widget.metric +
+        '_' +
+        widget.label +
+        '_' +
+        props.timeStamp ?? '',
       true
     ); // fetch the metrics on any property change
 
@@ -192,8 +195,13 @@ export const CloudViewWidget = React.memo(
       const dimensions: any[] = [];
       const legendRowsData: any[] = [];
 
-      // for now we will use this guy, but once we decide how to work with coloring, it should be dynamic
-      const colors: string[] = COLOR_MAP.get(props.widget.color)!;
+      // for now we will use this, but once we decide how to work with coloring, it should be dynamic
+      let colors: string[] = COLOR_MAP.get('default')!; // default to blue theme for now, untill the default theme is finalised
+      if (props.widget.color) {
+        colors = COLOR_MAP.get(props.widget.color)!;
+      }
+
+      colors = COLOR_MAP.get('default')!;
 
       if (
         status == 'success' &&
@@ -213,7 +221,6 @@ export const CloudViewWidget = React.memo(
           );
           const dimension = {
             backgroundColor: color,
-            borderColor: color,
             data: seriesDataFormatter(
               graphData.values,
               startEnd ? startEnd.start : graphData.values[0][0],
@@ -278,7 +285,6 @@ export const CloudViewWidget = React.memo(
       setWidget((widget) => {
         return { ...widget, size: zoomInValue ? 12 : 6 };
       });
-
     }, []);
 
     const handleAggregateFunctionChange = React.useCallback(
@@ -296,7 +302,6 @@ export const CloudViewWidget = React.memo(
               aggregate_function: aggregateValue,
             };
           });
-
         }
       },
       []
@@ -305,7 +310,7 @@ export const CloudViewWidget = React.memo(
     const handleIntervalChange = React.useCallback(
       (intervalValue: TimeGranularity) => {
         if (
-          !widget.time_granularity || 
+          !widget.time_granularity ||
           intervalValue.unit !== widget.time_granularity.unit ||
           intervalValue.value !== widget.time_granularity.value
         ) {
@@ -338,18 +343,18 @@ export const CloudViewWidget = React.memo(
       // todo, add implementation once component is ready
     };
     React.useEffect(() => {
-      if(!props.savePref){
+      if (!props.savePref) {
         return;
       }
       const availableWidget = fetchUserPrefObject()?.widgets[widget.label];
       if (!availableWidget) {
         updateWidgetPreference(widget.label, {
-          [SIZE]: widget.size,
           [AGGREGATE_FUNCTION]: widget.aggregate_function,
-          [TIME_GRANULARITY]: widget.time_granularity
-        })
+          [SIZE]: widget.size,
+          [TIME_GRANULARITY]: widget.time_granularity,
+        });
       }
-    }, [])
+    }, []);
 
     if (isLoading) {
       return (
@@ -396,14 +401,13 @@ export const CloudViewWidget = React.memo(
               <Grid sx={{ marginRight: 5, width: 100 }}>
                 {props.availableMetrics?.available_aggregate_functions &&
                   props.availableMetrics.available_aggregate_functions.length >
-                  0 && (
+                    0 && (
                     <AggregateFunctionComponent
                       available_aggregate_func={
                         props.availableMetrics?.available_aggregate_functions
                       }
                       default_aggregate_func={widget?.aggregate_function}
                       onAggregateFuncChange={handleAggregateFunctionChange}
-
                     />
                   )}
               </Grid>
