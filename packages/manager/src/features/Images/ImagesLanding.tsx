@@ -1,12 +1,10 @@
-import { Event, Image, ImageStatus } from '@linode/api-v4';
-import { APIError } from '@linode/api-v4/lib/types';
-import { Theme } from '@mui/material/styles';
-import { makeStyles } from 'tss-react/mui';
-import produce from 'immer';
+import CloseIcon from '@mui/icons-material/Close';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
+import { debounce } from 'throttle-debounce';
+import { makeStyles } from 'tss-react/mui';
 
 import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
 import { CircleProgress } from 'src/components/CircleProgress';
@@ -14,6 +12,8 @@ import { ConfirmationDialog } from 'src/components/ConfirmationDialog/Confirmati
 import { DocumentTitleSegment } from 'src/components/DocumentTitle';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Hidden } from 'src/components/Hidden';
+import { IconButton } from 'src/components/IconButton';
+import { InputAdornment } from 'src/components/InputAdornment';
 import { LandingHeader } from 'src/components/LandingHeader';
 import { Notice } from 'src/components/Notice/Notice';
 import { PaginationFooter } from 'src/components/PaginationFooter/PaginationFooter';
@@ -24,28 +24,36 @@ import { TableCell } from 'src/components/TableCell';
 import { TableHead } from 'src/components/TableHead';
 import { TableRow } from 'src/components/TableRow';
 import { TableRowEmpty } from 'src/components/TableRowEmpty/TableRowEmpty';
+import { TableRowLoading } from 'src/components/TableRowLoading/TableRowLoading';
 import { TableSortCell } from 'src/components/TableSortCell';
+import { TextField } from 'src/components/TextField';
 import { Typography } from 'src/components/Typography';
 import { useOrder } from 'src/hooks/useOrder';
 import { usePagination } from 'src/hooks/usePagination';
-import { listToItemsByID } from 'src/queries/base';
-import { useEventsInfiniteQuery } from 'src/queries/events/events';
-import {
-  queryKey,
-  removeImageFromCache,
-  useDeleteImageMutation,
-  useImagesQuery,
-} from 'src/queries/images';
 import {
   isEventImageUpload,
   isEventInProgressDiskImagize,
 } from 'src/queries/events/event.helpers';
+import { useEventsInfiniteQuery } from 'src/queries/events/events';
+import {
+  imageQueries,
+  useDeleteImageMutation,
+  useImagesQuery,
+} from 'src/queries/images';
 import { getErrorStringOrDefault } from 'src/utilities/errorUtils';
 
-import ImageRow, { ImageWithEvent } from './ImageRow';
-import { Handlers as ImageHandlers } from './ImagesActionMenu';
-import { DrawerMode, ImagesDrawer } from './ImagesDrawer';
+import { EditImageDrawer } from './EditImageDrawer';
+import ImageRow from './ImageRow';
 import { ImagesLandingEmptyState } from './ImagesLandingEmptyState';
+import { RebuildImageDrawer } from './RebuildImageDrawer';
+import { getEventsForImages } from './utils';
+
+import type { Handlers as ImageHandlers } from './ImagesActionMenu';
+import type { Image, ImageStatus } from '@linode/api-v4';
+import type { APIError } from '@linode/api-v4/lib/types';
+import type { Theme } from '@mui/material/styles';
+
+const searchQueryKey = 'query';
 
 const useStyles = makeStyles()((theme: Theme) => ({
   imageTable: {
@@ -61,16 +69,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
 }));
 
-interface ImageDrawerState {
-  description?: string;
-  imageID?: string;
-  label?: string;
-  mode: DrawerMode;
-  open: boolean;
-  selectedDisk: null | string;
-  selectedLinode?: number;
-}
-
 interface ImageDialogState {
   error?: string;
   image?: string;
@@ -80,16 +78,6 @@ interface ImageDialogState {
   submitting: boolean;
 }
 
-type CombinedProps = ImageDrawerState & ImageDialogState;
-
-const defaultDrawerState = {
-  description: '',
-  label: '',
-  mode: 'edit' as DrawerMode,
-  open: false,
-  selectedDisk: null,
-};
-
 const defaultDialogState = {
   error: undefined,
   image: '',
@@ -98,19 +86,18 @@ const defaultDialogState = {
   submitting: false,
 };
 
-export const ImagesLanding: React.FC<CombinedProps> = () => {
+export const ImagesLanding = () => {
   const { classes } = useStyles();
   const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const imageLabelFromParam = queryParams.get(searchQueryKey) ?? '';
 
   const queryClient = useQueryClient();
 
-  // Pagination, order, and query hooks for manual/custom images
-  const paginationForManualImages = usePagination(
-    1,
-    `${queryKey}-manual`,
-    'manual'
-  );
+  const paginationForManualImages = usePagination(1, 'images-manual', 'manual');
+
   const {
     handleOrderChange: handleManualImagesOrderChange,
     order: manualImagesOrder,
@@ -120,7 +107,7 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
       order: 'asc',
       orderBy: 'label',
     },
-    `${queryKey}-manual-order`,
+    'images-manual-order',
     'manual'
   );
 
@@ -129,9 +116,14 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
     ['+order_by']: manualImagesOrderBy,
   };
 
+  if (imageLabelFromParam) {
+    manualImagesFilter['label'] = { '+contains': imageLabelFromParam };
+  }
+
   const {
     data: manualImages,
     error: manualImagesError,
+    isFetching: manualImagesIsFetching,
     isLoading: manualImagesLoading,
   } = useImagesQuery(
     {
@@ -148,7 +140,7 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
   // Pagination, order, and query hooks for automatic/recovery images
   const paginationForAutomaticImages = usePagination(
     1,
-    `${queryKey}-automatic`,
+    'images-automatic',
     'automatic'
   );
   const {
@@ -160,7 +152,7 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
       order: 'asc',
       orderBy: 'label',
     },
-    `${queryKey}-automatic-order`,
+    'images-automatic-order',
     'automatic'
   );
 
@@ -169,9 +161,14 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
     ['+order_by']: automaticImagesOrderBy,
   };
 
+  if (imageLabelFromParam) {
+    automaticImagesFilter['label'] = { '+contains': imageLabelFromParam };
+  }
+
   const {
     data: automaticImages,
     error: automaticImagesError,
+    isFetching: automaticImagesIsFetching,
     isLoading: automaticImagesLoading,
   } = useImagesQuery(
     {
@@ -196,19 +193,23 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
     ) ?? [];
 
   // Private images with the associated events tied in.
-  const manualImagesData = getImagesWithEvents(
+  const manualImagesEvents = getEventsForImages(
     manualImages?.data ?? [],
     imageEvents
   );
 
   // Automatic images with the associated events tied in.
-  const automaticImagesData = getImagesWithEvents(
+  const automaticImagesEvents = getEventsForImages(
     automaticImages?.data ?? [],
     imageEvents
   );
 
-  const [drawer, setDrawer] = React.useState<ImageDrawerState>(
-    defaultDrawerState
+  const [selectedImage, setSelectedImage] = React.useState<Image>();
+
+  const [editDrawerOpen, setEditDrawerOpen] = React.useState<boolean>(false);
+
+  const [rebuildDrawerOpen, setRebuildDrawerOpen] = React.useState<boolean>(
+    false
   );
 
   const [dialog, setDialogState] = React.useState<ImageDialogState>(
@@ -284,7 +285,7 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
     imageLabel: string,
     imageDescription: string
   ) => {
-    removeImageFromCache(queryClient);
+    queryClient.invalidateQueries(imageQueries.paginated._def);
     history.push('/images/create/upload', {
       imageDescription,
       imageLabel,
@@ -292,27 +293,17 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
   };
 
   const onCancelFailedClick = () => {
-    removeImageFromCache(queryClient);
+    queryClient.invalidateQueries(imageQueries.paginated._def);
   };
 
-  const openForEdit = (label: string, description: string, imageID: string) => {
-    setDrawer({
-      description,
-      imageID,
-      label,
-      mode: 'edit',
-      open: true,
-      selectedDisk: null,
-    });
+  const openForEdit = (image: Image) => {
+    setSelectedImage(image);
+    setEditDrawerOpen(true);
   };
 
-  const openForRestore = (imageID: string) => {
-    setDrawer({
-      imageID,
-      mode: 'restore',
-      open: true,
-      selectedDisk: null,
-    });
+  const openForRestore = (image: Image) => {
+    setSelectedImage(image);
+    setRebuildDrawerOpen(true);
   };
 
   const deployNewLinode = (imageID: string) => {
@@ -321,38 +312,6 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
       search: `?type=Images&imageID=${imageID}`,
       state: { selectedImageId: imageID },
     });
-  };
-
-  const changeSelectedLinode = (linodeId: null | number) => {
-    setDrawer((prevDrawerState) => ({
-      ...prevDrawerState,
-      selectedDisk: null,
-      selectedLinode: linodeId ?? undefined,
-    }));
-  };
-
-  const changeSelectedDisk = (disk: null | string) => {
-    setDrawer((prevDrawerState) => ({
-      ...prevDrawerState,
-      selectedDisk: disk,
-    }));
-  };
-
-  const setLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    setDrawer((prevDrawerState) => ({
-      ...prevDrawerState,
-      label: value,
-    }));
-  };
-
-  const setDescription = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setDrawer((prevDrawerState) => ({
-      ...prevDrawerState,
-      description: value,
-    }));
   };
 
   const getActions = () => {
@@ -373,30 +332,15 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
     );
   };
 
-  const closeImageDrawer = () => {
-    setDrawer((prevDrawerState) => ({
-      ...prevDrawerState,
-      open: false,
-    }));
+  const resetSearch = () => {
+    queryParams.delete(searchQueryKey);
+    history.push({ search: queryParams.toString() });
   };
 
-  const renderImageDrawer = () => {
-    return (
-      <ImagesDrawer
-        changeDescription={setDescription}
-        changeDisk={changeSelectedDisk}
-        changeLabel={setLabel}
-        changeLinode={changeSelectedLinode}
-        description={drawer.description}
-        imageId={drawer.imageID}
-        label={drawer.label}
-        mode={drawer.mode}
-        onClose={closeImageDrawer}
-        open={drawer.open}
-        selectedDisk={drawer.selectedDisk}
-        selectedLinode={drawer.selectedLinode || null}
-      />
-    );
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    queryParams.delete('page');
+    queryParams.set(searchQueryKey, e.target.value);
+    history.push({ search: queryParams.toString() });
   };
 
   const handlers: ImageHandlers = {
@@ -440,8 +384,9 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
 
   /** Empty States */
   if (
-    (!manualImagesData || manualImagesData.length === 0) &&
-    (!automaticImagesData || automaticImagesData.length === 0)
+    !manualImages.data.length &&
+    !automaticImages.data.length &&
+    !imageLabelFromParam
   ) {
     return renderEmpty();
   }
@@ -454,6 +399,8 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
     <TableRowEmpty colSpan={6} message={`No Recovery Images to display.`} />
   );
 
+  const isFetching = manualImagesIsFetching || automaticImagesIsFetching;
+
   return (
     <React.Fragment>
       <DocumentTitleSegment segment="Images" />
@@ -462,6 +409,32 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
         entity="Image"
         onButtonClick={() => history.push('/images/create')}
         title="Images"
+      />
+      <TextField
+        InputProps={{
+          endAdornment: imageLabelFromParam && (
+            <InputAdornment position="end">
+              {isFetching && <CircleProgress size="sm" />}
+
+              <IconButton
+                aria-label="Clear"
+                data-testid="clear-images-search"
+                onClick={resetSearch}
+                size="small"
+              >
+                <CloseIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+        onChange={debounce(400, (e) => {
+          onSearch(e);
+        })}
+        hideLabel
+        label="Search"
+        placeholder="Search Images"
+        sx={{ mb: 2 }}
+        value={imageLabelFromParam}
       />
       <Paper className={classes.imageTable}>
         <div className={classes.imageTableHeader}>
@@ -507,12 +480,13 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {manualImagesData.length > 0
-              ? manualImagesData.map((manualImage) => (
+            {manualImages.data.length > 0
+              ? manualImages.data.map((manualImage) => (
                   <ImageRow
+                    event={manualImagesEvents[manualImage.id]}
+                    handlers={handlers}
+                    image={manualImage}
                     key={manualImage.id}
-                    {...manualImage}
-                    {...handlers}
                   />
                 ))
               : noManualImages}
@@ -574,15 +548,20 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {automaticImagesData.length > 0
-              ? automaticImagesData.map((automaticImage) => (
-                  <ImageRow
-                    key={automaticImage.id}
-                    {...automaticImage}
-                    {...handlers}
-                  />
-                ))
-              : noAutomaticImages}
+            {isFetching ? (
+              <TableRowLoading columns={6} />
+            ) : automaticImages.data.length > 0 ? (
+              automaticImages.data.map((automaticImage) => (
+                <ImageRow
+                  event={automaticImagesEvents[automaticImage.id]}
+                  handlers={handlers}
+                  image={automaticImage}
+                  key={automaticImage.id}
+                />
+              ))
+            ) : (
+              noAutomaticImages
+            )}
           </TableBody>
         </Table>
         <PaginationFooter
@@ -594,7 +573,16 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
           pageSize={paginationForAutomaticImages.pageSize}
         />
       </Paper>
-      {renderImageDrawer()}
+      <EditImageDrawer
+        image={selectedImage}
+        onClose={() => setEditDrawerOpen(false)}
+        open={editDrawerOpen}
+      />
+      <RebuildImageDrawer
+        image={selectedImage}
+        onClose={() => setRebuildDrawerOpen(false)}
+        open={rebuildDrawerOpen}
+      />
       <ConfirmationDialog
         title={
           dialogAction === 'cancel'
@@ -613,27 +601,3 @@ export const ImagesLanding: React.FC<CombinedProps> = () => {
 };
 
 export default ImagesLanding;
-
-const getImagesWithEvents = (images: Image[], events: Event[]) => {
-  const itemsById = listToItemsByID(images ?? []);
-  return Object.values(itemsById).reduce(
-    (accum, thisImage: Image) =>
-      produce(accum, (draft: any) => {
-        if (!thisImage.is_public) {
-          // NB: the secondary_entity returns only the numeric portion of the image ID so we have to interpolate.
-          const matchingEvent = events.find(
-            (thisEvent) =>
-              `private/${thisEvent.secondary_entity?.id}` === thisImage.id ||
-              (`private/${thisEvent.entity?.id}` === thisImage.id &&
-                thisEvent.status === 'failed')
-          );
-          if (matchingEvent) {
-            draft.push({ ...thisImage, event: matchingEvent });
-          } else {
-            draft.push(thisImage);
-          }
-        }
-      }),
-    []
-  ) as ImageWithEvent[];
-};

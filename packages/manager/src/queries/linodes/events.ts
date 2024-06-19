@@ -1,11 +1,10 @@
-import { EventHandlerData } from 'src/hooks/useEventHandlers';
-import { queryKey as accountNotificationsQueryKey } from 'src/queries/accountNotifications';
-import { queryKey as firewallsQueryKey } from 'src/queries/firewalls';
-import { queryKey as volumesQueryKey } from 'src/queries/volumes';
-
+import { accountQueries } from '../account/queries';
+import { firewallQueries } from '../firewalls';
+import { volumeQueries } from '../volumes/volumes';
 import { queryKey } from './linodes';
 
 import type { Event } from '@linode/api-v4';
+import type { EventHandlerData } from 'src/hooks/useEventHandlers';
 
 /**
  * Event handler for Linode events
@@ -30,7 +29,7 @@ export const linodeEventsHandler = ({
   // Some Linode events are an indication that the reponse from /v4/account/notifications
   // has changed, so refetch notifications.
   if (shouldRequestNotifications(event)) {
-    queryClient.invalidateQueries(accountNotificationsQueryKey);
+    queryClient.invalidateQueries(accountQueries.notifications.queryKey);
   }
 
   switch (event.action) {
@@ -95,10 +94,10 @@ export const linodeEventsHandler = ({
       queryClient.invalidateQueries([queryKey, 'infinite']);
       // A Linode made have been on a Firewall's device list, but now that it is deleted,
       // it will no longer be listed as a device on that firewall. Here, we invalidate outdated firewall data.
-      queryClient.invalidateQueries([firewallsQueryKey]);
+      queryClient.invalidateQueries({ queryKey: firewallQueries._def });
       // A Linode may have been attached to a Volume, but deleted. We need to refetch volumes data so that
       // the Volumes table does not show a Volume attached to a non-existant Linode.
-      queryClient.invalidateQueries([volumesQueryKey]);
+      queryClient.invalidateQueries(volumeQueries.lists.queryKey);
       return;
     case 'linode_config_create':
     case 'linode_config_delete':

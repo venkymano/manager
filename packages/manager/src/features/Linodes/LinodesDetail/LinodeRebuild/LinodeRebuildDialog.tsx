@@ -2,16 +2,20 @@ import { styled, useTheme } from '@mui/material/styles';
 import * as React from 'react';
 
 import { Dialog } from 'src/components/Dialog/Dialog';
-import EnhancedSelect, { Item } from 'src/components/EnhancedSelect/Select';
+import EnhancedSelect from 'src/components/EnhancedSelect/Select';
 import { Notice } from 'src/components/Notice/Notice';
+import { getIsDistributedRegion } from 'src/components/RegionSelect/RegionSelect.utils';
 import { Typography } from 'src/components/Typography';
 import { useLinodeQuery } from 'src/queries/linodes/linodes';
-import { useGrants, useProfile } from 'src/queries/profile';
+import { useGrants, useProfile } from 'src/queries/profile/profile';
+import { useRegionsQuery } from 'src/queries/regions/regions';
 
 import { HostMaintenanceError } from '../HostMaintenanceError';
 import { LinodePermissionsError } from '../LinodePermissionsError';
 import { RebuildFromImage } from './RebuildFromImage';
 import { RebuildFromStackScript } from './RebuildFromStackScript';
+
+import type { Item } from 'src/components/EnhancedSelect/Select';
 
 interface Props {
   linodeId: number | undefined;
@@ -42,6 +46,8 @@ export const LinodeRebuildDialog = (props: Props) => {
     linodeId !== undefined && open
   );
 
+  const { data: regionsData } = useRegionsQuery();
+
   const isReadOnly =
     Boolean(profile?.restricted) &&
     grants?.linode.find((grant) => grant.id === linodeId)?.permissions ===
@@ -51,23 +57,40 @@ export const LinodeRebuildDialog = (props: Props) => {
   const unauthorized = isReadOnly;
   const disabled = hostMaintenance || unauthorized;
 
+  // LDE-related checks
+  const isEncrypted = linode?.disk_encryption === 'enabled';
+  const isLKELinode = Boolean(linode?.lke_cluster_id);
+  const linodeIsInDistributedRegion = getIsDistributedRegion(
+    regionsData ?? [],
+    linode?.region ?? ''
+  );
+
   const theme = useTheme();
 
   const [mode, setMode] = React.useState<MODES>('fromImage');
   const [rebuildError, setRebuildError] = React.useState<string>('');
 
-  React.useEffect(() => {
-    if (open) {
-      setRebuildError('');
-    }
-  }, [open]);
+  const [
+    diskEncryptionEnabled,
+    setDiskEncryptionEnabled,
+  ] = React.useState<boolean>(isEncrypted);
+
+  const onExitDrawer = () => {
+    setRebuildError('');
+    setMode('fromImage');
+  };
 
   const handleRebuildError = (status: string) => {
     setRebuildError(status);
   };
 
+  const toggleDiskEncryptionEnabled = () => {
+    setDiskEncryptionEnabled(!diskEncryptionEnabled);
+  };
+
   return (
     <Dialog
+      TransitionProps={{ onExited: onExitDrawer }}
       fullHeight
       fullWidth
       maxWidth="md"
@@ -80,8 +103,8 @@ export const LinodeRebuildDialog = (props: Props) => {
         {hostMaintenance && <HostMaintenanceError />}
         {rebuildError && <Notice variant="error">{rebuildError}</Notice>}
         <Typography
-          sx={{ paddingBottom: theme.spacing(2) }}
           data-qa-rebuild-desc
+          sx={{ paddingBottom: theme.spacing(2) }}
         >
           If you can&rsquo;t rescue an existing disk, it&rsquo;s time to rebuild
           your Linode. There are a couple of different ways you can do this:
@@ -108,33 +131,47 @@ export const LinodeRebuildDialog = (props: Props) => {
       {mode === 'fromImage' && (
         <RebuildFromImage
           disabled={disabled}
+          diskEncryptionEnabled={diskEncryptionEnabled}
           handleRebuildError={handleRebuildError}
+          isLKELinode={isLKELinode}
           linodeId={linodeId ?? -1}
+          linodeIsInDistributedRegion={linodeIsInDistributedRegion}
           linodeLabel={linode?.label}
           linodeRegion={linode?.region}
           onClose={onClose}
           passwordHelperText={passwordHelperText}
+          toggleDiskEncryptionEnabled={toggleDiskEncryptionEnabled}
         />
       )}
       {mode === 'fromCommunityStackScript' && (
         <RebuildFromStackScript
           disabled={disabled}
+          diskEncryptionEnabled={diskEncryptionEnabled}
           handleRebuildError={handleRebuildError}
+          isLKELinode={isLKELinode}
           linodeId={linodeId ?? -1}
+          linodeIsInDistributedRegion={linodeIsInDistributedRegion}
           linodeLabel={linode?.label}
+          linodeRegion={linode?.region}
           onClose={onClose}
           passwordHelperText={passwordHelperText}
+          toggleDiskEncryptionEnabled={toggleDiskEncryptionEnabled}
           type="community"
         />
       )}
       {mode === 'fromAccountStackScript' && (
         <RebuildFromStackScript
           disabled={disabled}
+          diskEncryptionEnabled={diskEncryptionEnabled}
           handleRebuildError={handleRebuildError}
+          isLKELinode={isLKELinode}
           linodeId={linodeId ?? -1}
+          linodeIsInDistributedRegion={linodeIsInDistributedRegion}
           linodeLabel={linode?.label}
+          linodeRegion={linode?.region}
           onClose={onClose}
           passwordHelperText={passwordHelperText}
+          toggleDiskEncryptionEnabled={toggleDiskEncryptionEnabled}
           type="account"
         />
       )}

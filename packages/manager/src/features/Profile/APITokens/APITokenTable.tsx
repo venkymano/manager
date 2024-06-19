@@ -2,8 +2,8 @@ import { Token } from '@linode/api-v4/lib/profile';
 import Grid from '@mui/material/Unstable_Grid2';
 import * as React from 'react';
 
-import AddNewLink from 'src/components/AddNewLink';
 import { Box } from 'src/components/Box';
+import { Button } from 'src/components/Button/Button';
 import { DateTimeDisplay } from 'src/components/DateTimeDisplay';
 import { PaginationFooter } from 'src/components/PaginationFooter/PaginationFooter';
 import { Table } from 'src/components/Table';
@@ -17,15 +17,15 @@ import { TableRowLoading } from 'src/components/TableRowLoading/TableRowLoading'
 import { StyledTableSortCell } from 'src/components/TableSortCell/StyledTableSortCell';
 import { TableSortCell } from 'src/components/TableSortCell/TableSortCell';
 import { Typography } from 'src/components/Typography';
+import { PROXY_USER_RESTRICTED_TOOLTIP_TEXT } from 'src/features/Account/constants';
 import { SecretTokenDialog } from 'src/features/Profile/SecretTokenDialog/SecretTokenDialog';
-import { useFlags } from 'src/hooks/useFlags';
 import { useOrder } from 'src/hooks/useOrder';
 import { usePagination } from 'src/hooks/usePagination';
-import { useProfile } from 'src/queries/profile';
+import { useProfile } from 'src/queries/profile/profile';
 import {
   useAppTokensQuery,
   usePersonalAccessTokensQuery,
-} from 'src/queries/tokens';
+} from 'src/queries/profile/tokens';
 
 import { APITokenMenu } from './APITokenMenu';
 import {
@@ -36,8 +36,8 @@ import {
 import { CreateAPITokenDrawer } from './CreateAPITokenDrawer';
 import { EditAPITokenDrawer } from './EditAPITokenDrawer';
 import { RevokeTokenDialog } from './RevokeTokenDialog';
-import { ViewAPITokenDrawer } from './ViewAPITokenDrawer';
 import { isWayInTheFuture } from './utils';
+import { ViewAPITokenDrawer } from './ViewAPITokenDrawer';
 
 export type APITokenType = 'OAuth Client Token' | 'Personal Access Token';
 
@@ -55,7 +55,6 @@ const PREFERENCE_KEY = 'api-tokens';
 export const APITokenTable = (props: Props) => {
   const { title, type } = props;
 
-  const flags = useFlags();
   const { data: profile } = useProfile();
   const { handleOrderChange, order, orderBy } = useOrder(
     {
@@ -82,9 +81,7 @@ export const APITokenTable = (props: Props) => {
     { '+order': order, '+order_by': orderBy }
   );
 
-  const isProxyUser = Boolean(
-    flags.parentChildAccountAccess && profile?.user_type === 'proxy'
-  );
+  const isProxyUser = Boolean(profile?.user_type === 'proxy');
 
   const [isCreateOpen, setIsCreateOpen] = React.useState<boolean>(false);
   const [isRevokeOpen, setIsRevokeOpen] = React.useState<boolean>(false);
@@ -145,11 +142,7 @@ export const APITokenTable = (props: Props) => {
 
   const renderRows = (tokens: Token[]) => {
     return tokens.map((token: Token) => (
-      <TableRow
-        ariaLabel={token.label}
-        data-qa-table-row={token.label}
-        key={token.id}
-      >
+      <TableRow data-qa-table-row={token.label} key={token.id}>
         <TableCell data-qa-token-label>{token.label}</TableCell>
         <TableCell>
           <Typography data-qa-token-created variant="body1">
@@ -205,16 +198,16 @@ export const APITokenTable = (props: Props) => {
         </Grid>
         <StyledAddNewWrapper>
           {type === 'Personal Access Token' && (
-            <AddNewLink
-              disabledReason={
-                isProxyUser
-                  ? 'You can only create tokens for your own company.'
-                  : undefined
+            <Button
+              tooltipText={
+                isProxyUser ? PROXY_USER_RESTRICTED_TOOLTIP_TEXT : undefined
               }
+              buttonType="primary"
               disabled={isProxyUser}
-              label="Create a Personal Access Token"
               onClick={() => setIsCreateOpen(true)}
-            />
+            >
+              Create a Personal Access Token
+            </Button>
           )}
         </StyledAddNewWrapper>
       </StyledRootContainer>

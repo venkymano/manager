@@ -5,6 +5,7 @@ import type { NoticeVariant } from 'src/components/Notice/Notice';
 // These flags should correspond with active features flags in LD
 
 export interface TaxDetail {
+  qi_registration?: string;
   tax_id: string;
   tax_name: string;
 }
@@ -37,46 +38,65 @@ interface TaxCollectionBanner {
   regions?: TaxCollectionRegion[];
 }
 
-interface PlacementGroupsFlag {
+interface BaseFeatureFlag {
+  enabled: boolean;
+}
+
+interface BetaFeatureFlag extends BaseFeatureFlag {
+  beta: boolean;
+}
+
+interface GaFeatureFlag extends BaseFeatureFlag {
+  ga: boolean;
+}
+
+interface AclpFlag {
   beta: boolean;
   enabled: boolean;
 }
 
+interface gpuV2 {
+  planDivider: boolean;
+}
 type OneClickApp = Record<string, string>;
 
 export interface Flags {
   aclb: boolean;
   aclbFullCreateFlow: boolean;
+  aclp: AclpFlag;
   aclpResourceTypeMap: CloudPulseResourceTypeMap[];
   apiMaintenance: APIMaintenance;
   cloudView: boolean;
   databaseBeta: boolean;
   databaseResize: boolean;
   databases: boolean;
-  firewallNodebalancer: boolean;
-  gecko: boolean;
+  disableLargestGbPlans: boolean;
+  eventMessagesV2: boolean;
+  gecko: boolean; // @TODO gecko: delete this after next release
+  gecko2: GaFeatureFlag;
+  gpuv2: gpuV2;
   ipv6Sharing: boolean;
-  linodeCloneUiChanges: boolean;
+  linodeCreateRefactor: boolean;
   linodeCreateWithFirewall: boolean;
+  linodeDiskEncryption: boolean;
   mainContentBanner: MainContentBanner;
   metadata: boolean;
   objMultiCluster: boolean;
   oneClickApps: OneClickApp;
   oneClickAppsDocsOverride: Record<string, Doc[]>;
-  parentChildAccountAccess: boolean;
-  placementGroups: PlacementGroupsFlag;
+  placementGroups: BetaFeatureFlag;
   productInformationBanners: ProductInformationBannerFlag[];
   promos: boolean;
   promotionalOffers: PromotionalOffer[];
-  recharts: boolean;
   referralBannerText: ReferralBannerText;
   selfServeBetas: boolean;
   soldOutChips: boolean;
+  supportTicketSeverity: boolean;
   taxBanner: TaxBanner;
   taxCollectionBanner: TaxCollectionBanner;
+  taxId: BaseFeatureFlag;
   taxes: Taxes;
   tpaProviders: Provider[];
-  vpc: boolean;
 }
 
 type PromotionalOfferFeature =

@@ -21,6 +21,9 @@ import 'cypress-real-events/support';
 
 import './setup/defer-command';
 import './setup/login-command';
+import './setup/page-visit-tracking-commands';
+import './setup/test-tagging';
+
 chai.use(chaiString);
 
 chai.use(function (chai, utils) {

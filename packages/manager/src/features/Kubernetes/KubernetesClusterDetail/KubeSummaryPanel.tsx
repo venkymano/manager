@@ -1,7 +1,5 @@
-import { KubernetesCluster } from '@linode/api-v4/lib/kubernetes';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Grid from '@mui/material/Unstable_Grid2';
-import { Theme } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -11,8 +9,9 @@ import { Button } from 'src/components/Button/Button';
 import { Chip } from 'src/components/Chip';
 import { ConfirmationDialog } from 'src/components/ConfirmationDialog/ConfirmationDialog';
 import { Paper } from 'src/components/Paper';
-import { TagsPanel } from 'src/components/TagsPanel/TagsPanel';
-import KubeClusterSpecs from 'src/features/Kubernetes/KubernetesClusterDetail/KubeClusterSpecs';
+import { TagCell } from 'src/components/TagCell/TagCell';
+import { KubeClusterSpecs } from 'src/features/Kubernetes/KubernetesClusterDetail/KubeClusterSpecs';
+import { useIsResourceRestricted } from 'src/hooks/useIsResourceRestricted';
 import {
   useKubernetesClusterMutation,
   useKubernetesDashboardQuery,
@@ -23,6 +22,9 @@ import { getErrorStringOrDefault } from 'src/utilities/errorUtils';
 import { DeleteKubernetesClusterDialog } from './DeleteKubernetesClusterDialog';
 import { KubeConfigDisplay } from './KubeConfigDisplay';
 import { KubeConfigDrawer } from './KubeConfigDrawer';
+
+import type { KubernetesCluster } from '@linode/api-v4/lib/kubernetes';
+import type { Theme } from '@mui/material/styles';
 
 const useStyles = makeStyles()((theme: Theme) => ({
   actionRow: {
@@ -99,7 +101,7 @@ interface Props {
   cluster: KubernetesCluster;
 }
 
-export const KubeSummaryPanel = (props: Props) => {
+export const KubeSummaryPanel = React.memo((props: Props) => {
   const { cluster } = props;
   const { classes } = useStyles();
   const { enqueueSnackbar } = useSnackbar();
@@ -120,6 +122,12 @@ export const KubeSummaryPanel = (props: Props) => {
     isLoading: isResettingKubeConfig,
     mutateAsync: resetKubeConfig,
   } = useResetKubeConfigMutation();
+
+  const isClusterReadOnly = useIsResourceRestricted({
+    grantLevel: 'read_only',
+    grantType: 'linode',
+    id: cluster.id,
+  });
 
   const [
     resetKubeConfigDialogOpen,
@@ -197,8 +205,8 @@ export const KubeSummaryPanel = (props: Props) => {
               </Button>
             </Grid>
             <Grid className={classes.tags}>
-              <TagsPanel
-                entityId={cluster.id}
+              <TagCell
+                disabled={isClusterReadOnly}
                 tags={cluster.tags}
                 updateTags={handleUpdateTags}
               />
@@ -251,6 +259,4 @@ export const KubeSummaryPanel = (props: Props) => {
       </ConfirmationDialog>
     </>
   );
-};
-
-export default React.memo(KubeSummaryPanel);
+});

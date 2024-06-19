@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { RegionSelect } from 'src/components/RegionSelect/RegionSelect';
 import { useObjectStorageClusters } from 'src/queries/objectStorage';
-import { useRegionsQuery } from 'src/queries/regions';
+import { useRegionsQuery } from 'src/queries/regions/regions';
 
 interface Props {
   disabled?: boolean;
@@ -46,16 +46,16 @@ export const ClusterSelect: React.FC<Props> = (props) => {
     <RegionSelect
       currentCapability="Object Storage"
       data-qa-select-cluster
+      disableClearable
       disabled={disabled}
       errorText={errorText}
-      handleSelection={(id) => onChange(id)}
-      isClearable={false}
       label="Region"
       onBlur={onBlur}
+      onChange={(e, region) => onChange(region.id)}
       placeholder="Select a Region"
       regions={regionOptions ?? []}
       required={required}
-      selectedId={selectedCluster}
+      value={selectedCluster}
     />
   );
 };

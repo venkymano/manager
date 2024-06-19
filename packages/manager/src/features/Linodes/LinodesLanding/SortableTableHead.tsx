@@ -24,11 +24,11 @@ interface Props {
   toggleLinodeView: () => 'grid' | 'list';
 }
 
-type CombinedProps<T> = Props & Omit<OrderByProps<T>, 'data'>;
+interface SortableTableHeadProps<T>
+  extends Props,
+    Omit<OrderByProps<T>, 'data'> {}
 
-export const SortableTableHead = <T extends unknown>(
-  props: CombinedProps<T>
-) => {
+export const SortableTableHead = <T,>(props: SortableTableHeadProps<T>) => {
   const theme = useTheme();
 
   const {
@@ -42,6 +42,8 @@ export const SortableTableHead = <T extends unknown>(
     toggleLinodeView,
   } = props;
 
+  const displayViewDescriptionId = React.useId();
+
   const isActive = (label: string) =>
     label.toLowerCase() === orderBy.toLowerCase();
 
@@ -49,11 +51,6 @@ export const SortableTableHead = <T extends unknown>(
     <TableHead data-qa-table-head role="rowgroup">
       <TableRow>
         <TableSortCell
-          active={isActive('label')}
-          data-qa-sort-label={order}
-          direction={order}
-          handleClick={handleOrderChange}
-          label="label"
           sx={{
             ...theme.applyTableHeaderStyles,
             [theme.breakpoints.down('lg')]: {
@@ -61,15 +58,15 @@ export const SortableTableHead = <T extends unknown>(
             },
             width: '24%',
           }}
+          active={isActive('label')}
+          data-qa-sort-label={order}
+          direction={order}
+          handleClick={handleOrderChange}
+          label="label"
         >
           Label
         </TableSortCell>
         <TableSortCell
-          active={isActive('_statusPriority')}
-          direction={order}
-          handleClick={handleOrderChange}
-          label="_statusPriority"
-          noWrap
           sx={{
             ...theme.applyTableHeaderStyles,
             [theme.breakpoints.down('md')]: {
@@ -80,6 +77,11 @@ export const SortableTableHead = <T extends unknown>(
             },
             width: '20%',
           }}
+          active={isActive('_statusPriority')}
+          direction={order}
+          handleClick={handleOrderChange}
+          label="_statusPriority"
+          noWrap
         >
           Status
         </TableSortCell>
@@ -97,10 +99,6 @@ export const SortableTableHead = <T extends unknown>(
           <>
             <Hidden smDown>
               <TableSortCell
-                active={isActive('type')}
-                direction={order}
-                handleClick={handleOrderChange}
-                label="type"
                 sx={{
                   ...theme.applyTableHeaderStyles,
                   [theme.breakpoints.only('sm')]: {
@@ -108,6 +106,10 @@ export const SortableTableHead = <T extends unknown>(
                   },
                   width: '14%',
                 }}
+                active={isActive('type')}
+                direction={order}
+                handleClick={handleOrderChange}
+                label="type"
               >
                 Plan
               </TableSortCell>
@@ -122,11 +124,6 @@ export const SortableTableHead = <T extends unknown>(
               </TableSortCell>
               <Hidden lgDown>
                 <TableSortCell
-                  active={isActive('region')}
-                  data-qa-sort-region={order}
-                  direction={order}
-                  handleClick={handleOrderChange}
-                  label="region"
                   sx={{
                     ...theme.applyTableHeaderStyles,
                     [theme.breakpoints.down('sm')]: {
@@ -134,6 +131,11 @@ export const SortableTableHead = <T extends unknown>(
                     },
                     width: '14%',
                   }}
+                  active={isActive('region')}
+                  data-qa-sort-region={order}
+                  direction={order}
+                  handleClick={handleOrderChange}
+                  label="region"
                 >
                   Region
                 </TableSortCell>
@@ -141,11 +143,6 @@ export const SortableTableHead = <T extends unknown>(
             </Hidden>
             <Hidden lgDown>
               <TableSortCell
-                active={isActive('backups:last_successful')}
-                direction={order}
-                handleClick={handleOrderChange}
-                label="backups:last_successful"
-                noWrap
                 sx={{
                   ...theme.applyTableHeaderStyles,
                   [theme.breakpoints.down('sm')]: {
@@ -153,6 +150,11 @@ export const SortableTableHead = <T extends unknown>(
                   },
                   width: '14%',
                 }}
+                active={isActive('backups:last_successful')}
+                direction={order}
+                handleClick={handleOrderChange}
+                label="backups:last_successful"
+                noWrap
               >
                 Last Backup
               </TableSortCell>
@@ -167,12 +169,12 @@ export const SortableTableHead = <T extends unknown>(
               justifyContent: 'flex-end',
             }}
           >
-            <div className="visually-hidden" id="displayViewDescription">
+            <div className="visually-hidden" id={displayViewDescriptionId}>
               Currently in {linodeViewPreference} view
             </div>
             <Tooltip placement="top" title="Summary view">
               <StyledToggleButton
-                aria-describedby={'displayViewDescription'}
+                aria-describedby={displayViewDescriptionId}
                 aria-label="Toggle display"
                 disableRipple
                 isActive={linodeViewPreference === 'grid'}

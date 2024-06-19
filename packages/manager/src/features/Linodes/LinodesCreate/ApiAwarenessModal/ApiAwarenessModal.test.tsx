@@ -9,8 +9,7 @@ import { ApiAwarenessModal, ApiAwarenessModalProps } from './ApiAwarenessModal';
 const defaultProps: ApiAwarenessModalProps = {
   isOpen: false,
   onClose: vi.fn(),
-  payLoad: {},
-  route: '',
+  payLoad: { region: '', type: '' },
 };
 
 const renderComponent = (overrideProps?: Partial<ApiAwarenessModalProps>) => {

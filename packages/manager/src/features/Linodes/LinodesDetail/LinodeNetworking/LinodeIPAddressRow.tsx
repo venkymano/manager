@@ -26,15 +26,13 @@ export interface IPAddressRowHandlers {
   openRemoveIPRangeDialog: (range: IPRange) => void;
 }
 
-interface Props {
+interface LinodeIPAddressRowProps extends IPAddressRowHandlers, IPDisplay {
   isVPCOnlyLinode: boolean;
   linodeId: number;
   readOnly: boolean;
 }
 
-type CombinedProps = IPDisplay & IPAddressRowHandlers & Props;
-
-export const LinodeIPAddressRow = (props: CombinedProps) => {
+export const LinodeIPAddressRow = (props: LinodeIPAddressRowProps) => {
   const {
     _ip,
     _range,
@@ -153,7 +151,7 @@ const RangeRDNSCell = (props: {
   const ipsWithRDNS = listIPv6InRange(range.range, range.prefix, ipsInRegion);
 
   if (ipv6Loading) {
-    return <CircleProgress mini noPadding />;
+    return <CircleProgress size="sm" />;
   }
 
   // We don't show anything if there are no addresses.
