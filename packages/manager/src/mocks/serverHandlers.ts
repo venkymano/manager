@@ -105,6 +105,7 @@ import { pickRandom } from 'src/utilities/random';
 import { getStorage } from 'src/utilities/storage';
 
 import { getMetricsResponse } from './metricsMocker';
+
 import type {
   NotificationType,
   ObjectStorageKeyRequest,
@@ -525,268 +526,124 @@ const vpc = [
 ];
 
 const cloudView = [
-  rest.get('*/cloudview/namespaces', (req, res, ctx) => {
-    return res(ctx.json(makeResourcePage(namespaceFactory.buildList(10))));
+  http.get('*/cloudview/namespaces', async ({ request }) => {
+    const namespaces = namespaceFactory.buildList(10);
+    return HttpResponse.json(makeResourcePage(namespaces));
   }),
-  rest.post('*/cloudview/namespaces', async (req, res, ctx) => {
+  http.post('*/cloudview/namespaces', async ({ request }) => {
     await sleep(2000);
-    return res(ctx.json({}));
+    return HttpResponse.json({});
   }),
-  rest.get('*/cloudview/namespaces/:id/keys', async (req, res, ctx) => {
+  http.get('*/cloudview/namespaces/:id/keys', async ({ request }) => {
     await sleep(2000);
-    return res(
-      ctx.json({
-        active_keys: [
-          {
-            api_key:
-              'r1LtHY0f2PPAttUFxppB29yhhddTECvzmNICVJyHtBM0Wfo613L9Ya5mrOmshUpx',
-            expiry: '2024-04-12T16:08:55',
-          },
-        ],
-      })
-    );
+    return HttpResponse.json({
+      active_keys: [
+        {
+          api_key:
+            'r1LtHY0f2PPAttUFxppB29yhhddTECvzmNICVJyHtBM0Wfo613L9Ya5mrOmshUpx',
+          expiry: '2024-04-12T16:08:55',
+        },
+      ],
+    });
   }),
-  rest.delete('*/cloudview/namespaces/:id', (req, res, ctx) => {
-    return res(ctx.json({}));
-    // for errors
-    // return res(
-    //   ctx.status(400),
-    //   ctx.json({
-    //     errors: [
-    //       { field: 'label', reason: 'Error occured while deleting namespace' },
-    //     ],
-    //   })
-    // );
+  http.delete('*/cloudview/namespaces/:id', async ({ request }) => {
+    return HttpResponse.json({});
   }),
 
-  rest.post('*/monitors/service/*/metrics', async (req, res, ctx) => {
+  http.post('*/monitors/service/*/metrics', async ({ request }) => {
     await sleep(1000);
-    const data = getMetricsResponse(req.body);
-    return res(ctx.json(data));
+    const body = await request.json();
+    const data = getMetricsResponse(body);
+    return HttpResponse.json(data);
   }),
 
   // dashboards
-  rest.get('*/monitors/dashboards', async (req, res, ctx) => {
+  http.get('*/monitors/dashboards', async ({ request }) => {
     await sleep(100); // this is to test out loading feature
     // TODO, decide how to work on widgets and filters (for now keeping static ones)
     // return res(ctx.json(makeResourcePage(dashboardFactory.buildList(10))))
-    return res(
-      ctx.json(
-        makeResourcePage([
-          {
-            created: '2023-07-12T16:08:53',
-            id: req.params.id,
-            label: 'Akamai Global Dashboard',
-            service_type: 'linode',
-            time_duration: {
-              unit: 'hr',
-              value: 1,
-            },
-            updated: '2023-07-12T16:08:53',
-            widgets: [
-              {
-                aggregate_function: 'avg',
-                chart_type: 'line',
-                color: 'blue',
-                filters: [],
-                group_by: '',
-                label: 'CPU',
-                metric: 'system_memory_usage_bytes',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 12,
-                unit: '%',
-                y_label: 'count',
-              },
-              {
-                aggregate_function: 'avg',
-                chart_type: 'line',
-                color: 'red',
-                filters: [],
-                group_by: '',
-                label: 'HTTP_400',
-                metric: 'system_network_io_bytes_total',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 6,
-                unit: '%',
-                y_label: 'count',
-              },
-              {
-                aggregate_function: 'avg',
-                chart_type: 'line',
-                color: 'yellow',
-                filters: [],
-                group_by: '',
-                label: 'HTTP_500',
-                metric: 'system_cpu_utilization_ratio',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 6,
-                unit: '%',
-                y_label: 'count',
-              },
-              {
-                aggregate_function: 'avg',
-                chart_type: 'line',
-                color: 'green',
-                filters: [],
-                group_by: '',
-                label: 'Network',
-                metric: 'system_disk_operations_total',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 6,
-                unit: 'Kb/s',
-                y_label: 'count',
-              },
-            ],
-          },
-          {
-            created: '2023-07-12T16:08:53',
-            id: req.params.id,
-            label: 'ACLB Dashboard',
-            service_type: 'aclb',
-            time_duration: {
-              unit: 'hr',
-              value: 1,
-            },
-            updated: '2023-07-12T16:08:53',
-            widgets: [
-              {
-                aggregate_function: 'sum',
-                chart_type: 'line',
-                color: 'blue',
-                filters: [],
-                group_by: '',
-                label: 'CPU',
-                metric: '200',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 12,
-                unit: '%',
-                y_label: 'count',
-              },
-              {
-                aggregate_function: 'sum',
-                chart_type: 'line',
-                color: 'red',
-                filters: [],
-                group_by: '',
-                label: 'HTTP_400',
-                metric: '400',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 6,
-                unit: '%',
-                y_label: 'count',
-              },
-              {
-                aggregate_function: 'sum',
-                chart_type: 'line',
-                color: 'yellow',
-                filters: [],
-                group_by: '',
-                label: 'HTTP_500',
-                metric: '500',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 6,
-                unit: '%',
-                y_label: 'count',
-              },
-              {
-                aggregate_function: 'sum',
-                chart_type: 'line',
-                color: 'green',
-                filters: [],
-                group_by: '',
-                label: 'Network',
-                metric: '401',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 6,
-                unit: 'Kb/s',
-                y_label: 'count',
-              },
-            ],
-          },
-          {
-            created: 'Thu, 18 Apr 2024 05:31:58 GMT',
-            id: 2,
-            label: '1stLinodeDashboad',
-            service_type: 'linode',
-            type: 'standard',
-            updated: null,
-            widgets: [
-              {
-                aggregate_function: 'avg',
-                chart_type: 'line',
-                color: 'blue',
-                label: 'CPU utilization ratio',
-                metric: 'system_cpu_utilization_ratio',
-                service_type: 'linode',
-                size: 12,
-                unit: 'percent',
-                y_label: 'system_cpu_utilization_ratio',
-              },
-              {
-                aggregate_function: 'avg',
-                chart_type: 'line',
-                color: 'red',
-                label: 'Bytes of memory in use',
-                metric: 'system_memory_usage_bytes',
-                service_type: 'linode',
-                size: 12,
-                unit: 'byte',
-                y_label: 'system_memory_usage_bytes',
-              },
-              {
-                aggregate_function: 'avg',
-                chart_type: 'line',
-                color: 'green',
-                label: 'Number of bytes transmitted and received',
-                metric: 'system_network_io_bytes_total',
-                service_type: 'linode',
-                size: 6,
-                unit: 'bits_per_second',
-                y_label: 'system_network_io_bytes_total',
-              },
-              {
-                aggregate_function: 'avg',
-                chart_type: 'line',
-                color: 'yellow',
-                label: 'Disk operations count',
-                metric: 'system_disk_operations_total',
-                service_type: 'linode',
-                size: 6,
-                unit: 'rate',
-                y_label: 'system_disk_operations_total',
-              },
-            ],
-          },
-        ])
-      )
-    );
-  }),
-
-  rest.get('*/monitor/dashboards/:id', async (req, res, ctx) => {
-    await sleep(100); // this is to test out loading feature
-    if (req.params.id) {
-      return res(
-        ctx.json({
+    const body = await request.json();
+    console.log('request', request);
+    return HttpResponse.json(
+      makeResourcePage([
+        {
           created: '2023-07-12T16:08:53',
-          id: req.params.id,
+          id: 1,
           label: 'Akamai Global Dashboard',
-          service_type: 'ACLB',
+          service_type: 'linode',
+          time_duration: {
+            unit: 'hr',
+            value: 1,
+          },
+          updated: '2023-07-12T16:08:53',
+          widgets: [
+            {
+              aggregate_function: 'avg',
+              chart_type: 'line',
+              color: 'blue',
+              filters: [],
+              group_by: '',
+              label: 'CPU',
+              metric: 'system_memory_usage_bytes',
+              namespace_id: 1,
+              region_id: 1,
+              service_type: 'ACLB',
+              size: 12,
+              unit: '%',
+              y_label: 'count',
+            },
+            {
+              aggregate_function: 'avg',
+              chart_type: 'line',
+              color: 'red',
+              filters: [],
+              group_by: '',
+              label: 'HTTP_400',
+              metric: 'system_network_io_bytes_total',
+              namespace_id: 1,
+              region_id: 1,
+              service_type: 'ACLB',
+              size: 6,
+              unit: '%',
+              y_label: 'count',
+            },
+            {
+              aggregate_function: 'avg',
+              chart_type: 'line',
+              color: 'yellow',
+              filters: [],
+              group_by: '',
+              label: 'HTTP_500',
+              metric: 'system_cpu_utilization_ratio',
+              namespace_id: 1,
+              region_id: 1,
+              service_type: 'ACLB',
+              size: 6,
+              unit: '%',
+              y_label: 'count',
+            },
+            {
+              aggregate_function: 'avg',
+              chart_type: 'line',
+              color: 'green',
+              filters: [],
+              group_by: '',
+              label: 'Network',
+              metric: 'system_disk_operations_total',
+              namespace_id: 1,
+              region_id: 1,
+              service_type: 'ACLB',
+              size: 6,
+              unit: 'Kb/s',
+              y_label: 'count',
+            },
+          ],
+        },
+        {
+          created: '2023-07-12T16:08:53',
+          id: 2,
+          label: 'ACLB Dashboard',
+          service_type: 'aclb',
           time_duration: {
             unit: 'hr',
             value: 1,
@@ -799,12 +656,13 @@ const cloudView = [
               color: 'blue',
               filters: [],
               group_by: '',
-              label: 'HTTP_200',
+              label: 'CPU',
               metric: '200',
               namespace_id: 1,
               region_id: 1,
               service_type: 'ACLB',
               size: 12,
+              unit: '%',
               y_label: 'count',
             },
             {
@@ -819,6 +677,7 @@ const cloudView = [
               region_id: 1,
               service_type: 'ACLB',
               size: 6,
+              unit: '%',
               y_label: 'count',
             },
             {
@@ -833,6 +692,7 @@ const cloudView = [
               region_id: 1,
               service_type: 'ACLB',
               size: 6,
+              unit: '%',
               y_label: 'count',
             },
             {
@@ -841,81 +701,209 @@ const cloudView = [
               color: 'green',
               filters: [],
               group_by: '',
-              label: 'HTTP_401',
+              label: 'Network',
               metric: '401',
               namespace_id: 1,
               region_id: 1,
               service_type: 'ACLB',
               size: 6,
+              unit: 'Kb/s',
               y_label: 'count',
             },
           ],
-        })
-      );
+        },
+        {
+          created: 'Thu, 18 Apr 2024 05:31:58 GMT',
+          id: 3,
+          label: '1stLinodeDashboad',
+          service_type: 'linode',
+          type: 'standard',
+          updated: null,
+          widgets: [
+            {
+              aggregate_function: 'avg',
+              chart_type: 'line',
+              color: 'blue',
+              label: 'CPU utilization ratio',
+              metric: 'system_cpu_utilization_ratio',
+              service_type: 'linode',
+              size: 12,
+              unit: 'percent',
+              y_label: 'system_cpu_utilization_ratio',
+            },
+            {
+              aggregate_function: 'avg',
+              chart_type: 'line',
+              color: 'red',
+              label: 'Bytes of memory in use',
+              metric: 'system_memory_usage_bytes',
+              service_type: 'linode',
+              size: 12,
+              unit: 'byte',
+              y_label: 'system_memory_usage_bytes',
+            },
+            {
+              aggregate_function: 'avg',
+              chart_type: 'line',
+              color: 'green',
+              label: 'Number of bytes transmitted and received',
+              metric: 'system_network_io_bytes_total',
+              service_type: 'linode',
+              size: 6,
+              unit: 'bits_per_second',
+              y_label: 'system_network_io_bytes_total',
+            },
+            {
+              aggregate_function: 'avg',
+              chart_type: 'line',
+              color: 'yellow',
+              label: 'Disk operations count',
+              metric: 'system_disk_operations_total',
+              service_type: 'linode',
+              size: 6,
+              unit: 'rate',
+              y_label: 'system_disk_operations_total',
+            },
+          ],
+        },
+      ])
+    );
+  }),
+
+  http.get('*/monitor/dashboards/:id', async ({ request, params }) => {
+    await sleep(100); // this is to test out loading feature
+    if (params.id) {
+      return HttpResponse.json({
+        created: '2023-07-12T16:08:53',
+        id: params.id,
+        label: 'Akamai Global Dashboard',
+        service_type: 'ACLB',
+        time_duration: {
+          unit: 'hr',
+          value: 1,
+        },
+        updated: '2023-07-12T16:08:53',
+        widgets: [
+          {
+            aggregate_function: 'sum',
+            chart_type: 'line',
+            color: 'blue',
+            filters: [],
+            group_by: '',
+            label: 'HTTP_200',
+            metric: '200',
+            namespace_id: 1,
+            region_id: 1,
+            service_type: 'ACLB',
+            size: 12,
+            y_label: 'count',
+          },
+          {
+            aggregate_function: 'sum',
+            chart_type: 'line',
+            color: 'red',
+            filters: [],
+            group_by: '',
+            label: 'HTTP_400',
+            metric: '400',
+            namespace_id: 1,
+            region_id: 1,
+            service_type: 'ACLB',
+            size: 6,
+            y_label: 'count',
+          },
+          {
+            aggregate_function: 'sum',
+            chart_type: 'line',
+            color: 'yellow',
+            filters: [],
+            group_by: '',
+            label: 'HTTP_500',
+            metric: '500',
+            namespace_id: 1,
+            region_id: 1,
+            service_type: 'ACLB',
+            size: 6,
+            y_label: 'count',
+          },
+          {
+            aggregate_function: 'sum',
+            chart_type: 'line',
+            color: 'green',
+            filters: [],
+            group_by: '',
+            label: 'HTTP_401',
+            metric: '401',
+            namespace_id: 1,
+            region_id: 1,
+            service_type: 'ACLB',
+            size: 6,
+            y_label: 'count',
+          },
+        ],
+      });
     } else {
       // TODO, decide how to work on widgets and filters (for now keeping static ones)
-      return res(ctx.json(dashboardFactory.build({ id: 0 })));
+      return HttpResponse.json(dashboardFactory.build({ id: 0 }));
     }
   }),
 
-  rest.get('*/cloudview/services', async (req, res, ctx) => {
+  http.get('*/cloudview/services', async ({ request, params }) => {
     await sleep(2000);
-    return res(
-      ctx.json({
-        service_types: [
-          {
-            available_metrics: [
-              {
-                data_type: 'test',
-                description: 'test',
-                dimensions: [
-                  {
-                    data_type: 'test',
-                    description: 'test',
-                    key: 'test',
-                    label: 'test',
-                    values: ['test'],
-                  },
-                ],
-                label: 'test',
-                metric_label: 'test',
-                metric_type: 'test',
-              },
-            ],
-            price: '10usd',
-            service_type: 'ACLB',
-          },
-          {
-            available_metrics: [
-              {
-                data_type: 'test',
-                description: 'test',
-                dimensions: [
-                  {
-                    data_type: 'test',
-                    description: 'test',
-                    key: 'test',
-                    label: 'test',
-                    values: ['test'],
-                  },
-                ],
-                label: 'test',
-                metric_label: 'test',
-                metric_type: 'test',
-              },
-            ],
-            price: '10usd',
-            service_type: 'linodes',
-          },
-        ],
-      })
-    );
+    return HttpResponse.json({
+      service_types: [
+        {
+          available_metrics: [
+            {
+              data_type: 'test',
+              description: 'test',
+              dimensions: [
+                {
+                  data_type: 'test',
+                  description: 'test',
+                  key: 'test',
+                  label: 'test',
+                  values: ['test'],
+                },
+              ],
+              label: 'test',
+              metric_label: 'test',
+              metric_type: 'test',
+            },
+          ],
+          price: '10usd',
+          service_type: 'ACLB',
+        },
+        {
+          available_metrics: [
+            {
+              data_type: 'test',
+              description: 'test',
+              dimensions: [
+                {
+                  data_type: 'test',
+                  description: 'test',
+                  key: 'test',
+                  label: 'test',
+                  values: ['test'],
+                },
+              ],
+              label: 'test',
+              metric_label: 'test',
+              metric_type: 'test',
+            },
+          ],
+          price: '10usd',
+          service_type: 'linodes',
+        },
+      ],
+    });
   }),
-  rest.post('*/monitorss/service/linode/token', (req, res, ctx) => {
-    return res(ctx.json({ token: 'testlinodetoken' }));
+  http.post('*/monitorss/service/linode/token', async ({ request, params }) => {
+    return HttpResponse.json({ token: 'testlinodetoken' });
   }),
-  rest.post('*/monitorss/service/aclb/token', (req, res, ctx) => {
-    return res(ctx.json({ token: 'testaclbtoken' }));
+  http.post('*/monitorss/service/aclb/token', async ({ request, params }) => {
+    return HttpResponse.json({ token: 'testaclbtoken' });
   }),
 ];
 
