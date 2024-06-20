@@ -196,7 +196,7 @@ export const CloudViewWidget = React.memo(
       const legendRowsData: any[] = [];
 
       // for now we will use this, but once we decide how to work with coloring, it should be dynamic
-      let colors: string[] = COLOR_MAP.get('default')!; // default to blue theme for now, untill the default theme is finalised
+      let colors: string[] = COLOR_MAP.get('default')!; // choose default theme by default
       if (props.widget.color) {
         colors = COLOR_MAP.get(props.widget.color)!;
       }
