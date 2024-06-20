@@ -184,7 +184,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
         return (
           <Grid columnSpacing={1.5} container rowSpacing={0} spacing={2}>
             {
-                     
+
             {...newDashboard}.widgets.map((element, index) => {
               if (element) {
                 const availMetrics = metricDefinitions?.data.find(
@@ -192,7 +192,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
                     element.label === availMetrics.label
                 );
                 const cloudViewWidgetProperties = getCloudViewGraphProperties({...element});
-                
+
                 if(availMetrics && !cloudViewWidgetProperties.widget.time_granularity){
                   cloudViewWidgetProperties.widget.time_granularity = getTimeGranularity(availMetrics.scrape_interval);
                 }
@@ -241,7 +241,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
 
   return (
     <>
-      <RenderWidgets />;
+      <RenderWidgets />
     </>
   );
 });

@@ -423,7 +423,7 @@ export const CloudViewWidget = React.memo(
                 zoomIn={widget?.size == 12 ? true : false}
               />
             </div>
-            <Divider spacingBottom={32} spacingTop={32} />
+            <Divider spacingBottom={32} spacingTop={15} />
             {!isLoading && <CloudViewLineGraph // rename where we have cloudview to cloudpulse
               error={
                 status == 'error'
@@ -441,7 +441,7 @@ export const CloudViewWidget = React.memo(
               data={data}
               formatTooltip={isBytes ? formatToolTip : undefined}
               gridSize={widget.size}
-              legendRows={legendRows}
+              legendRows={(legendRows && legendRows.length > 0) ? legendRows : undefined}
               loading={isLoading}
               nativeLegend={true}
               showToday={today}
