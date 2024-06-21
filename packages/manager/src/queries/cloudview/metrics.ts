@@ -21,7 +21,7 @@ export const useCloudViewMetricsQuery = (
     () => getCloudViewMetricsAPI(props.authToken, serviceType, request),
     {
       enabled: !!enabled,
-      refetchInterval: 60000,
+      refetchInterval: 6000000,
       retry: 0,
       refetchOnWindowFocus: false
     }
