@@ -141,9 +141,9 @@ export const CloudViewWidget = React.memo(
       const results =
         flags.aclpResourceTypeMap && flags.aclpResourceTypeMap.length > 0
           ? flags.aclpResourceTypeMap.filter(
-              (obj: CloudPulseResourceTypeMap) =>
-                obj.serviceName === serviceType
-            )
+            (obj: CloudPulseResourceTypeMap) =>
+              obj.serviceType === serviceType
+          )
           : [];
 
       const flag = results && results.length > 0 ? results[0] : undefined;
