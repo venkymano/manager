@@ -300,45 +300,37 @@ export const CloudViewWidget = React.memo(
 
     const handleAggregateFunctionChange = React.useCallback(
       (aggregateValue: string) => {
-        if (aggregateValue !== widget.aggregate_function) {
-          if (props.savePref) {
-            updateWidgetPreference(widget.label, {
-              [AGGREGATE_FUNCTION]: aggregateValue,
-            });
-          }
-
-          setWidget((currentWidget) => {
-            return {
-              ...currentWidget,
-              aggregate_function: aggregateValue,
-            };
+        if (props.savePref) {
+          updateWidgetPreference(widget.label, {
+            [AGGREGATE_FUNCTION]: aggregateValue,
           });
 
         }
+
+        setWidget((currentWidget) => {
+          return {
+            ...currentWidget,
+            aggregate_function: aggregateValue,
+          };
+        });
       },
       []
     );
 
     const handleIntervalChange = React.useCallback(
       (intervalValue: TimeGranularity) => {
-        if (
-          !widget.time_granularity ||
-          intervalValue.unit !== widget.time_granularity.unit ||
-          intervalValue.value !== widget.time_granularity.value
-        ) {
-          if (props.savePref) {
-            updateWidgetPreference(widget.label, {
-              [TIME_GRANULARITY]: { ...intervalValue },
-            });
-          }
-          setWidget((currentWidget) => {
-            return {
-              ...currentWidget,
-              time_granularity: { ...intervalValue },
-            };
+        if (props.savePref) {
+          updateWidgetPreference(widget.label, {
+            [TIME_GRANULARITY]: { ...intervalValue },
           });
-          // setSelectedInterval({ ...intervalValue });
         }
+        setWidget((currentWidget) => {
+          return {
+            ...currentWidget,
+            time_granularity: { ...intervalValue },
+          };
+        });
+        // setSelectedInterval({ ...intervalValue });
       },
       []
     );
