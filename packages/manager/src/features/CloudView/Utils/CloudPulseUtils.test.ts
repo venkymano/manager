@@ -69,7 +69,7 @@ it('test getDimensionName happy path', () => {
   };
 
   const flag = {
-    metricKey: 'LINODE_ID',
+    dimensionKey: 'LINODE_ID',
   };
 
   const resources = [
@@ -102,7 +102,7 @@ it('test getDimensionName non matching use case', () => {
   };
 
   const flag = {
-    metricKey: 'LINODE_ID',
+    dimensionKey: 'LINODE_ID',
   };
 
   const resources = [
@@ -127,7 +127,7 @@ it('test getDimensionName non matching use case with flag', () => {
   };
 
   const flag = {
-    metricKey: 'LINODE_ID',
+    dimensionKey: 'LINODE_ID',
   };
 
   const resources = [
@@ -153,7 +153,7 @@ it('test getDimensionName matching use case with multiple metrics', () => {
   };
 
   const flag = {
-    metricKey: 'LINODE_ID',
+    dimensionKey: 'LINODE_ID',
   };
 
   const resources = [
@@ -179,7 +179,7 @@ it('test getDimensionName matching use case with multiple metrics in which somet
   };
 
   const flag = {
-    metricKey: 'LINODE_ID',
+    dimensionKey: 'LINODE_ID',
   };
 
   const resources = [
@@ -205,7 +205,7 @@ it('test getDimensionName matching use case with multiple metrics in which id is
   };
 
   const flag = {
-    metricKey: 'LINODE_ID',
+    dimensionKey: 'LINODE_ID',
   };
 
   const resources = [

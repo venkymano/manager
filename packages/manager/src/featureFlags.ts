@@ -104,8 +104,8 @@ export interface PromotionalOffer {
 }
 
 export interface CloudPulseResourceTypeMap {
-  metricKey: string;
-  serviceName: string;
+  dimensionKey: string;
+  serviceType: string;
 }
 
 /**
