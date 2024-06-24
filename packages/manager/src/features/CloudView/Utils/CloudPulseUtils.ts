@@ -1,6 +1,8 @@
 import { GetJWETokenPayload, TimeDuration } from '@linode/api-v4';
 
 import { WithStartAndEnd } from 'src/features/Longview/request.types';
+import { useFlags } from 'src/hooks/useFlags';
+import { ACLP_SERVICES_FOR_REGION_FILTER } from './CloudPulseConstants';
 
 export const mapResourceIdToName = (id: string, resources: any[]) => {
   if (!resources || resources.length == 0) {
@@ -97,4 +99,19 @@ export const removeObjectReference = (object: any)=> {
   } catch (e) {
     return null;
   }
+}
+
+export const isRegionApplicable = (serviceType : string | undefined) : boolean=>{
+  const flags = useFlags();
+
+  let isRegionApplicable = true;
+
+  if(serviceType &&flags && flags[ACLP_SERVICES_FOR_REGION_FILTER]){
+    const services  :Array<string> = flags[ACLP_SERVICES_FOR_REGION_FILTER];
+
+    if(services.indexOf(serviceType) === -1){
+      isRegionApplicable = false;
+    }
+  }
+  return isRegionApplicable;
 }

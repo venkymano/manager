@@ -20,3 +20,5 @@ export const REFRESH = "refresh";
 export const TIME_GRANULARITY = "time_granularity";
 
 export const WIDGETS = "widgets";
+
+export const ACLP_SERVICES_FOR_REGION_FILTER = "aclpServicesForRegionFilters";
