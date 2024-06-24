@@ -15,13 +15,7 @@ import { CloudViewDashboardSelect } from '../shared/DashboardSelect';
 import { CloudViewRegionSelect } from '../shared/RegionSelect';
 import { CloudViewMultiResourceSelect } from '../shared/ResourceMultiSelect';
 import { CloudPulseTimeRangeSelect } from '../shared/TimeRangeSelect';
-import {
-  REFRESH,
-  REGION,
-  RESOURCES,
-  TIME_DURATION,
-} from '../Utils/CloudPulseConstants';
-import { isRegionApplicable } from '../Utils/CloudPulseUtils';
+import { REFRESH, REGION, RESOURCES, TIME_DURATION } from '../Utils/CloudPulseConstants';
 import { updateGlobalFilterPreference } from '../Utils/UserPreference';
 
 export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
@@ -33,11 +27,7 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
     Dashboard | undefined
   >();
 
-  const [selectedRegion, setSelectedRegion] = React.useState<
-    string | undefined
-  >();
-
-  const isRegionAppl: boolean = isRegionApplicable(selectedDashboard?.service_type);
+  const [selectedRegion, setSelectedRegion] = React.useState<string | undefined>();
 
   const handleTimeRangeChange = React.useCallback(
     (
