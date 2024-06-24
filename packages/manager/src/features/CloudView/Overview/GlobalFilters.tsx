@@ -21,6 +21,7 @@ import {
   RESOURCES,
   TIME_DURATION,
 } from '../Utils/CloudPulseConstants';
+import { isRegionApplicable } from '../Utils/CloudPulseUtils';
 import { updateGlobalFilterPreference } from '../Utils/UserPreference';
 
 export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
@@ -35,6 +36,8 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
   const [selectedRegion, setSelectedRegion] = React.useState<
     string | undefined
   >();
+
+  const isRegionAppl: boolean = isRegionApplicable(selectedDashboard?.service_type);
 
   const handleTimeRangeChange = React.useCallback(
     (
@@ -92,15 +95,20 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
             handleDashboardChange={handleDashboardChange}
           />
         </Grid>
-        <Grid sx={{ marginLeft: 4, width: 200 }}>
-          <StyledCloudViewRegionSelect
-            handleRegionChange={handleRegionChange}
-            selectedDashboard={selectedDashboard}
-          />
-        </Grid>
+        {
+          isRegionAppl &&
+          <Grid sx={{ marginLeft: 4, width: 200 }}>
+            <StyledCloudViewRegionSelect
+
+              handleRegionChange={handleRegionChange}
+              selectedDashboard={selectedDashboard}
+            />
+          </Grid>
+        }
         <Grid sx={{ marginLeft: 4, width: 450 }}>
           <StyledCloudViewResourceSelect
-            disabled={!selectedRegion || !selectedDashboard?.service_type}
+
+            disabled={(!selectedRegion && isRegionAppl) || !selectedDashboard?.service_type}
             handleResourceChange={handleResourceChange}
             region={selectedRegion}
             resourceType={selectedDashboard?.service_type}
