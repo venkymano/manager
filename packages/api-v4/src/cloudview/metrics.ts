@@ -22,9 +22,9 @@ export const getCloudViewMetrics = (
 
 export const getCloudViewMetricsAPI = (
   jweToken: string,
+  readApiEndpoint: string,
   serviceType?: string,
-  metricsRequest?: CloudViewMetricsRequest,
-  readApiEndpoint: string
+  metricsRequest?: CloudViewMetricsRequest,  
 ) =>
   Request<CloudViewMetricsResponse>(
     setURL(
