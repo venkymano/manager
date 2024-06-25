@@ -23,11 +23,12 @@ export const getCloudViewMetrics = (
 export const getCloudViewMetricsAPI = (
   jweToken: string,
   serviceType?: string,
-  metricsRequest?: CloudViewMetricsRequest
+  metricsRequest?: CloudViewMetricsRequest,
+  readApiEndpoint: string
 ) =>
   Request<CloudViewMetricsResponse>(
     setURL(
-      `https://aclp-us-iad.cloud-observability-dev.akadns.net/monitor/services/${encodeURIComponent(
+      `${readApiEndpoint}/${encodeURIComponent(
         serviceType!
       )}/metrics`
     ),

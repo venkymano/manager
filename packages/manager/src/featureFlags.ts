@@ -48,6 +48,7 @@ export interface Flags {
   aclb: boolean;
   aclbFullCreateFlow: boolean;
   aclpResourceTypeMap: CloudPulseResourceTypeMap[];
+  aclpReadEndpoint: string;
   apiMaintenance: APIMaintenance;
   cloudView: boolean;
   databaseBeta: boolean;
