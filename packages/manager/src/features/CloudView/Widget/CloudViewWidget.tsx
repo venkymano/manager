@@ -202,7 +202,7 @@ export const CloudViewWidget = React.memo(
       }
       
       // for now , lets stick with the default theme
-      // colors = COLOR_MAP.get('default')!;
+      colors = COLOR_MAP.get('default')!;
 
       if (
         status == 'success' &&
