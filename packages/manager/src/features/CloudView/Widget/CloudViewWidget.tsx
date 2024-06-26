@@ -99,7 +99,11 @@ export const CloudViewWidget = React.memo(
 
     const [data, setData] = React.useState<Array<any>>([]);
 
+
+    const jweTokenExpiryError = 'JWE Decrypt: expired';
+
     const [legendRows, setLegendRows] = React.useState<any[]>([]);
+
 
     const [today, setToday] = React.useState<boolean>(false);
 
@@ -368,6 +372,7 @@ export const CloudViewWidget = React.memo(
     }, []);
 
 
+
     return (
       <Grid xs={widget.size}>
         <Paper
@@ -422,7 +427,11 @@ export const CloudViewWidget = React.memo(
               />
             </div>
             <Divider spacingBottom={32} spacingTop={15} />
-            {!isLoading && <CloudViewLineGraph // rename where we have cloudview to cloudpulse
+            {!(isLoading ||
+              (status == 'error' &&
+                error &&
+                error.length > 0 &&
+                error[0].reason == jweTokenExpiryError)) && <CloudViewLineGraph // rename where we have cloudview to cloudpulse
               error={
                 status == 'error'
                   ? error && error.length > 0
@@ -447,7 +456,11 @@ export const CloudViewWidget = React.memo(
               title={""}
               unit={!isBytes ? ` ${currentUnit}` : undefined}
             />}
-            {isLoading &&
+            {(isLoading ||
+              (status == 'error' &&
+                error &&
+                error.length > 0 &&
+                error[0].reason == jweTokenExpiryError)) &&
               <CircleProgress />}
           </div>
         </Paper>

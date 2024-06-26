@@ -4,8 +4,7 @@ import {
   CloudViewMetricsResponse,
   getCloudViewMetricsAPI,
 } from '@linode/api-v4';
-import { useQuery } from '@tanstack/react-query';
-
+import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useCloudViewMetricsQuery = (
   serviceType: string,
@@ -15,11 +14,26 @@ export const useCloudViewMetricsQuery = (
   enabled: boolean | undefined,
   readApiEndpoint: string
 ) => {
+  const queryClient = useQueryClient();
   return useQuery<CloudViewMetricsResponse, APIError[]>(
-    [request, widgetProps, serviceType], // querykey and dashboardId makes this uniquely identifiable
+    [request, widgetProps, serviceType, props.authToken], // querykey and dashboardId makes this uniquely identifiable
     () => getCloudViewMetricsAPI(props.authToken,readApiEndpoint, serviceType, request),
     {
       enabled: !!enabled,
+      onError(err: APIError[]) {
+        if (err && err.length > 0 && err[0].reason == 'JWE Decrypt: expired') {
+          const currentJWEtokenCache: any = queryClient.getQueryData([
+            'jwe-token',
+            serviceType,
+          ]);
+          if (
+            currentJWEtokenCache.token == props.authToken &&
+            !queryClient.isFetching(['jwe-token', serviceType])
+          ) {
+            queryClient.invalidateQueries(['jwe-token', serviceType]);
+          }
+        }
+      },
       refetchInterval: 6000000,
       retry: 0,
       refetchOnWindowFocus: false
