@@ -7,13 +7,13 @@ import {
   getJWEToken,
 } from '@linode/api-v4';
 import { APIError, ResourcePage } from '@linode/api-v4/lib/types';
-import { useQuery } from '@tanstack/react-query';
+import { UseQueryOptions, useQueries, useQuery } from '@tanstack/react-query';
 
 export const queryKey = 'cloudview-dashboards';
 
 export const useCloudViewDashboardByIdQuery = (
   dashboardId: number | undefined,
-  key :boolean | undefined
+  key: boolean | undefined
 ) => {
   return useQuery<Dashboard, APIError[]>(
     [queryKey, dashboardId, key], // querykey and dashboardId makes this uniquely identifiable
@@ -24,14 +24,17 @@ export const useCloudViewDashboardByIdQuery = (
   );
 };
 
-export const useCloudViewDashboardsQuery = () => {
-  return useQuery<ResourcePage<Dashboard>, APIError[]>(
-    [queryKey], // querykey and dashboardId makes this uniquely identifiable
-    () => getDashboards(),
-    {
-      enabled: true,
-    } // run this only if dashboarID is valid one
-  );
+export const useCloudViewDashboardsQuery = (serviceTypes: string[]) => {
+  return useQueries({
+    queries: serviceTypes?.map<
+      UseQueryOptions<ResourcePage<Dashboard>, APIError[]>
+    >((serviceType) => ({
+      enabled: serviceTypes.length > 0,
+      queryFn: () => getDashboards(serviceType),
+      queryKey: [queryKey, serviceType],
+      retry: 0,
+    })),
+  });
 };
 
 export const useCloudViewJWEtokenQuery = (

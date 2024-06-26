@@ -86,7 +86,7 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
   return (
     <Grid container sx={{ ...itemSpacing, padding: '8px' }}>
       <StyledGrid xs={12}>
-        <Grid sx={{ width: 300 }}>
+        <Grid sx={{ width: 300, marginTop: 2 }}>
           <CloudViewDashboardSelect
             handleDashboardChange={handleDashboardChange}
           />
@@ -136,10 +136,11 @@ const StyledCloudViewTimeRangeSelect = styled(CloudPulseTimeRangeSelect, {
   label: 'StyledCloudViewTimeRangeSelect',
 })({
   width: 160,
+  marginTop: 8,
 });
 
 const StyledGrid = styled(Grid, { label: 'StyledGrid' })(({ theme }) => ({
-  alignItems: 'end',
+  alignItems: 'start',
   boxSizing: 'border-box',
   display: 'flex',
   flexDirection: 'row',
@@ -161,4 +162,5 @@ const StyledReload = styled(Reload, { label: 'StyledReload' })(({ theme }) => ({
   },
   height: '27px',
   width: '27px',
+  marginTop: 27,
 }));

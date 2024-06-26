@@ -1,6 +1,10 @@
 import { API_ROOT } from '../constants';
 import Request, { setHeaders, setMethod, setURL } from '../request';
-import { MetricDefinitions, MonitorServiceType, ServiceTypes } from './types';
+import {
+  MetricDefinitions,
+  MonitorServiceType,
+  ServiceTypesList,
+} from './types';
 import { ResourcePage as Page } from 'src/types';
 
 /**
@@ -10,9 +14,14 @@ import { ResourcePage as Page } from 'src/types';
  *
  */
 export const getCloudViewServiceTypes = () =>
-  Request<ServiceTypes>(
-    setURL(`${API_ROOT}/cloudview/services`),
-    setMethod('GET')
+  Request<ServiceTypesList>(
+    setURL(
+      `http://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services`
+    ),
+    setMethod('GET'),
+    setHeaders({
+      Authorization: 'Bearer vagrant',
+    })
   );
 
 export const getMonitorServiceTypeInformationByServiceType = (
