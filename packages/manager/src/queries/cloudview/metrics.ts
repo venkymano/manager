@@ -2,26 +2,25 @@ import {
   APIError,
   CloudViewMetricsRequest,
   CloudViewMetricsResponse,
-  getCloudViewMetrics,
   getCloudViewMetricsAPI,
 } from '@linode/api-v4';
 import { useQuery } from '@tanstack/react-query';
 
-import { queryKey } from '../preferences';
 
 export const useCloudViewMetricsQuery = (
   serviceType: string,
   request: CloudViewMetricsRequest,
   props: any,
   widgetProps: any,
-  enabled: boolean | undefined
+  enabled: boolean | undefined,
+  readApiEndpoint: string
 ) => {
   return useQuery<CloudViewMetricsResponse, APIError[]>(
     [request, widgetProps, serviceType], // querykey and dashboardId makes this uniquely identifiable
-    () => getCloudViewMetricsAPI(props.authToken, serviceType, request),
+    () => getCloudViewMetricsAPI(props.authToken,readApiEndpoint, serviceType, request),
     {
       enabled: !!enabled,
-      refetchInterval: 60000,
+      refetchInterval: 6000000,
       retry: 0,
       refetchOnWindowFocus: false
     }
