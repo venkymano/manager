@@ -189,7 +189,7 @@ export const CloudViewWidget = React.memo(
       '_' +
       props.timeStamp ?? '',
       flags!=undefined,
-      flags.aclpReadEndpoint
+      flags.aclpReadEndpoint!
     ); // fetch the metrics on any property change
 
     React.useEffect(() => {
