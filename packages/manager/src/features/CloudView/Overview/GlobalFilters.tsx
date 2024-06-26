@@ -135,7 +135,7 @@ const StyledCloudViewResourceSelect = styled(CloudViewMultiResourceSelect, {
 const StyledCloudViewTimeRangeSelect = styled(CloudPulseTimeRangeSelect, {
   label: 'StyledCloudViewTimeRangeSelect',
 })({
-  width: 140,
+  width: 160,
 });
 
 const StyledGrid = styled(Grid, { label: 'StyledGrid' })(({ theme }) => ({

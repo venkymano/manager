@@ -2,14 +2,12 @@ import { Theme } from '@mui/material/styles';
 import * as React from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { Divider } from 'src/components/Divider';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import {
   DataSet,
   LineGraph,
   LineGraphProps,
 } from 'src/components/LineGraph/LineGraph';
-import { Typography } from 'src/components/Typography';
 
 const useStyles = makeStyles()((theme: Theme) => ({
   message: {
@@ -17,15 +15,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     position: 'absolute',
     top: '45%',
     transform: 'translate(-50%, -50%)',
-  },
-  title: {
-    '& > span': {
-      color: theme.palette.text.primary,
-    },
-    color: theme.color.headline,
-    fontFamily: theme.font.bold,
-    fontSize: '1rem',
-  },
+  }
 }));
 
 export interface CloudViewLineGraphProps extends LineGraphProps {
@@ -54,19 +44,7 @@ export const CloudViewLineGraph = React.memo(
 
     return (
       <React.Fragment>
-        <Typography
-          className={classes.title}
-          style={{ marginLeft: '13px', marginTop: '25px', paddingTop: '15px' }}
-          variant="body1"
-        >
-          {title}
-          {subtitle && (
-            <React.Fragment>
-              &nbsp;<span>({subtitle})</span>
-            </React.Fragment>
-          )}
-        </Typography>
-        <Divider spacingBottom={32} spacingTop={32} />
+
         <div style={{ position: 'relative' }}>
           {error ? (
             <div style={{ height: props.chartHeight || '300px' }}>

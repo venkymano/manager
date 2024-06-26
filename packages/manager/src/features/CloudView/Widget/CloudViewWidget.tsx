@@ -6,12 +6,14 @@ import {
   TimeGranularity,
   Widgets,
 } from '@linode/api-v4';
-import { Paper } from '@mui/material';
+import { Paper, Theme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import React from 'react';
 
 import { CircleProgress } from 'src/components/CircleProgress';
+import { Divider } from 'src/components/Divider';
+import { Typography } from 'src/components/Typography';
 import { CloudPulseResourceTypeMap } from 'src/featureFlags';
 import { useFlags } from 'src/hooks/useFlags';
 import { useCloudViewMetricsQuery } from 'src/queries/cloudview/metrics';
@@ -19,14 +21,13 @@ import { useProfile } from 'src/queries/profile';
 import { isToday as _isToday } from 'src/utilities/isToday';
 import { roundTo } from 'src/utilities/roundTo';
 import { getMetrics } from 'src/utilities/statMetrics';
-
+import { makeStyles } from 'tss-react/mui';
 import {
   AGGREGATE_FUNCTION,
   SIZE,
   TIME_GRANULARITY,
 } from '../Utils/CloudPulseConstants';
 import {
-  convertStringToCamelCasesWithSpaces,
   convertTimeDurationToStartAndEndTimeRange,
   getDimensionName,
 } from '../Utils/CloudPulseUtils';
@@ -74,8 +75,24 @@ const StyledZoomIcon = styled(ZoomIcon, {
   marginTop: '10px',
 });
 
+const useStyles = makeStyles()((theme: Theme) => ({
+
+  title: {
+    '& > span': {
+      color: theme.palette.text.primary,
+    },
+    color: theme.color.headline,
+    fontFamily: theme.font.bold,
+    marginLeft: "8px",
+    fontSize: '1.30rem',
+  },
+}));
+
 export const CloudViewWidget = React.memo(
   (props: CloudViewWidgetProperties) => {
+
+    const { classes } = useStyles();
+
     const { data: profile } = useProfile();
 
     const timezone = profile?.timezone || 'US/Eastern';
@@ -161,17 +178,18 @@ export const CloudViewWidget = React.memo(
       getCloudViewMetricsRequest(),
       props,
       widget.aggregate_function +
-        '_' +
-        widget.group_by +
-        '_' +
-        widget.time_granularity +
-        '_' +
-        widget.metric +
-        '_' +
-        widget.label +
-        '_' +
-        props.timeStamp ?? '',
-      true
+      '_' +
+      widget.group_by +
+      '_' +
+      widget.time_granularity +
+      '_' +
+      widget.metric +
+      '_' +
+      widget.label +
+      '_' +
+      props.timeStamp ?? '',
+      flags!=undefined,
+      flags.aclpReadEndpoint
     ); // fetch the metrics on any property change
 
     React.useEffect(() => {
@@ -202,7 +220,7 @@ export const CloudViewWidget = React.memo(
       }
       
       // for now , lets stick with the default theme
-      colors = COLOR_MAP.get('default')!;
+      // colors = COLOR_MAP.get('default')!;
 
       if (
         status == 'success' &&
@@ -349,17 +367,6 @@ export const CloudViewWidget = React.memo(
       }
     }, []);
 
-    if (isLoading) {
-      return (
-        <Grid xs={widget.size}>
-          <Paper style={{ height: '98%', width: '100%' }}>
-            <div style={{ margin: '1%' }}>
-              <CircleProgress />
-            </div>
-          </Paper>
-        </Grid>
-      );
-    }
 
     return (
       <Grid xs={widget.size}>
@@ -372,16 +379,21 @@ export const CloudViewWidget = React.memo(
           }}
         >
           {/* add further components like group by resource, aggregate_function, step here , for sample added zoom icon here*/}
-          <div className={widget.metric} style={{ margin: '1%' }}>
+          <div className={widget.metric} style={{ margin: '1%', }}>
             <div
               style={{
-                alignItems: 'start',
+                alignItems: 'center',
                 display: 'flex',
-                float: 'right',
-                justifyContent: 'flex-end',
-                width: '70%',
+                width: '100%',
               }}
             >
+              <Grid sx={{ marginRight: "auto" }}>
+                <Typography
+                  className={classes.title}
+                >
+                  {`${props.widget.label}`} {(!isLoading || !isBytes) && `(${currentUnit})`} {/* show the units of bytes data only when complete data is loaded */}
+                </Typography>
+              </Grid>
               <Grid sx={{ marginRight: 5, width: 100 }}>
                 {props.availableMetrics?.scrape_interval && (
                   <IntervalSelectComponent
@@ -409,7 +421,8 @@ export const CloudViewWidget = React.memo(
                 zoomIn={widget?.size == 12 ? true : false}
               />
             </div>
-            <CloudViewLineGraph // rename where we have cloudview to cloudpulse
+            <Divider spacingBottom={32} spacingTop={15} />
+            {!isLoading && <CloudViewLineGraph // rename where we have cloudview to cloudpulse
               error={
                 status == 'error'
                   ? error && error.length > 0
@@ -426,15 +439,16 @@ export const CloudViewWidget = React.memo(
               data={data}
               formatTooltip={isBytes ? formatToolTip : undefined}
               gridSize={widget.size}
-              legendRows={legendRows}
+              legendRows={(legendRows && legendRows.length > 0) ? legendRows : undefined}
               loading={isLoading}
               nativeLegend={true}
               showToday={today}
-              subtitle={currentUnit}
               timezone={timezone}
-              title={convertStringToCamelCasesWithSpaces(props.widget.label)}
+              title={""}
               unit={!isBytes ? ` ${currentUnit}` : undefined}
-            />
+            />}
+            {isLoading &&
+              <CircleProgress />}
           </div>
         </Paper>
       </Grid>
