@@ -7,7 +7,9 @@ import { Dashboard, JWEToken, GetJWETokenPayload } from './types';
 export const getDashboardById = (dashboardId?: number) =>
   Request<Dashboard>(
     setURL(
-      `http://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/dashboards/${encodeURIComponent(dashboardId!)}`
+      `http://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/dashboards/${encodeURIComponent(
+        dashboardId!
+      )}`
     ),
     setMethod('GET'),
     setHeaders({
@@ -15,10 +17,12 @@ export const getDashboardById = (dashboardId?: number) =>
     })
   );
 
-export const getDashboards = () =>
+export const getDashboards = (serviceType: string) =>
   Request<ResourcePage<Dashboard>>(
     setURL(
-      `http://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services/linode/dashboards`
+      `http://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services/${encodeURIComponent(
+        serviceType
+      )}/dashboards`
     ),
     setMethod('GET'),
     setHeaders({

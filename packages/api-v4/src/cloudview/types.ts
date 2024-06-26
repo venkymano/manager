@@ -169,3 +169,7 @@ export interface JWEToken {
 export interface GetJWETokenPayload {
   resource_id: number[];
 }
+
+export interface ServiceTypesList {
+  data: any[];
+}
