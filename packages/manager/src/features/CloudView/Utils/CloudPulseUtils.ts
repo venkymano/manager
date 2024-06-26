@@ -22,13 +22,13 @@ export const mapResourceIdToName = (id: string, resources: any[]) => {
 export const getDimensionName = (metric: any, flag: any, resources: any[]) => {
   let labelName = '';
   Object.keys(metric).forEach((key) => {
-    if (flag && key == flag.metricKey) {
-      const mappedName = mapResourceIdToName(metric[flag.metricKey], resources);
+    if (flag && key == flag.dimensionKey) {
+      const mappedName = mapResourceIdToName(metric[flag.dimensionKey], resources);
 
       if (mappedName && mappedName.length > 0) {
         labelName =
           labelName +
-          mapResourceIdToName(metric[flag.metricKey], resources) +
+          mapResourceIdToName(metric[flag.dimensionKey], resources) +
           '_';
       }
     } else if (metric[key]) {
@@ -87,3 +87,14 @@ export const convertStringToCamelCasesWithSpaces = (
 
   return nonFormattedString;
 };
+
+export const removeObjectReference = (object: any)=> {
+  if (!object) {
+    return null;
+  }
+  try {
+    return JSON.parse(JSON.stringify(object));
+  } catch (e) {
+    return null;
+  }
+}

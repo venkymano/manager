@@ -11,12 +11,13 @@ export const useCloudViewMetricsQuery = (
   request: CloudViewMetricsRequest,
   props: any,
   widgetProps: any,
-  enabled: boolean | undefined
+  enabled: boolean | undefined,
+  readApiEndpoint: string
 ) => {
   const queryClient = useQueryClient();
   return useQuery<CloudViewMetricsResponse, APIError[]>(
     [request, widgetProps, serviceType, props.authToken], // querykey and dashboardId makes this uniquely identifiable
-    () => getCloudViewMetricsAPI(props.authToken, serviceType, request),
+    () => getCloudViewMetricsAPI(props.authToken,readApiEndpoint, serviceType, request),
     {
       enabled: !!enabled,
       onError(err: APIError[]) {
@@ -33,8 +34,7 @@ export const useCloudViewMetricsQuery = (
           }
         }
       },
-      refetchInterval: 60000,
-      refetchOnWindowFocus: false,
+      refetchInterval: 6000000,
       retry: 0,
     }
   );

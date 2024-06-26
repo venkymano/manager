@@ -1,4 +1,4 @@
-export type Unit = 'b' | 'Kb' | 'Mb' | 'Gb'
+export type Unit = 'Pb' | 'Tb' | 'Gb' | 'Kb' | 'Mb' | 'b';
 
 /**
  * converts bytes to either Kb (Kilobits) or Mb (Megabits) or Gb (Gigabits)
@@ -6,39 +6,40 @@ export type Unit = 'b' | 'Kb' | 'Mb' | 'Gb'
  *
  * @param networkUsedInBytes inbound and outbound traffic in bytes
  */
-export const generateUnitByByteValue = (
-  networkUsedInBytes: number
-): Unit => {
+export const generateUnitByByteValue = (networkUsedInBytes: number): Unit => {
   const networkUsedToKilobits = (networkUsedInBytes * 8) / 1000;
   if (networkUsedToKilobits <= 1) {
     return 'b';
-  } else if (networkUsedToKilobits <= 1000) {
+  } else if (networkUsedToKilobits <= 1e3) {
     return 'Kb';
-  } else if (networkUsedToKilobits <= 1000000) {
+  } else if (networkUsedToKilobits <= 1e6) {
     return 'Mb';
-  } else {
+  } else if(networkUsedToKilobits <= 1e9) {
     return 'Gb';
+  }else if (networkUsedToKilobits <= 1e12){
+    return 'Tb';
+  }else{
+    return 'Pb';
   }
 };
 
-
-
-export const convertBytesToUnit = (
-  valueInBits: number,
-  maxUnit: Unit
-) => {
-  if (maxUnit === "Gb") {
-    return valueInBits / Math.pow(1000, 3);
+export const convertBytesToUnit = (valueInBits: number, maxUnit: Unit) => {
+  if (maxUnit === 'Pb') {
+    return valueInBits / 1e15;
   }
-  else if (maxUnit === 'Mb') {
-    return valueInBits / Math.pow(1000, 2);
+  else if (maxUnit === 'Tb') {
+    return valueInBits / 1e12;
+  }
+  else if (maxUnit === 'Gb') {
+    return valueInBits / 1e9;
+  } else if (maxUnit === 'Mb') {
+    return valueInBits / 1e6;
   } else if (maxUnit === 'Kb') {
-    return valueInBits / 1000;
+    return valueInBits / 1e3;
   } else {
     return Math.round(valueInBits);
   }
 };
-
 
 export const formatToolTip = (valueInBytes: number) => {
   const _unit = generateUnitByByteValue(valueInBytes);
