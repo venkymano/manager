@@ -100,7 +100,7 @@ export const CloudViewWidget = React.memo(
     const [data, setData] = React.useState<Array<any>>([]);
 
 
-    const jweTokenExpiryError = 'JWE Decrypt: expired';
+    const jweTokenExpiryError = 'Token expired';
 
     const [legendRows, setLegendRows] = React.useState<any[]>([]);
 

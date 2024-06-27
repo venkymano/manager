@@ -21,7 +21,7 @@ export const useCloudViewMetricsQuery = (
     {
       enabled: !!enabled,
       onError(err: APIError[]) {
-        if (err && err.length > 0 && err[0].reason == 'JWE Decrypt: expired') {
+        if (err && err.length > 0 && err[0].reason == 'Token expired') {
           const currentJWEtokenCache: any = queryClient.getQueryData([
             'jwe-token',
             serviceType,
