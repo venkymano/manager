@@ -1,6 +1,8 @@
 import type { Doc } from './features/OneClickApps/types';
 import type { TPAProvider } from '@linode/api-v4/lib/profile';
 import type { NoticeVariant } from 'src/components/Notice/Notice';
+import { StringLocale } from 'yup/lib/locale';
+import { CloudPulseSelectTypes } from './features/CloudView/shared/CloudPulseCustomSelect';
 
 // These flags should correspond with active features flags in LD
 
@@ -78,6 +80,7 @@ export interface Flags {
   taxes: Taxes;
   tpaProviders: Provider[];
   vpc: boolean;
+  aclpServiceTypeFiltersMap: CloudPulseServiceTypeFilterMap[];
 }
 
 type PromotionalOfferFeature =
@@ -107,6 +110,34 @@ export interface PromotionalOffer {
 export interface CloudPulseResourceTypeMap {
   dimensionKey: string;
   serviceType: string;
+}
+
+export interface CloudPulseServiceTypeFilterMap {
+  serviceType: string;
+  filters: CloudPulseServiceTypeFilters[];
+}
+
+export interface CloudPulseServiceTypeFilters {
+  name: string;
+  configuration:CloudPulseServiceTypeFiltersConfiguration;
+}
+
+export interface CloudPulseServiceTypeFiltersConfiguration {
+  componentKey: string;
+  placeholder: string;
+  dataApiUrl: string;
+  options: CloudPulseServiceTypeFiltersOptions[];
+  isMultiSelect: boolean;
+  filterKey: string;
+  filterType: string;
+  filterLabel: string;
+  type: CloudPulseSelectTypes;
+  sx: any;
+}
+
+export interface CloudPulseServiceTypeFiltersOptions {
+  id: string;
+  label: string;
 }
 
 /**
