@@ -223,7 +223,7 @@ export const LineGraph = (props: LineGraphProps) => {
                     hour: 'LLL dd',
                     minute: 'LLL dd',
                   },
-              stepSize: showToday ? 3 : 5,
+              // stepSize: showToday ? 12:12,
             },
             type: 'time',
             // This cast is because the type definition does not include adapters

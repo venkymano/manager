@@ -144,8 +144,9 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
         if(filterMap) {
           return (filterMap.filters.map((filter, index) => {
 
-            return (<Grid sx={{ marginLeft: 1, width: 150 }}>
+            return (<Grid sx={{ marginLeft: 2, width: 150 }}>
               <CloudPulseCustomSelect
+              key={index + '_' + filter.configuration.filterKey}
               filterKey={filter.configuration.filterType}
               filterType={filter.configuration.filterKey}
               handleSelectionChange={handleCustomSelectChange}

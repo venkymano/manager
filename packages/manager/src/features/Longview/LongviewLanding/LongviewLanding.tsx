@@ -168,8 +168,8 @@ export const LongviewLanding = (props: CombinedProps) => {
             <SafeTabPanel index={2}>
               <CloudPulseDashboard
                 duration={{
-                  unit: 'day',
-                  value: 30,
+                  unit: 'hr',
+                  value: 24,
                 }}
                 dashboardId={1} // the id of dashboard
                 resources={['57667285', '57667325', '57667355']}

@@ -5,18 +5,12 @@ import Request, { setMethod, setURL, setData, setHeaders } from '../request';
 import { Dashboard, JWEToken, GetJWETokenPayload } from './types';
 
 export const getFilters = (url: string) => 
-    Request<CloudPulseSelectOptions>(
+    Request<any>(
         setURL(
-          `http://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services/linode/dashboards`
+          url
         ),
         setMethod('GET'),
         setHeaders({
           Authorization: 'Bearer vagrant',
         })
       );
-
-
-export interface CloudPulseSelectOptions {
-id: string;
-label: string;
-}

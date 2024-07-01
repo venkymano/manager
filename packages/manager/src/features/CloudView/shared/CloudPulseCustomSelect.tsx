@@ -1,18 +1,20 @@
-import { CloudPulseSelectOptions } from '@linode/api-v4';
 import React from 'react';
 
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
+import { CloudPulseServiceTypeFiltersOptions } from 'src/featureFlags';
+import { useGetCustomFiltersQuery } from 'src/queries/cloudview/customfilters';
 
 export interface CloudPulseCustomSelectProps {
-  optionFromApi?: boolean;
+  dataApiUrl?: string;
   filterKey: string;
   handleSelectionChange: (label: string, filterKey: string) => void;
-  options?: CloudPulseSelectOptions[];
+  options?: CloudPulseServiceTypeFiltersOptions[];
   placeholder?: string;
   type: CloudPulseSelectTypes;
   filterType: string;
   isMultiSelect: boolean;
   errorText?: string;
+  maxSelections?: number;
 }
 
 export enum CloudPulseSelectTypes {
@@ -22,16 +24,36 @@ export enum CloudPulseSelectTypes {
 
 export const CloudPulseCustomSelect = React.memo(
   (props: CloudPulseCustomSelectProps) => {
-    if (props.type == CloudPulseSelectTypes.static) {
+
+    const [selectedResource, setResource] = React.useState<any>([]);
+
+    const {data: queriedResources, isLoading, isError} = useGetCustomFiltersQuery(props.dataApiUrl!, 
+      props.dataApiUrl != undefined,
+      props.filterKey
+    );
+
+
+
+    if (props.type == CloudPulseSelectTypes.static || 
+        (!isLoading && !isError && queriedResources)
+    ) {
       return (
         <Autocomplete
-          onChange={(_: any, value: CloudPulseSelectOptions) =>
-            props.handleSelectionChange(value.label, props.filterKey)
-          }
+          onChange={(_: any, value: any[]) => {
+            props.handleSelectionChange(value[0], props.filterKey)
+
+            if(props.maxSelections && value.length >= props.maxSelections) {
+              value = value.slice(0, props.maxSelections);
+            }
+
+            setResource(value);
+          }}
           key={props.filterKey}
           label=""
-          options={props.options ? props.options : []}
+          options={props.type == CloudPulseSelectTypes.static ? props.options! : queriedResources!}
           placeholder={props.placeholder ? props.placeholder : 'Select a Value'}
+          multiple={props.isMultiSelect!=undefined ? props.isMultiSelect : false}
+          value={selectedResource}
         />
       );
     } else {
