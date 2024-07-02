@@ -16,7 +16,7 @@ import { ResourcePage as Page } from 'src/types';
 export const getCloudViewServiceTypes = () =>
   Request<ServiceTypesList>(
     setURL(
-      `http://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services`
+      `https://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services`
     ),
     setMethod('GET'),
     setHeaders({
