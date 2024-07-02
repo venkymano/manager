@@ -47,6 +47,12 @@ export const all_interval_options = [
   },
 ];
 
+const autoIntervalOption = {
+  label: 'Auto',
+  unit: 'Auto',
+  value: -1
+}
+
 export const getIntervalIndex = (scrapeIntervalValue: number) => {
   const index = all_interval_options.findIndex(
     (interval) =>
@@ -67,15 +73,15 @@ export const IntervalSelectComponent = React.memo(
     const firstIntervalIndex = getIntervalIndex(scrapeIntervalValue);
 
     // all intervals displayed if srape interval > highest available interval. Error handling done by api
-    const available_interval_options =
-      firstIntervalIndex < 0
-        ? all_interval_options.slice()
-        : all_interval_options.slice(
-          firstIntervalIndex,
-          all_interval_options.length
-        );
+    const available_interval_options = [...all_interval_options]
+      // firstIntervalIndex < 0
+      //   ? all_interval_options.slice()
+      //   : all_interval_options.slice(
+      //     firstIntervalIndex,
+      //     all_interval_options.length
+      //   );
 
-    let default_interval = available_interval_options.find(
+    let default_interval =props.default_interval?.unit === "Auto" ? autoIntervalOption :  available_interval_options.find(
       (obj) =>
         obj.value === props.default_interval?.value &&
         obj.unit === props.default_interval?.unit
@@ -83,10 +89,10 @@ export const IntervalSelectComponent = React.memo(
     let default_interval_unavailable = false;
 
     if (!default_interval) {
-      default_interval = available_interval_options[0];
+      default_interval = autoIntervalOption;
       props.onIntervalChange({
-        unit: available_interval_options[0].unit,
-        value: available_interval_options[0].value,
+        unit: default_interval.unit,
+        value: default_interval.value,
       });
 
       if (props.default_interval && props.default_interval.value) {
@@ -103,7 +109,7 @@ export const IntervalSelectComponent = React.memo(
       >
         <Autocomplete
           isOptionEqualToValue={(option, value) => {
-            return option?.value == value?.value && option?.unit == value?.unit;
+            return option?.value === value?.value && option?.unit === value?.unit;
           }}
           onChange={(_: any, selectedInterval: any) => {
             props.onIntervalChange({
@@ -116,7 +122,7 @@ export const IntervalSelectComponent = React.memo(
           fullWidth={false}
           label=""
           noMarginTop={true}
-          options={available_interval_options}
+          options={[autoIntervalOption, ...available_interval_options]}
         />
         {default_interval_unavailable && (
           <p style={{ color: 'rgb(210 165 28)', fontSize: 'smaller' }}>

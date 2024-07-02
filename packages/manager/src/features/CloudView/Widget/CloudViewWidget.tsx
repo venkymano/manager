@@ -138,9 +138,10 @@ export const CloudViewWidget = React.memo(
       request.relative_time_duration = props.duration
         ? props.duration!
         : widget.time_duration;
-      request.time_granularity = { value: widget.time_granularity.value, 
+      request.time_granularity = widget.time_granularity.unit === "Auto" ? undefined : {
+        value: widget.time_granularity.value,
         unit: widget.time_granularity.unit
-       };
+      };
       return request;
     };
 
@@ -151,8 +152,8 @@ export const CloudViewWidget = React.memo(
       return props.widget.service_type
         ? props.widget.service_type!
         : props.serviceType
-        ? props.serviceType
-        : '';
+          ? props.serviceType
+          : '';
     };
 
     const getLabelName = (metric: any, serviceType: string) => {
@@ -195,7 +196,7 @@ export const CloudViewWidget = React.memo(
       widget.label +
       '_' +
       props.timeStamp ?? '',
-      flags!=undefined,
+      flags != undefined,
       flags.aclpReadEndpoint!
     ); // fetch the metrics on any property change
 
@@ -225,7 +226,7 @@ export const CloudViewWidget = React.memo(
       if (props.widget.color) {
         colors = COLOR_MAP.get(props.widget.color)!;
       }
-      
+
       // for now , lets stick with the default theme
       // colors = COLOR_MAP.get('default')!;
 
@@ -364,7 +365,8 @@ export const CloudViewWidget = React.memo(
       if (!props.savePref) {
         return;
       }
-      const availableWidget = fetchUserPrefObject()?.widgets[widget.label];
+      const widgets = fetchUserPrefObject()?.widgets;
+      const availableWidget = !widgets ? undefined : widgets[widget.label];
       if (!availableWidget) {
         updateWidgetPreference(widget.label, {
           [AGGREGATE_FUNCTION]: widget.aggregate_function,
@@ -414,7 +416,7 @@ export const CloudViewWidget = React.memo(
               <Grid sx={{ marginRight: 5, width: 100 }}>
                 {props.availableMetrics?.available_aggregate_functions &&
                   props.availableMetrics.available_aggregate_functions.length >
-                    0 && (
+                  0 && (
                     <AggregateFunctionComponent
                       available_aggregate_func={
                         props.availableMetrics?.available_aggregate_functions
@@ -435,30 +437,30 @@ export const CloudViewWidget = React.memo(
                 error &&
                 error.length > 0 &&
                 error[0].reason == jweTokenExpiryError)) && <CloudViewLineGraph // rename where we have cloudview to cloudpulse
-              error={
-                status == 'error'
-                  ? error && error.length > 0
-                    ? error[0].reason
-                    : 'Error while rendering widget'
-                  : undefined
-              }
-              formatData={
-                isBytes
-                  ? (data: number) => convertBytesToUnit(data * 8, currentUnit)
-                  : undefined
-              }
-              ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
-              data={data}
-              formatTooltip={isBytes ? formatToolTip : undefined}
-              gridSize={widget.size}
-              legendRows={(legendRows && legendRows.length > 0) ? legendRows : undefined}
-              loading={isLoading}
-              nativeLegend={true}
-              showToday={today}
-              timezone={timezone}
-              title={""}
-              unit={!isBytes ? ` ${currentUnit}` : undefined}
-            />}
+                error={
+                  status == 'error'
+                    ? error && error.length > 0
+                      ? error[0].reason
+                      : 'Error while rendering widget'
+                    : undefined
+                }
+                formatData={
+                  isBytes
+                    ? (data: number) => convertBytesToUnit(data * 8, currentUnit)
+                    : undefined
+                }
+                ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
+                data={data}
+                formatTooltip={isBytes ? formatToolTip : undefined}
+                gridSize={widget.size}
+                legendRows={(legendRows && legendRows.length > 0) ? legendRows : undefined}
+                loading={isLoading}
+                nativeLegend={true}
+                showToday={today}
+                timezone={timezone}
+                title={""}
+                unit={!isBytes ? ` ${currentUnit}` : undefined}
+              />}
             {(isLoading ||
               (status == 'error' &&
                 error &&
