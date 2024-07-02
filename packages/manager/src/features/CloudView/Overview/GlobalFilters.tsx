@@ -86,7 +86,7 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
   return (
     <Grid container sx={{ ...itemSpacing, padding: '8px' }}>
       <StyledGrid xs={12}>
-        <Grid sx={{ width: 300, marginTop: 2 }}>
+        <Grid sx={{ width: 300 }}>
           <CloudViewDashboardSelect
             handleDashboardChange={handleDashboardChange}
           />

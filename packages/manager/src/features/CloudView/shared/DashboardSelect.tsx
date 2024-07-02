@@ -155,8 +155,7 @@ export const CloudViewDashboardSelect = React.memo(
         groupBy={(option: Dashboard) => option.service_type}
         isOptionEqualToValue={(option, value) => option.label === value.label}
         label=""
-        loading={dashboardsLoading || serviceTypesLoading}
-        noMarginTop
+        loading={dashboardsLoading || serviceTypesLoading}        
         placeholder="Select a Dashboard"
       />
     );
