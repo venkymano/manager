@@ -7,7 +7,7 @@ import { useGetCustomFiltersQuery } from 'src/queries/cloudview/customfilters';
 export interface CloudPulseCustomSelectProps {
   dataApiUrl?: string;
   filterKey: string;
-  handleSelectionChange: (label: string, filterKey: string) => void;
+  handleSelectionChange: (filterKey: string, label: string, ) => void;
   options?: CloudPulseServiceTypeFiltersOptions[];
   placeholder?: string;
   type: CloudPulseSelectTypes;
@@ -15,11 +15,14 @@ export interface CloudPulseCustomSelectProps {
   isMultiSelect: boolean;
   errorText?: string;
   maxSelections?: number;
+  apiResponseIdField?:string;
+  apiResponseLabelField?: string
 }
 
 export enum CloudPulseSelectTypes {
   dynamic,
   static,
+  predefined
 }
 
 export const CloudPulseCustomSelect = React.memo(
@@ -29,7 +32,9 @@ export const CloudPulseCustomSelect = React.memo(
 
     const {data: queriedResources, isLoading, isError} = useGetCustomFiltersQuery(props.dataApiUrl!, 
       props.dataApiUrl != undefined,
-      props.filterKey
+      props.filterKey, 
+      props.apiResponseIdField ? props.apiResponseIdField : 'id',
+      props.apiResponseLabelField ? props.apiResponseLabelField : 'label'
     );
 
 
@@ -40,7 +45,7 @@ export const CloudPulseCustomSelect = React.memo(
       return (
         <Autocomplete
           onChange={(_: any, value: any[]) => {
-            props.handleSelectionChange(value[0], props.filterKey)
+            props.handleSelectionChange(props.filterKey, value[0])
 
             if(props.maxSelections && value.length >= props.maxSelections) {
               value = value.slice(0, props.maxSelections);

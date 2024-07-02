@@ -123,16 +123,20 @@ export interface CloudPulseServiceTypeFilters {
 }
 
 export interface CloudPulseServiceTypeFiltersConfiguration {
-  componentKey: string;
-  placeholder: string;
-  dataApiUrl: string;
-  options: CloudPulseServiceTypeFiltersOptions[];
-  isMultiSelect: boolean;
+  name: string;
+  placeholder?: string;
+  type: CloudPulseSelectTypes;  
+  options?: CloudPulseServiceTypeFiltersOptions[];
+  apiUrl?: string;
+  apiIdField?: string;
+  apiLabelField?: string;
+  isMultiSelect?: boolean;
   filterKey: string;
   filterType: string;
-  filterLabel: string;
-  type: CloudPulseSelectTypes;
-  sx: any;
+  maxSelections?: number;
+  isMetricsFilter: boolean;
+  dependency?: string[];
+  priority: number;
 }
 
 export interface CloudPulseServiceTypeFiltersOptions {
