@@ -134,7 +134,7 @@ export const DashBoardLanding = () => {
           <Paper>
             <StyledPlaceholder
               icon={CloudViewIcon}
-              subtitle="Select Service Type, Region and Resource to visualize metrics"
+              subtitle="Select Dashboard, Region and Resource to visualize metrics"
               title=""
             />
           </Paper>
