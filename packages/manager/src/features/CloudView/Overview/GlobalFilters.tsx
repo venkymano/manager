@@ -4,7 +4,8 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import * as React from 'react';
 
-import Reload from 'src/assets/icons/reload.svg';
+// import Reload from 'src/assets/icons/reload.svg';
+import Cached from '@mui/icons-material/Cached';
 
 import {
   FiltersObject,
@@ -153,14 +154,14 @@ const itemSpacing = {
   margin: '0',
 };
 
-const StyledReload = styled(Reload, { label: 'StyledReload' })(({ theme }) => ({
+const StyledReload = styled(Cached, { label: 'StyledReload' })(({ theme }) => ({
   '&:active': {
     color: 'green',
   },
   '&:hover': {
     cursor: 'pointer',
   },
-  height: '27px',
-  width: '27px',
+  height: '30px',
+  width: '30px',
   marginTop: 27,
 }));
