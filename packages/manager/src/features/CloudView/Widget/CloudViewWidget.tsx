@@ -28,6 +28,7 @@ import {
   TIME_GRANULARITY,
 } from '../Utils/CloudPulseConstants';
 import {
+  convertStringToCamelCasesWithSpaces,
   convertTimeDurationToStartAndEndTimeRange,
   getDimensionName,
 } from '../Utils/CloudPulseUtils';
@@ -99,7 +100,11 @@ export const CloudViewWidget = React.memo(
 
     const [data, setData] = React.useState<Array<any>>([]);
 
+
+    const jweTokenExpiryError = 'Token expired';
+
     const [legendRows, setLegendRows] = React.useState<any[]>([]);
+
 
     const [today, setToday] = React.useState<boolean>(false);
 
@@ -130,10 +135,12 @@ export const CloudViewWidget = React.memo(
         );
       }
       request.metric = widget.metric!;
-      request.time_duration = props.duration
+      request.relative_time_duration = props.duration
         ? props.duration!
         : widget.time_duration;
-      request.time_granularity = { ...widget.time_granularity };
+      request.time_granularity = { value: widget.time_granularity.value, 
+        unit: widget.time_granularity.unit
+       };
       return request;
     };
 
@@ -368,6 +375,7 @@ export const CloudViewWidget = React.memo(
     }, []);
 
 
+
     return (
       <Grid xs={widget.size}>
         <Paper
@@ -391,7 +399,7 @@ export const CloudViewWidget = React.memo(
                 <Typography
                   className={classes.title}
                 >
-                  {`${props.widget.label}`} {(!isLoading || !isBytes) && `(${currentUnit})`} {/* show the units of bytes data only when complete data is loaded */}
+                  {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)} {(!isLoading || !isBytes) && `(${currentUnit})`} {/* show the units of bytes data only when complete data is loaded */}
                 </Typography>
               </Grid>
               <Grid sx={{ marginRight: 5, width: 100 }}>
@@ -422,7 +430,11 @@ export const CloudViewWidget = React.memo(
               />
             </div>
             <Divider spacingBottom={32} spacingTop={15} />
-            {!isLoading && <CloudViewLineGraph // rename where we have cloudview to cloudpulse
+            {!(isLoading ||
+              (status == 'error' &&
+                error &&
+                error.length > 0 &&
+                error[0].reason == jweTokenExpiryError)) && <CloudViewLineGraph // rename where we have cloudview to cloudpulse
               error={
                 status == 'error'
                   ? error && error.length > 0
@@ -447,7 +459,11 @@ export const CloudViewWidget = React.memo(
               title={""}
               unit={!isBytes ? ` ${currentUnit}` : undefined}
             />}
-            {isLoading &&
+            {(isLoading ||
+              (status == 'error' &&
+                error &&
+                error.length > 0 &&
+                error[0].reason == jweTokenExpiryError)) &&
               <CircleProgress />}
           </div>
         </Paper>

@@ -98,7 +98,7 @@ export const IntervalSelectComponent = React.memo(
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'column',          
         }}
       >
         <Autocomplete

@@ -4,7 +4,6 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import * as React from 'react';
 
-import Reload from 'src/assets/icons/reload.svg';
 import { CircleProgress } from 'src/components/CircleProgress';
 import {
   CloudPulseServiceTypeFilterMap,
@@ -12,6 +11,9 @@ import {
   CloudPulseServiceTypeFiltersConfiguration,
 } from 'src/featureFlags';
 import { useFlags } from 'src/hooks/useFlags';
+// import Reload from 'src/assets/icons/reload.svg';
+
+import { Cached } from '@mui/icons-material';
 
 import {
   FiltersObject,
@@ -205,7 +207,6 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
                 filterType={filter.configuration.filterKey}
                 handleSelectionChange={handleCustomSelectChange}
                 key={index + '_' + filter.configuration.filterKey}
-                key={index + '_' + filter.configuration.name}
                 options={filter.configuration.options}
                 type={filter.configuration.type}
               />
@@ -225,8 +226,38 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
       <CircleProgress /> // untill flags gets loaded, show circle progress
     );
   }
+
+  const itemSpacing = {
+    boxSizing: 'border-box',
+    margin: '0',
+  };
+
+  const StyledReload = styled(Cached, { label: 'StyledReload' })(
+    ({ theme }) => ({
+      '&:active': {
+        color: 'green',
+      },
+      '&:hover': {
+        cursor: 'pointer',
+      },
+      height: '30px',
+      marginTop: 27,
+      width: '30px',
+    })
+  );
+
+  const StyledGrid = styled(Grid, { label: 'StyledGrid' })(({ theme }) => ({
+    alignItems: 'end',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 5,
+    justifyContent: 'start',
+    // flexWrap:'nowrap',
+    marginBottom: theme.spacing(1.25),
+  }));
+
   return (
-    // <Grid container sx={{ ...itemSpacing, padding: '8px' }}>
     <StyledGrid container xs={12}>
       <Grid sx={{ marginLeft: 2, width: 300 }}>
         <CloudViewDashboardSelect
@@ -264,33 +295,5 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
         <StyledReload onClick={handleGlobalRefresh} />
       </Grid>
     </StyledGrid>
-    // </Grid>
   );
 });
-
-const StyledGrid = styled(Grid, { label: 'StyledGrid' })(({ theme }) => ({
-  alignItems: 'end',
-  boxSizing: 'border-box',
-  display: 'flex',
-  flexDirection: 'row',
-  gap: 5,
-  justifyContent: 'start',
-  // flexWrap:'nowrap',
-  marginBottom: theme.spacing(1.25),
-}));
-
-const itemSpacing = {
-  boxSizing: 'border-box',
-  margin: '0',
-};
-
-const StyledReload = styled(Reload, { label: 'StyledReload' })(({ theme }) => ({
-  '&:active': {
-    color: 'green',
-  },
-  '&:hover': {
-    cursor: 'pointer',
-  },
-  height: '27px',
-  width: '27px',
-}));
