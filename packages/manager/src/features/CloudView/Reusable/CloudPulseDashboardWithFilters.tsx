@@ -6,6 +6,7 @@ import { useFlags } from 'src/hooks/useFlags';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { useCloudViewDashboardByIdQuery } from 'src/queries/cloudview/dashboards';
 import { CloudViewMultiResourceSelect } from '../shared/ResourceMultiSelect';
+import { predefinedComponentsMap } from './PredefineConfigMap';
 
 export interface DashboardWithFilterProps {
     dashboardId : number;
@@ -107,6 +108,10 @@ export const CloudPulseDashboardWithFilters = React.memo((props: DashboardWithFi
             resourceType={data?.service_type}
         />)
       }
+
+      const predefinedComponentsMap = new Map<string, any>([
+        ['resource', <ResourceSelectionComponent/>]
+      ]);
     
       const FormFilterComponentsByFlags = () => {
     
@@ -125,7 +130,7 @@ export const CloudPulseDashboardWithFilters = React.memo((props: DashboardWithFi
     
                     // like below we will have lot of predefined filters as well
                     if(filter.configuration.type == CloudPulseSelectTypes.predefined && filter.configuration.filterKey == 'resource') {
-                        return (<ResourceSelectionComponent/>)
+                        return (predefinedComponentsMap.get(filter.configuration.filterKey))
                     }
         
                     return (<Grid sx={{ marginLeft: 2, width: 150 }}>
