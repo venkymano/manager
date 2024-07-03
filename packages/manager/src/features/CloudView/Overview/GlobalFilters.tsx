@@ -229,7 +229,7 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
         </Grid>
         {/* { flags.aclpServiceTypeFiltersMap && flags.aclpServiceTypeFiltersMap.length> 0  && 
         (<FormFilterComponentsByFlags/>)} */}
-        {selectedDashboard && <CloudPulseDashboardWithFilters dashboardId={selectedDashboard.dashboardId}/> }
+        {selectedDashboard && <CloudPulseDashboardWithFilters dashboardId={selectedDashboard.id}/> }
 
         <Grid sx={{ marginLeft: 1, marginRight: 3 }}>
           <StyledReload onClick={handleGlobalRefresh} />

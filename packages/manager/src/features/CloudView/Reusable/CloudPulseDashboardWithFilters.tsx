@@ -5,6 +5,7 @@ import { CloudPulseSelectTypes, CloudPulseCustomSelect } from '../shared/CloudPu
 import { useFlags } from 'src/hooks/useFlags';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { useCloudViewDashboardByIdQuery } from 'src/queries/cloudview/dashboards';
+import { CloudViewMultiResourceSelect } from '../shared/ResourceMultiSelect';
 
 export interface DashboardWithFilterProps {
     dashboardId : number;
@@ -15,9 +16,17 @@ export const CloudPulseDashboardWithFilters = React.memo((props: DashboardWithFi
 
     const flags = useFlags(); // flags for rendering dynamic global filters
 
-    const {data:dashboard, isLoading, isError} = useCloudViewDashboardByIdQuery(props.dashboardId, 
-        true
+    const [stateInt, setStateInt] = React.useState(1);
+
+    const {data, status} = useCloudViewDashboardByIdQuery(props.dashboardId, undefined
     )
+
+    
+    React.useEffect(() => {
+        console.log(status)
+    }, [status])
+
+
 
     const mockFilter = ():CloudPulseServiceTypeFilterMap[] => {
         let linodeServiceTypeMap : CloudPulseServiceTypeFilterMap[] = [];
@@ -27,6 +36,7 @@ export const CloudPulseDashboardWithFilters = React.memo((props: DashboardWithFi
         linodeFilterMap.filters = [];
         linodeFilterMap.filters.push(getFilter());
         linodeFilterMap.filters.push(getDynamicTypeFilter());    
+        linodeFilterMap.filters.push(getPredefinedFilter())
     
         linodeServiceTypeMap.push(linodeFilterMap);
     
@@ -72,42 +82,75 @@ export const CloudPulseDashboardWithFilters = React.memo((props: DashboardWithFi
     
         return filter;
       }
+
+      const getPredefinedFilter = () => {
+        let filter: CloudPulseServiceTypeFilters = {} as CloudPulseServiceTypeFilters;
+        filter.configuration = {} as CloudPulseServiceTypeFiltersConfiguration;
+        filter.name = 'Resources'
+        filter.configuration.filterKey = "resource",
+        filter.configuration.type = CloudPulseSelectTypes.predefined;
+        filter.configuration.filterType = "string",
+        filter.configuration.placeholder = 'Select Resources'
+        filter.configuration.isMetricsFilter = true;
+        return filter;
+      }
+
+      const handleResourceChange = React.useCallback((resourceId: any[]) => {
+        // emitGlobalFilterChange(resourceId?.map((obj) => obj.id) ?? [], RESOURCES);
+      }, []);
+
+      const ResourceSelectionComponent = () => {
+        return (<CloudViewMultiResourceSelect 
+            disabled={false}
+            handleResourceChange={handleResourceChange}
+            region={undefined}
+            resourceType={data?.service_type}
+        />)
+      }
     
       const FormFilterComponentsByFlags = () => {
     
           flags.aclpServiceTypeFiltersMap = mockFilter();
-          if(flags.aclpServiceTypeFiltersMap) {
-            // let aclpServiceTypeFiltersMap: CloudPulseServiceTypeFilterMap[] = [...flags.aclpServiceTypeFiltersMap];
-            let aclpServiceTypeFiltersMap: CloudPulseServiceTypeFilterMap[] = mockFilter();
+          if(flags && data) {
+            if(flags.aclpServiceTypeFiltersMap) {
+                // let aclpServiceTypeFiltersMap: CloudPulseServiceTypeFilterMap[] = [...flags.aclpServiceTypeFiltersMap];
+                let aclpServiceTypeFiltersMap: CloudPulseServiceTypeFilterMap[] = mockFilter();
+        
+                //process the map to build custom select dropdown
+                let filterMap = aclpServiceTypeFiltersMap[0];
+        
+                if(filterMap) {
+                  return (filterMap.filters.map((filter, index) => {
+                    
     
-            //process the map to build custom select dropdown
-            let filterMap = aclpServiceTypeFiltersMap[0];
-    
-            if(filterMap) {
-              return (filterMap.filters.map((filter, index) => {
-    
-                return (<Grid sx={{ marginLeft: 2, width: 150 }}>
-                  <CloudPulseCustomSelect
-                  key={index + '_' + filter.configuration.filterKey}
-                  filterKey={filter.configuration.filterType}
-                  filterType={filter.configuration.filterKey}
-                  handleSelectionChange={handleCustomSelectChange}
-                  type={filter.configuration.type}
-                  isMultiSelect = {filter.configuration.isMultiSelect ? filter.configuration.isMultiSelect : false}
-                  placeholder={filter.configuration.placeholder ? 
-                    filter.configuration.placeholder : 'Select Value'
-                  }
-                  options={filter.configuration.options}
-                  dataApiUrl={filter.configuration.apiUrl}
-                  apiResponseIdField={filter.configuration.apiIdField ? filter.configuration.apiIdField : 'id'}
-                  apiResponseLabelField={filter.configuration.apiLabelField ? filter.configuration.apiLabelField : 'label'}
-                  />
-                  </Grid>);
-    
-              }));
-            } else {
-              return (<React.Fragment key={'empty'}></React.Fragment>)
-            }
+                    // like below we will have lot of predefined filters as well
+                    if(filter.configuration.type == CloudPulseSelectTypes.predefined && filter.configuration.filterKey == 'resource') {
+                        return (<ResourceSelectionComponent/>)
+                    }
+        
+                    return (<Grid sx={{ marginLeft: 2, width: 150 }}>
+                      <CloudPulseCustomSelect
+                      key={index + '_' + filter.configuration.filterKey}
+                      filterKey={filter.configuration.filterType}
+                      filterType={filter.configuration.filterKey}
+                      handleSelectionChange={handleCustomSelectChange}
+                      type={filter.configuration.type}
+                      isMultiSelect = {filter.configuration.isMultiSelect ? filter.configuration.isMultiSelect : false}
+                      placeholder={filter.configuration.placeholder ? 
+                        filter.configuration.placeholder : 'Select Value'
+                      }
+                      options={filter.configuration.options}
+                      dataApiUrl={filter.configuration.apiUrl}
+                      apiResponseIdField={filter.configuration.apiIdField ? filter.configuration.apiIdField : 'id'}
+                      apiResponseLabelField={filter.configuration.apiLabelField ? filter.configuration.apiLabelField : 'label'}
+                      />
+                      </Grid>);
+        
+                  }));
+                } else {
+                  return (<React.Fragment key={'empty'}></React.Fragment>)
+                }
+              }
           }
           
           return (<React.Fragment key={'empty'}></React.Fragment>)
@@ -120,11 +163,10 @@ export const CloudPulseDashboardWithFilters = React.memo((props: DashboardWithFi
         console.log(filterType, filterLabel)
     }, []);
 
-      if(!flags || !isLoading) {
-        return <CircleProgress/>
-      }
+        return (
+            <><FormFilterComponentsByFlags/></>
+            
+        )
 
-      return (
-        <FormFilterComponentsByFlags/>
-      )
+      
 })
