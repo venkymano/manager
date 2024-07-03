@@ -28,6 +28,7 @@ import {
   TIME_GRANULARITY,
 } from '../Utils/CloudPulseConstants';
 import {
+  convertStringToCamelCasesWithSpaces,
   convertTimeDurationToStartAndEndTimeRange,
   getDimensionName,
 } from '../Utils/CloudPulseUtils';
@@ -134,10 +135,12 @@ export const CloudViewWidget = React.memo(
         );
       }
       request.metric = widget.metric!;
-      request.time_duration = props.duration
+      request.relative_time_duration = props.duration
         ? props.duration!
         : widget.time_duration;
-      request.time_granularity = { ...widget.time_granularity };
+      request.time_granularity = { value: widget.time_granularity.value, 
+        unit: widget.time_granularity.unit
+       };
       return request;
     };
 
@@ -396,7 +399,7 @@ export const CloudViewWidget = React.memo(
                 <Typography
                   className={classes.title}
                 >
-                  {`${props.widget.label}`} {(!isLoading || !isBytes) && `(${currentUnit})`} {/* show the units of bytes data only when complete data is loaded */}
+                  {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)} {(!isLoading || !isBytes) && `(${currentUnit})`} {/* show the units of bytes data only when complete data is loaded */}
                 </Typography>
               </Grid>
               <Grid sx={{ marginRight: 5, width: 100 }}>

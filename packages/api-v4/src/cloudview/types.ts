@@ -65,7 +65,7 @@ export interface CloudViewMetricsRequest {
   filters: Filter[]; // widget level
   aggregate_function: string; // come from widget
   group_by: string; // come from widget
-  time_duration: TimeDuration; // come from dashboard
+  relative_time_duration: TimeDuration; // come from dashboard
   time_granularity: TimeGranularity; // comes from dashboard
   counter: number;
   startTime: number;

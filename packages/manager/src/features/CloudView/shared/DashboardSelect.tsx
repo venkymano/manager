@@ -156,7 +156,7 @@ export const CloudViewDashboardSelect = React.memo(
         isOptionEqualToValue={(option, value) => option.label === value.label}
         label=""
         loading={dashboardsLoading || serviceTypesLoading}        
-        placeholder="Select a Dashboard"
+        placeholder="Select Dashboard"
       />
     );
   }

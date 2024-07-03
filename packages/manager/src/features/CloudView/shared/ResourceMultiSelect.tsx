@@ -103,7 +103,7 @@ export const CloudViewMultiResourceSelect = (
       limitTags={2}
       multiple
       options={getResourceList()}
-      placeholder="Select a resource"
+      placeholder="Select Resources"
       value={getSelectedResources()}
     />
   );
