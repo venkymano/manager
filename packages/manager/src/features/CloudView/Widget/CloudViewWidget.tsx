@@ -10,6 +10,7 @@ import { Paper, Theme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { CircleProgress } from 'src/components/CircleProgress';
 import { Divider } from 'src/components/Divider';
@@ -21,7 +22,7 @@ import { useProfile } from 'src/queries/profile';
 import { isToday as _isToday } from 'src/utilities/isToday';
 import { roundTo } from 'src/utilities/roundTo';
 import { getMetrics } from 'src/utilities/statMetrics';
-import { makeStyles } from 'tss-react/mui';
+
 import {
   AGGREGATE_FUNCTION,
   SIZE,
@@ -77,21 +78,19 @@ const StyledZoomIcon = styled(ZoomIcon, {
 });
 
 const useStyles = makeStyles()((theme: Theme) => ({
-
   title: {
     '& > span': {
       color: theme.palette.text.primary,
     },
     color: theme.color.headline,
     fontFamily: theme.font.bold,
-    marginLeft: "8px",
     fontSize: '1.30rem',
+    marginLeft: '8px',
   },
 }));
 
 export const CloudViewWidget = React.memo(
   (props: CloudViewWidgetProperties) => {
-
     const { classes } = useStyles();
 
     const { data: profile } = useProfile();
@@ -100,11 +99,9 @@ export const CloudViewWidget = React.memo(
 
     const [data, setData] = React.useState<Array<any>>([]);
 
-
     const jweTokenExpiryError = 'Token expired';
 
     const [legendRows, setLegendRows] = React.useState<any[]>([]);
-
 
     const [today, setToday] = React.useState<boolean>(false);
 
@@ -138,9 +135,13 @@ export const CloudViewWidget = React.memo(
       request.relative_time_duration = props.duration
         ? props.duration!
         : widget.time_duration;
-      request.time_granularity = { value: widget.time_granularity.value, 
-        unit: widget.time_granularity.unit
-       };
+      request.time_granularity =
+        widget.time_granularity.unit === 'Auto'
+          ? undefined
+          : {
+              unit: widget.time_granularity.unit,
+              value: widget.time_granularity.value,
+            };
       return request;
     };
 
@@ -165,9 +166,9 @@ export const CloudViewWidget = React.memo(
       const results =
         flags.aclpResourceTypeMap && flags.aclpResourceTypeMap.length > 0
           ? flags.aclpResourceTypeMap.filter(
-            (obj: CloudPulseResourceTypeMap) =>
-              obj.serviceType === serviceType
-          )
+              (obj: CloudPulseResourceTypeMap) =>
+                obj.serviceType === serviceType
+            )
           : [];
 
       const flag = results && results.length > 0 ? results[0] : undefined;
@@ -185,17 +186,17 @@ export const CloudViewWidget = React.memo(
       getCloudViewMetricsRequest(),
       props,
       widget.aggregate_function +
-      '_' +
-      widget.group_by +
-      '_' +
-      widget.time_granularity +
-      '_' +
-      widget.metric +
-      '_' +
-      widget.label +
-      '_' +
-      props.timeStamp ?? '',
-      flags!=undefined,
+        '_' +
+        widget.group_by +
+        '_' +
+        widget.time_granularity +
+        '_' +
+        widget.metric +
+        '_' +
+        widget.label +
+        '_' +
+        props.timeStamp ?? '',
+      flags != undefined,
       flags.aclpReadEndpoint!
     ); // fetch the metrics on any property change
 
@@ -225,7 +226,7 @@ export const CloudViewWidget = React.memo(
       if (props.widget.color) {
         colors = COLOR_MAP.get(props.widget.color)!;
       }
-      
+
       // for now , lets stick with the default theme
       // colors = COLOR_MAP.get('default')!;
 
@@ -364,7 +365,8 @@ export const CloudViewWidget = React.memo(
       if (!props.savePref) {
         return;
       }
-      const availableWidget = fetchUserPrefObject()?.widgets[widget.label];
+      const widgets = fetchUserPrefObject()?.widgets;
+      const availableWidget = !widgets ? undefined : widgets[widget.label];
       if (!availableWidget) {
         updateWidgetPreference(widget.label, {
           [AGGREGATE_FUNCTION]: widget.aggregate_function,
@@ -373,8 +375,6 @@ export const CloudViewWidget = React.memo(
         });
       }
     }, []);
-
-
 
     return (
       <Grid xs={widget.size}>
@@ -387,7 +387,7 @@ export const CloudViewWidget = React.memo(
           }}
         >
           {/* add further components like group by resource, aggregate_function, step here , for sample added zoom icon here*/}
-          <div className={widget.metric} style={{ margin: '1%', }}>
+          <div className={widget.metric} style={{ margin: '1%' }}>
             <div
               style={{
                 alignItems: 'center',
@@ -395,11 +395,11 @@ export const CloudViewWidget = React.memo(
                 width: '100%',
               }}
             >
-              <Grid sx={{ marginRight: "auto" }}>
-                <Typography
-                  className={classes.title}
-                >
-                  {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)} {(!isLoading || !isBytes) && `(${currentUnit})`} {/* show the units of bytes data only when complete data is loaded */}
+              <Grid sx={{ marginRight: 'auto' }}>
+                <Typography className={classes.title}>
+                  {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
+                  {(!isLoading || !isBytes) && `(${currentUnit})`}{' '}
+                  {/* show the units of bytes data only when complete data is loaded */}
                 </Typography>
               </Grid>
               <Grid sx={{ marginRight: 5, width: 100 }}>
@@ -430,41 +430,47 @@ export const CloudViewWidget = React.memo(
               />
             </div>
             <Divider spacingBottom={32} spacingTop={15} />
-            {!(isLoading ||
+            {!(
+              isLoading ||
               (status == 'error' &&
                 error &&
                 error.length > 0 &&
-                error[0].reason == jweTokenExpiryError)) && <CloudViewLineGraph // rename where we have cloudview to cloudpulse
-              error={
-                status == 'error'
-                  ? error && error.length > 0
-                    ? error[0].reason
-                    : 'Error while rendering widget'
-                  : undefined
-              }
-              formatData={
-                isBytes
-                  ? (data: number) => convertBytesToUnit(data * 8, currentUnit)
-                  : undefined
-              }
-              ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
-              data={data}
-              formatTooltip={isBytes ? formatToolTip : undefined}
-              gridSize={widget.size}
-              legendRows={(legendRows && legendRows.length > 0) ? legendRows : undefined}
-              loading={isLoading}
-              nativeLegend={true}
-              showToday={today}
-              timezone={timezone}
-              title={""}
-              unit={!isBytes ? ` ${currentUnit}` : undefined}
-            />}
+                error[0].reason == jweTokenExpiryError)
+            ) && (
+              <CloudViewLineGraph // rename where we have cloudview to cloudpulse
+                error={
+                  status == 'error'
+                    ? error && error.length > 0
+                      ? error[0].reason
+                      : 'Error while rendering widget'
+                    : undefined
+                }
+                formatData={
+                  isBytes
+                    ? (data: number) =>
+                        convertBytesToUnit(data * 8, currentUnit)
+                    : undefined
+                }
+                legendRows={
+                  legendRows && legendRows.length > 0 ? legendRows : undefined
+                }
+                ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
+                data={data}
+                formatTooltip={isBytes ? formatToolTip : undefined}
+                gridSize={widget.size}
+                loading={isLoading}
+                nativeLegend={true}
+                showToday={today}
+                timezone={timezone}
+                title={''}
+                unit={!isBytes ? ` ${currentUnit}` : undefined}
+              />
+            )}
             {(isLoading ||
               (status == 'error' &&
                 error &&
                 error.length > 0 &&
-                error[0].reason == jweTokenExpiryError)) &&
-              <CircleProgress />}
+                error[0].reason == jweTokenExpiryError)) && <CircleProgress />}
           </div>
         </Paper>
       </Grid>

@@ -1,4 +1,4 @@
-import { Dashboard, TimeDuration, TimeGranularity } from '@linode/api-v4';
+import { Dashboard, TimeDuration } from '@linode/api-v4';
 import { Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
@@ -14,6 +14,8 @@ import {
 } from '../Utils/UserPreference';
 import { CloudPulseDashboard } from './Dashboard';
 import { REFRESH, REGION, RESOURCES, TIME_DURATION } from '../Utils/CloudPulseConstants';
+
+import { isRegionApplicable } from '../Utils/CloudPulseUtils';
 
 const StyledPlaceholder = styled(Placeholder, {
   label: 'StyledPlaceholder',
@@ -33,31 +35,34 @@ export const DashBoardLanding = () => {
   const [dashboard, setDashboard] = React.useState<Dashboard>();
   const [isPrefLoaded, setIsPrefLoaded] = React.useState<boolean>(false);
 
+  const isRegionAppl : boolean = isRegionApplicable(dashboard?.service_type);
+
+
   const handleGlobalFilterChange = React.useCallback((
-    updatedData : any,
-    changedFilter : string
+    updatedData: any,
+    changedFilter: string
   ) => {
-      switch(changedFilter){
-        case REGION : {
-          setRegion(updatedData);
-          break;
-        }
-        case RESOURCES : {
-          setResources(updatedData);
-          break;
-        }
-        case TIME_DURATION : {
-          setTimeDuration(updatedData);
-          break
-        }
-        case REFRESH : {
-          setTimeStamp(updatedData);
-          break;
-        }
+    switch (changedFilter) {
+      case REGION: {
+        setRegion(updatedData);
+        break;
       }
+      case RESOURCES: {
+        setResources(updatedData);
+        break;
+      }
+      case TIME_DURATION: {
+        setTimeDuration(updatedData);
+        break
+      }
+      case REFRESH: {
+        setTimeStamp(updatedData);
+        break;
+      }
+    }
 
   }, []);
-  const handleDashboardChange = React.useCallback((dashboard: Dashboard) => {    
+  const handleDashboardChange = React.useCallback((dashboard: Dashboard) => {
     setDashboard(dashboard);
 
   }, []);
@@ -95,7 +100,6 @@ export const DashBoardLanding = () => {
     return <CircleProgress></CircleProgress>;
   }
 
-
   return (
     <>
       <Paper style={{ border: 'solid 1px #e3e5e8' }}>
@@ -109,11 +113,11 @@ export const DashBoardLanding = () => {
         </div>
       </Paper>
       {
-      dashboard &&
-      region &&
-      resources &&
-      resources.length > 0 &&
-      timeDuration && (
+        dashboard &&
+        (!isRegionAppl || region) &&
+        resources &&
+        resources.length > 0 &&
+        timeDuration && (
           <CloudPulseDashboard
             dashboardId={dashboard.id}
             duration={timeDuration}
@@ -127,7 +131,7 @@ export const DashBoardLanding = () => {
         )}
 
       {(!dashboard ||
-        !region ||
+        (!region && isRegionAppl) ||
         !resources ||
         resources.length == 0 ||
         !timeDuration) && (

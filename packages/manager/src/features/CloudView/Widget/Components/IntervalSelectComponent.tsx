@@ -28,7 +28,7 @@ export const all_interval_options = [
   {
     label: '1 min',
     unit: 'min',
-    value: 1
+    value: 1,
   },
   {
     label: '5 min',
@@ -36,9 +36,9 @@ export const all_interval_options = [
     value: 5,
   },
   {
-    label: '2 hrs',
+    label: '1 hr',
     unit: 'hr',
-    value: 2,
+    value: 1,
   },
   {
     label: '1 day',
@@ -47,22 +47,23 @@ export const all_interval_options = [
   },
 ];
 
+const autoIntervalOption = {
+  label: 'Auto',
+  unit: 'Auto',
+  value: -1,
+};
+
 export const getIntervalIndex = (scrapeIntervalValue: number) => {
-  const index = all_interval_options.findIndex(
+  return all_interval_options.findIndex(
     (interval) =>
       scrapeIntervalValue <=
       getInSeconds(String(interval.value) + interval.unit.slice(0, 1))
   );
-  return index;
-}
+};
 
 export const IntervalSelectComponent = React.memo(
   (props: IntervalSelectProperties) => {
-
-
     const scrapeIntervalValue = getInSeconds(props.scrape_interval);
-
-
 
     const firstIntervalIndex = getIntervalIndex(scrapeIntervalValue);
 
@@ -71,22 +72,25 @@ export const IntervalSelectComponent = React.memo(
       firstIntervalIndex < 0
         ? all_interval_options.slice()
         : all_interval_options.slice(
-          firstIntervalIndex,
-          all_interval_options.length
-        );
+            firstIntervalIndex,
+            all_interval_options.length
+          );
 
-    let default_interval = available_interval_options.find(
-      (obj) =>
-        obj.value === props.default_interval?.value &&
-        obj.unit === props.default_interval?.unit
-    );
+    let default_interval =
+      props.default_interval?.unit === 'Auto'
+        ? autoIntervalOption
+        : available_interval_options.find(
+            (obj) =>
+              obj.value === props.default_interval?.value &&
+              obj.unit === props.default_interval?.unit
+          );
     let default_interval_unavailable = false;
 
     if (!default_interval) {
-      default_interval = available_interval_options[0];
+      default_interval = autoIntervalOption;
       props.onIntervalChange({
-        unit: available_interval_options[0].unit,
-        value: available_interval_options[0].value,
+        unit: default_interval.unit,
+        value: default_interval.value,
       });
 
       if (props.default_interval && props.default_interval.value) {
@@ -98,12 +102,14 @@ export const IntervalSelectComponent = React.memo(
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',          
+          flexDirection: 'column',
         }}
       >
         <Autocomplete
           isOptionEqualToValue={(option, value) => {
-            return option?.value == value?.value && option?.unit == value?.unit;
+            return (
+              option?.value === value?.value && option?.unit === value?.unit
+            );
           }}
           onChange={(_: any, selectedInterval: any) => {
             props.onIntervalChange({
@@ -116,7 +122,7 @@ export const IntervalSelectComponent = React.memo(
           fullWidth={false}
           label=""
           noMarginTop={true}
-          options={available_interval_options}
+          options={[autoIntervalOption, ...available_interval_options]}
         />
         {default_interval_unavailable && (
           <p style={{ color: 'rgb(210 165 28)', fontSize: 'smaller' }}>
