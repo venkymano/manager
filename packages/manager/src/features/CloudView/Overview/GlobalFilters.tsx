@@ -39,7 +39,7 @@ export const GlobalFilters = React.memo(
     }, []);
 
     const filterChange = React.useCallback((filterKey: string, value: any) => {
-      console.log(filterKey, value)
+      console.log(filterKey, value);
       props.handleAnyFilterChange(filterKey, value);
     }, []);
 
@@ -88,9 +88,11 @@ export const GlobalFilters = React.memo(
           />
         )}
 
-        <Grid sx={{ marginLeft: 1, marginRight: 3 }}>
-          <StyledReload onClick={handleGlobalRefresh} />
-        </Grid>
+        {selectedDashboard && (
+          <Grid sx={{ marginLeft: 1, marginRight: 3 }}>
+            <StyledReload onClick={handleGlobalRefresh} />
+          </Grid>
+        )}
       </StyledGrid>
     );
   },

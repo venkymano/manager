@@ -76,14 +76,6 @@ export interface CloudPulseWidgetFilters {
   isDimensionFilter: boolean;
 }
 
-const StyledZoomIcon = styled(ZoomIcon, {
-  label: 'StyledZoomIcon',
-})({
-  display: 'inline-block',
-  marginLeft: '10px',
-  marginTop: '10px',
-});
-
 const useStyles = makeStyles()((theme: Theme) => ({
   title: {
     '& > span': {
@@ -174,20 +166,19 @@ export const CloudViewWidget = React.memo(
         i++
       ) {
         if (!props.nonTrivialFilters[i].isDimensionFilter) {
-          if(props.nonTrivialFilters[i].filterKey == 'resource') {
+          if (props.nonTrivialFilters[i].filterKey == 'resource') {
             props.nonTrivialFilters[i].filterKey = 'resource_id';
           }
           request[props.nonTrivialFilters[i].filterKey] =
             props.nonTrivialFilters[i].filterValue;
-        } 
-        // else {
-        //   request['filters'] = request['filters'] ?? [];
-        //   request['filters'].push({
-        //     key: props.nonTrivialFilters[i].filterKey,
-        //     operator: 'eq',
-        //     value: props.nonTrivialFilters[i].filterValue,
-        //   });
-        // }
+        } else {
+          request['filters'] = request['filters'] ?? [];
+          request['filters'].push({
+            key: props.nonTrivialFilters[i].filterKey,
+            operator: 'eq',
+            value: props.nonTrivialFilters[i].filterValue,
+          });
+        }
       }
 
       return request;
@@ -243,7 +234,7 @@ export const CloudViewWidget = React.memo(
         '_' +
         widget.label +
         '_' +
-        props.timeStamp ?? '',
+        props.timeStamp ?? '' + '_' + props.nonTrivialFilters,
       flags != undefined,
       flags.aclpReadEndpoint!
     ); // fetch the metrics on any property change
@@ -424,7 +415,17 @@ export const CloudViewWidget = React.memo(
     }, []);
 
     return (
-      <Grid xs={widget.size}>
+      <Grid
+        sx={{
+          alignItems: 'center',
+          columnGap: 0.2,
+          direction: 'column',
+          flexWrap: 'nowrap',
+        }}
+        container
+        lg={widget.size}
+        xs={6}
+      >
         <Paper
           style={{
             border: 'solid 1px #e3e5e8',
@@ -433,50 +434,83 @@ export const CloudViewWidget = React.memo(
             width: '100%',
           }}
         >
-          {/* add further components like group by resource, aggregate_function, step here , for sample added zoom icon here*/}
-          <div className={widget.metric} style={{ margin: '1%' }}>
-            <div
-              style={{
-                alignItems: 'center',
-                display: 'flex',
-                width: '100%',
+          <Grid
+            sx={{
+              alignItems: 'center',
+              columnGap: 0.2,
+              direction: 'row',
+              flexWrap: 'nowrap',
+              justifyContent: 'flex-start',
+            }}
+            container
+            lg={widget.size}
+            xs={6}
+          >
+            <Grid lg="auto" xs="auto">
+              <Typography className={classes.title}>
+                {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
+                {(!isLoading || !isBytes) && `(${currentUnit})`}{' '}
+                {/* show the units of bytes data only when complete data is loaded */}
+              </Typography>
+            </Grid>
+            <Grid
+              sx={{
+                marginLeft: 'auto',
               }}
+              lg="auto"
+              xs="auto"
             >
-              <Grid sx={{ marginRight: 'auto' }}>
-                <Typography className={classes.title}>
-                  {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
-                  {(!isLoading || !isBytes) && `(${currentUnit})`}{' '}
-                  {/* show the units of bytes data only when complete data is loaded */}
-                </Typography>
-              </Grid>
-              <Grid sx={{ marginRight: 5, width: 100 }}>
-                {props.availableMetrics?.scrape_interval && (
-                  <IntervalSelectComponent
-                    default_interval={widget?.time_granularity}
-                    onIntervalChange={handleIntervalChange}
-                    scrape_interval={props.availableMetrics.scrape_interval}
+              {props.availableMetrics?.scrape_interval && (
+                <IntervalSelectComponent
+                  default_interval={widget?.time_granularity}
+                  onIntervalChange={handleIntervalChange}
+                  scrape_interval={props.availableMetrics.scrape_interval}
+                />
+              )}
+            </Grid>
+            <Grid lg="auto" xs="auto">
+              {props.availableMetrics?.available_aggregate_functions &&
+                props.availableMetrics.available_aggregate_functions.length >
+                  0 && (
+                  <AggregateFunctionComponent
+                    available_aggregate_func={
+                      props.availableMetrics?.available_aggregate_functions
+                    }
+                    default_aggregate_func={widget?.aggregate_function}
+                    onAggregateFuncChange={handleAggregateFunctionChange}
                   />
                 )}
-              </Grid>
-              <Grid sx={{ marginRight: 5, width: 100 }}>
-                {props.availableMetrics?.available_aggregate_functions &&
-                  props.availableMetrics.available_aggregate_functions.length >
-                    0 && (
-                    <AggregateFunctionComponent
-                      available_aggregate_func={
-                        props.availableMetrics?.available_aggregate_functions
-                      }
-                      default_aggregate_func={widget?.aggregate_function}
-                      onAggregateFuncChange={handleAggregateFunctionChange}
-                    />
-                  )}
-              </Grid>
-              <StyledZoomIcon
+            </Grid>
+            <Grid
+              // sx={{
+              //   marginTop: 1.5,
+              //   marginLeft:10,
+              lg="auto" // }}
+              xs="auto"
+            >
+              <ZoomIcon
                 handleZoomToggle={handleZoomToggle}
                 zoomIn={widget?.size == 12 ? true : false}
               />
-            </div>
+            </Grid>
+          </Grid>
+          {/* </div> */}
+          <Grid
+            // sx={{
+            //   marginTop: 1.5,
+            //   marginLeft:10,
+            lg="auto" // }}
+            xs="auto"
+          >
             <Divider spacingBottom={32} spacingTop={15} />
+          </Grid>
+          <Grid
+            // sx={{
+            //   marginTop: 1.5,
+            //   marginLeft:10,
+            lg="auto" // }}
+            xs="auto"
+          >
             {!(
               isLoading ||
               (status == 'error' &&
@@ -518,7 +552,8 @@ export const CloudViewWidget = React.memo(
                 error &&
                 error.length > 0 &&
                 error[0].reason == jweTokenExpiryError)) && <CircleProgress />}
-          </div>
+          </Grid>
+          {/* </div> */}
         </Paper>
       </Grid>
     );

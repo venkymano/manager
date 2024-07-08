@@ -116,6 +116,16 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
     return <ErrorState errorText={'Error loading metric definitions'} />;
   }
 
+  if (!props.nonTrivialFilter || !props.duration || !props.resources) {
+    return (
+      <ErrorState
+        errorText={
+          'Either pass Filters or pass Resources and Duration directly'
+        }
+      />
+    );
+  }
+
   const getCloudViewGraphProperties = (widget: Widgets) => {
     const graphProp: CloudViewWidgetProperties = {} as CloudViewWidgetProperties;
     graphProp.widget = { ...widget };

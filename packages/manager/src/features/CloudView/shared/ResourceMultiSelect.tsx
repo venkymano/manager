@@ -17,6 +17,7 @@ interface CloudViewResourceSelectProps {
   // defaultValue?: any[];
   disabled: boolean;
   handleResourceChange: (resource: any) => void;
+  placeholder?: string;
   region: string | undefined;
   resourceType: string | undefined;
 }
@@ -109,7 +110,7 @@ export const CloudViewMultiResourceSelect = React.memo(
         limitTags={2}
         multiple
         options={getResourceList()}
-        placeholder="Select Resources"
+        placeholder={props.placeholder ?? 'Select Resources'}
         value={getSelectedResources()}
       />
     );

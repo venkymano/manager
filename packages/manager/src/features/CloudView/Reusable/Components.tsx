@@ -13,8 +13,10 @@ const Components: { [key: string]: MemoExoticComponent<any> } = {
 };
 
 const renderComponent = (props: any) => {
-  if (typeof Components[props.key] !== 'undefined') {
-    return React.createElement(Components[props.key], props);
+  if (typeof Components[props.componentKey] !== 'undefined') {
+    return React.createElement(Components[props.componentKey], {
+      ...props
+    });
   }
 
   return <div></div>;

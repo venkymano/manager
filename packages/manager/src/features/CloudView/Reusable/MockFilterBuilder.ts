@@ -13,7 +13,8 @@ export const mockFilter = (): CloudPulseServiceTypeFilterMap[] => {
   linodeFilterMap.serviceType = 'linode';
   linodeFilterMap.filters = [];
   linodeFilterMap.filters.push(getFilter());
-  linodeFilterMap.filters.push(getDynamicTypeFilter());
+//   linodeFilterMap.filters.push(getDynamicTypeFilter());
+  linodeFilterMap.filters.push(getTestFilter());
   linodeFilterMap.filters.push(getPredefinedFilterRegion());
   linodeFilterMap.filters.push(getPredefinedFilter());
   linodeFilterMap.filters.push(getPredefinedFilterTimeDuration());
@@ -52,6 +53,35 @@ const getFilter = () => {
   return filter;
 };
 
+const getTestFilter = () => {
+  const filter: CloudPulseServiceTypeFilters = {} as CloudPulseServiceTypeFilters;
+  filter.configuration = {} as CloudPulseServiceTypeFiltersConfiguration;
+  filter.name = 'Test Filter';
+  filter.configuration.name = 'Test Filter';
+  filter.configuration.filterKey = 'TestFilter';
+  filter.configuration.filterType = 'string';
+  filter.configuration.type = CloudPulseSelectTypes.static;
+  filter.configuration.options = [
+    {
+      id: 'testfilter1',
+      label: 'Test Filter 1',
+    },
+    {
+      id: 'testfilter2',
+      label: 'Test Filter 2',
+    },
+    {
+      id: 'testfilter3',
+      label: 'Test Filter 3',
+    },
+  ];
+  filter.configuration.placeholder = 'Select a Test';
+  filter.configuration.isMultiSelect = false;
+  filter.configuration.isNonRequestFilter = false;
+
+  return filter;
+};
+
 const getDynamicTypeFilter = () => {
   const filter: CloudPulseServiceTypeFilters = {} as CloudPulseServiceTypeFilters;
   filter.configuration = {} as CloudPulseServiceTypeFiltersConfiguration;
@@ -76,9 +106,10 @@ const getPredefinedFilter = () => {
   filter.configuration.filterKey = 'resource_id';
   filter.configuration.type = CloudPulseSelectTypes.predefined;
   filter.configuration.filterType = 'string';
-  filter.configuration.placeholder = 'Select Resources';
+  filter.configuration.placeholder = 'Select Clusters';
   filter.configuration.isMetricsFilter = true;
   filter.configuration.isNonRequestFilter = false;
+  filter.configuration.dependency = ['region'];
   return filter;
 };
 
@@ -104,7 +135,6 @@ const getPredefinedFilterRegion = () => {
   filter.configuration.filterType = 'string';
   filter.configuration.placeholder = 'Select Region';
   filter.configuration.isMetricsFilter = true;
-  filter.configuration.dependency = ['resource_id']; // this means once we select region, we pass it to resource as props and we show resources in disabled state
   filter.configuration.isNonRequestFilter = true;
   return filter;
 };

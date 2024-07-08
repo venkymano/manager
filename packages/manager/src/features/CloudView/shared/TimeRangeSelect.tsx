@@ -120,6 +120,7 @@ export const CloudPulseTimeRangeSelect = React.memo(
         isSearchable={false}
         onChange={handleChange}
         options={options}
+        placeholder={props.placeholder ?? 'Select Time Range'}
         small
       />
     );

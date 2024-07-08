@@ -27,7 +27,7 @@ export enum CloudPulseSelectTypes {
 
 export const CloudPulseCustomSelect = React.memo(
   (props: CloudPulseCustomSelectProps) => {
-    const [selectedResource, setResource] = React.useState<any>([]);
+    const [selectedResource, setResource] = React.useState<any>();
 
     const {
       data: queriedResources,
@@ -40,6 +40,24 @@ export const CloudPulseCustomSelect = React.memo(
       props.apiResponseIdField ? props.apiResponseIdField : 'id',
       props.apiResponseLabelField ? props.apiResponseLabelField : 'label'
     );
+
+    const getSelectedResources = () => {
+      if (props.options && !selectedResource) {
+        props.handleSelectionChange(
+          props.filterKey,
+          props.options[0].id.toString()
+        );
+        return props.options[0];
+      } else if (queriedResources && !selectedResource) {
+        props.handleSelectionChange(
+          props.filterKey,
+          queriedResources[0].id.toString()
+        );
+        return queriedResources[0];
+      }
+
+      return selectedResource;
+    };
 
     if (
       props.type == CloudPulseSelectTypes.static ||
@@ -75,10 +93,9 @@ export const CloudPulseCustomSelect = React.memo(
               ? props.options!
               : queriedResources!
           }
-          key={props.filterKey}
           label=""
           placeholder={props.placeholder ? props.placeholder : 'Select a Value'}
-          value={selectedResource}
+          value={getSelectedResources()}
         />
       );
     } else {

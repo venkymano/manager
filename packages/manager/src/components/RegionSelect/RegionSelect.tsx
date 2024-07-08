@@ -156,7 +156,7 @@ export const RegionSelect = React.memo((props: RegionSelectProps) => {
         loadingText="Loading regions..."
         noOptionsText="No results"
         options={options}
-        placeholder="Select a Region"
+        placeholder={props.placeholder ?? 'Select a Region'}
         value={selectedRegion}
       />
       {showEdgeIconHelperText && ( // @TODO Gecko Beta: Add docs link

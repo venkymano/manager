@@ -70,9 +70,9 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
         const filter = serviceTypeConfig?.filters[i];
         if (
           filter &&
-          filter.configuration.filterKey == filterkey &&
           filter.configuration.dependency &&
-          filter.configuration.dependency.length > 0
+          filter.configuration.dependency.length > 0 &&
+          filter.configuration.dependency.includes(filterkey)
         ) {
           dependentFilterReference.current[filterkey] = value;
           setDependentFilters({ ...dependentFilterReference.current });
@@ -82,8 +82,6 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
     };
 
     const checkIfDisabledNeeded = (filterKey: string, serviceType: string) => {
-      const dependentFiltersObj: string[] = [];
-
       flags.aclpServiceTypeFiltersMap = mockFilter();
 
       const serviceTypeConfig = flags.aclpServiceTypeFiltersMap?.find(
@@ -98,16 +96,20 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
         const filter = serviceTypeConfig?.filters[i];
         if (
           filter &&
-          filter.configuration.dependency &&
-          filter.configuration.dependency.includes(filterKey)
+          filter.configuration.filterKey == filterKey &&
+          filter.configuration.dependency
         ) {
-          dependentFiltersObj.push(filter.configuration.filterKey);
+          return filter.configuration.dependency.some(
+            (dependent) =>
+              !dependentFilters[dependent] ||
+              (Array.isArray(dependentFilters[dependent])
+                ? dependentFilters[dependent].length == 0
+                : false)
+          );
         }
       }
 
-      return dependentFiltersObj.some(
-        (filter) => dependentFilters && !dependentFilters[filter]
-      ); // if anything is not defined , then return true
+      return false;
     };
 
     const handleCustomSelectChange = React.useCallback(
@@ -119,6 +121,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
 
     const getPredefinedPropsRegion = (config: CloudPulseServiceTypeFilters) => {
       return {
+        componentKey: config.configuration.filterKey,
         filterKey: config.configuration.filterKey,
         handleRegionChange,
         key: config.configuration.filterKey,
@@ -130,6 +133,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
 
     const getPredefinedResources = (config: CloudPulseServiceTypeFilters) => {
       return {
+        componentKey: config.configuration.filterKey,
         disabled: checkIfDisabledNeeded(
           'resource_id',
           data ? data.service_type! : undefined!
@@ -148,6 +152,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
       config: CloudPulseServiceTypeFilters
     ) => {
       return {
+        componentKey: config.configuration.filterKey,
         filterKey: config.configuration.filterKey,
         handleStatsChange: handleTimeRangeChange,
         key: config.configuration.filterKey,
@@ -160,12 +165,13 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
       return {
         apiResponseIdField: config.configuration.apiIdField,
         apiResponseLabelField: config.configuration.apiLabelField,
+        componentKey: 'customDropDown',
         dataApiUrl: config.configuration.apiUrl,
         filterKey: config.configuration.filterKey,
         filterType: config.configuration.filterType,
         handleSelectionChange: handleCustomSelectChange,
         isMultiSelect: config.configuration.isMultiSelect,
-        key: 'customDropDown',
+        key: config.configuration.filterKey,
         maxSelections: config.configuration.maxSelections,
         options: config.configuration.options,
         placeholder: config.configuration.placeholder,
@@ -196,13 +202,13 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
     return (
       <>
         {mockFilter().map((filter) => {
-          return filter.filters.map((filter) => {
+          return filter.filters.map((filter, index) => {
             return (
               <Grid
                 key={filter.configuration.filterKey}
                 sx={{ marginLeft: 2, width: 250 }}
               >
-                {RenderComponent(getProps(filter))}
+                {RenderComponent({ ...getProps(filter), key: index })}
               </Grid>
             );
           });

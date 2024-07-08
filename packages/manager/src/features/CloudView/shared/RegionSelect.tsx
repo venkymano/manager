@@ -13,6 +13,7 @@ import {
 
 export interface CloudViewRegionSelectProps {
   handleRegionChange: (region: string | undefined) => void;
+  placeholder?: string;
   selectedDashboard?: Dashboard;
 }
 
@@ -35,6 +36,7 @@ export const CloudViewRegionSelect = React.memo(
           handleSelection={(value) => {}}
           label=""
           noMarginTop
+          placeholder={props.placeholder}
           regions={[]}
           selectedId={''}
         />
@@ -52,6 +54,7 @@ export const CloudViewRegionSelect = React.memo(
         isClearable={true}
         label=""
         noMarginTop
+        placeholder={props.placeholder}
         regions={regions ? regions : []}
         selectedId={getPrefferedRegion()!}
       />
