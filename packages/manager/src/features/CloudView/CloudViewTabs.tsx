@@ -10,6 +10,7 @@ import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
 
 import { DashBoardLanding } from './Dashboard/DashboardLanding';
+import { UpdatedDashBoardLanding } from './Dashboard/UpdatedDashboardLanding';
 import { Namespaces } from './Namespaces/Namespaces';
 type Props = RouteComponentProps<{}>;
 
@@ -52,7 +53,7 @@ export const CloudViewTabs = React.memo((props: Props) => {
         <React.Suspense fallback={<SuspenseLoader />}>
           <TabPanels>
             <SafeTabPanel index={0}>
-              <DashBoardLanding />
+              <UpdatedDashBoardLanding />
             </SafeTabPanel>
             {/* <SafeTabPanel index={1}>
               <Namespaces />

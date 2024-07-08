@@ -56,5 +56,13 @@ export const CloudViewRegionSelect = React.memo(
         selectedId={getPrefferedRegion()!}
       />
     );
-  }
+  },
+  compareProps
 );
+
+function compareProps(
+  oldProps: CloudViewRegionSelectProps,
+  newProps: CloudViewRegionSelectProps
+) {
+  return oldProps.selectedDashboard?.id == newProps.selectedDashboard?.id;
+}

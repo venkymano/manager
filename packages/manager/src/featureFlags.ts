@@ -1,8 +1,10 @@
+import { StringLocale } from 'yup/lib/locale';
+
+import { CloudPulseSelectTypes } from './features/CloudView/shared/CloudPulseCustomSelect';
+
 import type { Doc } from './features/OneClickApps/types';
 import type { TPAProvider } from '@linode/api-v4/lib/profile';
 import type { NoticeVariant } from 'src/components/Notice/Notice';
-import { StringLocale } from 'yup/lib/locale';
-import { CloudPulseSelectTypes } from './features/CloudView/shared/CloudPulseCustomSelect';
 
 // These flags should correspond with active features flags in LD
 
@@ -49,8 +51,9 @@ type OneClickApp = Record<string, string>;
 export interface Flags {
   aclb: boolean;
   aclbFullCreateFlow: boolean;
-  aclpResourceTypeMap: CloudPulseResourceTypeMap[];
   aclpReadEndpoint: string;
+  aclpResourceTypeMap: CloudPulseResourceTypeMap[];
+  aclpServiceTypeFiltersMap: CloudPulseServiceTypeFilterMap[];
   apiMaintenance: APIMaintenance;
   cloudView: boolean;
   databaseBeta: boolean;
@@ -80,7 +83,6 @@ export interface Flags {
   taxes: Taxes;
   tpaProviders: Provider[];
   vpc: boolean;
-  aclpServiceTypeFiltersMap: CloudPulseServiceTypeFilterMap[];
 }
 
 type PromotionalOfferFeature =
@@ -113,30 +115,31 @@ export interface CloudPulseResourceTypeMap {
 }
 
 export interface CloudPulseServiceTypeFilterMap {
-  serviceType: string;
   filters: CloudPulseServiceTypeFilters[];
+  serviceType: string;
 }
 
 export interface CloudPulseServiceTypeFilters {
+  configuration: CloudPulseServiceTypeFiltersConfiguration;
   name: string;
-  configuration:CloudPulseServiceTypeFiltersConfiguration;
 }
 
 export interface CloudPulseServiceTypeFiltersConfiguration {
-  name: string;
-  placeholder?: string;
-  type: CloudPulseSelectTypes;  
-  options?: CloudPulseServiceTypeFiltersOptions[];
-  apiUrl?: string;
   apiIdField?: string;
   apiLabelField?: string;
-  isMultiSelect?: boolean;
+  apiUrl?: string;
+  dependency?: string[];
   filterKey: string;
   filterType: string;
-  maxSelections?: number;
   isMetricsFilter: boolean;
-  dependency?: string[];
+  isMultiSelect?: boolean;
+  isNonRequestFilter: boolean;
+  maxSelections?: number;
+  name: string;
+  options?: CloudPulseServiceTypeFiltersOptions[];
+  placeholder?: string;
   priority: number;
+  type: CloudPulseSelectTypes;
 }
 
 export interface CloudPulseServiceTypeFiltersOptions {

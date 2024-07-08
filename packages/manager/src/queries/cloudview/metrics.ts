@@ -8,7 +8,7 @@ import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useCloudViewMetricsQuery = (
   serviceType: string,
-  request: CloudViewMetricsRequest,
+  request: any,
   props: any,
   widgetProps: any,
   enabled: boolean | undefined,

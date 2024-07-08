@@ -21,25 +21,31 @@ import {
 import { useResourcesQuery } from 'src/queries/cloudview/resources';
 import { useGetCloudViewMetricDefinitionsByServiceType } from 'src/queries/cloudview/services';
 
+import { removeObjectReference } from '../Utils/CloudPulseUtils';
+import { fetchUserPrefObject } from '../Utils/UserPreference';
 import {
+  CloudPulseWidgetFilters,
   CloudViewWidget,
   CloudViewWidgetProperties,
 } from '../Widget/CloudViewWidget';
-import { fetchUserPrefObject } from '../Utils/UserPreference';
-import { all_interval_options, getInSeconds, getIntervalIndex } from '../Widget/Components/IntervalSelectComponent';
-import { removeObjectReference } from '../Utils/CloudPulseUtils';
+import {
+  all_interval_options,
+  getInSeconds,
+  getIntervalIndex,
+} from '../Widget/Components/IntervalSelectComponent';
 
 export interface DashboardProperties {
   dashboardId: number; // need to pass the dashboardId
   duration: TimeDuration;
 
   manualRefreshTimeStamp?: number | undefined;
+  nonTrivialFilter?: CloudPulseWidgetFilters[];
   // on any change in dashboard
   onDashboardChange?: (dashboard: Dashboard) => void;
   region?: string;
   resources: string[];
   // widgetPreferences?: AclpWidget[]; // this is optional
-  savePref? : boolean | undefined;
+  savePref?: boolean | undefined;
 }
 
 export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
@@ -113,7 +119,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   const getCloudViewGraphProperties = (widget: Widgets) => {
     const graphProp: CloudViewWidgetProperties = {} as CloudViewWidgetProperties;
     graphProp.widget = { ...widget };
-    if(props.savePref){
+    if (props.savePref) {
       setPrefferedWidgetPlan(graphProp.widget);
     }
     graphProp.serviceType = dashboard?.service_type ?? '';
@@ -137,7 +143,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
       widgetObj.time_granularity = { ...pref.time_granularity };
 
       // update ref
-      dashboardRef.current?.widgets.forEach((obj : Widgets) => {
+      dashboardRef.current?.widgets.forEach((obj: Widgets) => {
         if (obj.label == widgetObj.label) {
           obj.size = widgetObj.size;
           obj.aggregate_function = widgetObj.aggregate_function;
@@ -163,11 +169,11 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
     }
   };
 
-  const getTimeGranularity= (scrapeInterval : string)=>{
-      const scrapeIntervalValue = getInSeconds(scrapeInterval);
-      const index = getIntervalIndex(scrapeIntervalValue)
-      return index < 0 ? all_interval_options[0] : all_interval_options[index];
-  }
+  const getTimeGranularity = (scrapeInterval: string) => {
+    const scrapeIntervalValue = getInSeconds(scrapeInterval);
+    const index = getIntervalIndex(scrapeIntervalValue);
+    return index < 0 ? all_interval_options[0] : all_interval_options[index];
+  };
 
   const RenderWidgets = () => {
     if (dashboard != undefined) {
@@ -180,21 +186,26 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
       ) {
         // maintain a copy
         dashboardRef.current = removeObjectReference(dashboard);
-        const newDashboard : Dashboard = removeObjectReference(dashboard);
+        const newDashboard: Dashboard = removeObjectReference(dashboard);
         return (
           <Grid columnSpacing={1.5} container rowSpacing={0} spacing={2}>
-            {
-
-            {...newDashboard}.widgets.map((element, index) => {
+            {{ ...newDashboard }.widgets.map((element, index) => {
               if (element) {
                 const availMetrics = metricDefinitions?.data.find(
                   (availMetrics: AvailableMetrics) =>
                     element.label === availMetrics.label
                 );
-                const cloudViewWidgetProperties = getCloudViewGraphProperties({...element});
+                const cloudViewWidgetProperties = getCloudViewGraphProperties({
+                  ...element,
+                });
 
-                if(availMetrics && !cloudViewWidgetProperties.widget.time_granularity){
-                  cloudViewWidgetProperties.widget.time_granularity = getTimeGranularity(availMetrics.scrape_interval);
+                if (
+                  availMetrics &&
+                  !cloudViewWidgetProperties.widget.time_granularity
+                ) {
+                  cloudViewWidgetProperties.widget.time_granularity = getTimeGranularity(
+                    availMetrics.scrape_interval
+                  );
                 }
                 return (
                   <CloudViewWidget
@@ -203,8 +214,9 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
                     authToken={jweToken?.token}
                     availableMetrics={availMetrics}
                     handleWidgetChange={handleWidgetChange}
+                    nonTrivialFilters={props.nonTrivialFilter}
                     resources={resources.data}
-                    savePref = {props.savePref}
+                    savePref={props.savePref}
                   />
                 );
               } else {
@@ -239,9 +251,20 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
     );
   };
 
+  return <RenderWidgets />;
+}, compareProps);
+
+function compareProps(
+  oldProps: DashboardProperties,
+  newProps: DashboardProperties
+) {
   return (
-    <>
-      <RenderWidgets />
-    </>
+    oldProps.dashboardId == newProps.dashboardId &&
+    oldProps.region == newProps.region &&
+    oldProps.manualRefreshTimeStamp == newProps.manualRefreshTimeStamp &&
+    JSON.stringify(oldProps.resources) == JSON.stringify(newProps.resources) &&
+    JSON.stringify(oldProps.duration) == JSON.stringify(newProps.duration) &&
+    JSON.stringify(oldProps.nonTrivialFilter) ==
+      JSON.stringify(newProps.nonTrivialFilter)
   );
-});
+}
