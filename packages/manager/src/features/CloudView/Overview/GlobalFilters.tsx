@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
 import { Dashboard, TimeDuration } from '@linode/api-v4';
+// import Reload from 'src/assets/icons/reload.svg';
+import Cached from '@mui/icons-material/Cached';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import * as React from 'react';
-
-// import Reload from 'src/assets/icons/reload.svg';
-import Cached from '@mui/icons-material/Cached';
 
 import {
   FiltersObject,
@@ -15,7 +14,13 @@ import { CloudViewDashboardSelect } from '../shared/DashboardSelect';
 import { CloudViewRegionSelect } from '../shared/RegionSelect';
 import { CloudViewMultiResourceSelect } from '../shared/ResourceMultiSelect';
 import { CloudPulseTimeRangeSelect } from '../shared/TimeRangeSelect';
-import { REFRESH, REGION, RESOURCES, TIME_DURATION } from '../Utils/CloudPulseConstants';
+import {
+  REFRESH,
+  REGION,
+  RESOURCES,
+  TIME_DURATION,
+} from '../Utils/CloudPulseConstants';
+import { useIsRegionApplicable } from '../Utils/CloudPulseUtils';
 import { updateGlobalFilterPreference } from '../Utils/UserPreference';
 
 export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
@@ -27,7 +32,11 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
     Dashboard | undefined
   >();
 
-  const [selectedRegion, setSelectedRegion] = React.useState<string | undefined>();
+  const [selectedRegion, setSelectedRegion] = React.useState<
+    string | undefined
+  >();
+
+  const isRegionAppl = useIsRegionApplicable(selectedDashboard?.service_type);
 
   const handleTimeRangeChange = React.useCallback(
     (
@@ -85,20 +94,20 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
             handleDashboardChange={handleDashboardChange}
           />
         </Grid>
-        {
-          isRegionAppl &&
+        {isRegionAppl && (
           <Grid sx={{ marginLeft: 4, width: 200 }}>
             <StyledCloudViewRegionSelect
-
               handleRegionChange={handleRegionChange}
               selectedDashboard={selectedDashboard}
             />
           </Grid>
-        }
+        )}
         <Grid sx={{ marginLeft: 4, width: 450 }}>
           <StyledCloudViewResourceSelect
-
-            disabled={(!selectedRegion && isRegionAppl) || !selectedDashboard?.service_type}
+            disabled={
+              (!selectedRegion && isRegionAppl) ||
+              !selectedDashboard?.service_type
+            }
             handleResourceChange={handleResourceChange}
             region={selectedRegion}
             resourceType={selectedDashboard?.service_type}
@@ -134,8 +143,8 @@ const StyledCloudViewResourceSelect = styled(CloudViewMultiResourceSelect, {
 const StyledCloudViewTimeRangeSelect = styled(CloudPulseTimeRangeSelect, {
   label: 'StyledCloudViewTimeRangeSelect',
 })({
-  width: 160,
   marginTop: 8,
+  width: 160,
 });
 
 const StyledGrid = styled(Grid, { label: 'StyledGrid' })(({ theme }) => ({
@@ -160,6 +169,6 @@ const StyledReload = styled(Cached, { label: 'StyledReload' })(({ theme }) => ({
     cursor: 'pointer',
   },
   height: '30px',
-  width: '30px',
   marginTop: 27,
+  width: '30px',
 }));

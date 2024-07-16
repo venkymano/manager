@@ -34,9 +34,10 @@ import {
   getDimensionName,
 } from '../Utils/CloudPulseUtils';
 import {
-  convertBytesToUnit,
+  convertValueToUnit,
   formatToolTip,
-  generateUnitByByteValue,
+  generateUnitByBaseUnit,
+  isBitsOrBytesUnit,
 } from '../Utils/UnitConversion';
 import {
   fetchUserPrefObject,
@@ -107,7 +108,7 @@ export const CloudViewWidget = React.memo(
 
     const flags = useFlags();
 
-    const isBytes = props.unit === 'Bytes';
+    const isBitsOrBytes = isBitsOrBytesUnit(props.unit);
 
     // const [
     //   selectedInterval,
@@ -117,7 +118,7 @@ export const CloudViewWidget = React.memo(
     const [widget, setWidget] = React.useState<Widgets>({ ...props.widget }); // any change in agg_functions, step, group_by, will be published to dashboard component for save
 
     const [currentUnit, setCurrentUnit] = React.useState<any>(
-      isBytes ? 'b' : props.unit
+      generateUnitByBaseUnit(0, props.unit) ?? props.unit
     );
 
     const getCloudViewMetricsRequest = (): CloudViewMetricsRequest => {
@@ -286,7 +287,7 @@ export const CloudViewWidget = React.memo(
     }, [status, metricsList]);
 
     const formatBytesData = (dimensions: any, legendRowsData: any) => {
-      if ((props.unit && props.unit !== 'Bytes') || !dimensions) {
+      if ((props.unit && !isBitsOrBytes) || !dimensions) {
         return;
       }
       let maxValue = 0;
@@ -296,10 +297,11 @@ export const CloudViewWidget = React.memo(
       if (maxValue === 0) {
         return;
       }
-      const unit = generateUnitByByteValue(maxValue);
+      const unit = generateUnitByBaseUnit(maxValue, props.unit);
       setCurrentUnit(unit);
       dimensions.forEach((dimension: any, index: number) => {
-        legendRowsData[index].format = formatToolTip;
+        legendRowsData[index].format = (value: number) =>
+          formatToolTip(value, props.unit);
       });
     };
 
@@ -398,7 +400,7 @@ export const CloudViewWidget = React.memo(
               <Grid sx={{ marginRight: 'auto' }}>
                 <Typography className={classes.title}>
                   {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
-                  {(!isLoading || !isBytes) && `(${currentUnit})`}{' '}
+                  {(!isLoading || !isBitsOrBytes) && `(${currentUnit})`}{' '}
                   {/* show the units of bytes data only when complete data is loaded */}
                 </Typography>
               </Grid>
@@ -446,9 +448,14 @@ export const CloudViewWidget = React.memo(
                     : undefined
                 }
                 formatData={
-                  isBytes
+                  isBitsOrBytes
                     ? (data: number) =>
-                        convertBytesToUnit(data * 8, currentUnit)
+                        convertValueToUnit(data, currentUnit, props.unit)
+                    : undefined
+                }
+                formatTooltip={
+                  isBitsOrBytes
+                    ? (value: number) => formatToolTip(value, props.unit)
                     : undefined
                 }
                 legendRows={
@@ -456,14 +463,13 @@ export const CloudViewWidget = React.memo(
                 }
                 ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
                 data={data}
-                formatTooltip={isBytes ? formatToolTip : undefined}
                 gridSize={widget.size}
                 loading={isLoading}
                 nativeLegend={true}
                 showToday={today}
                 timezone={timezone}
                 title={''}
-                unit={!isBytes ? ` ${currentUnit}` : undefined}
+                unit={!isBitsOrBytes ? ` ${currentUnit}` : undefined}
               />
             )}
             {(isLoading ||
