@@ -22,15 +22,15 @@ const byteRegex = /[bB][yY][tT][eE][sS]{0,1}/;
  */
 
 export const generateUnitByBitValue = (value: number): Unit => {
-  if (value <= 1e3) {
+  if (value < 1e3) {
     return 'b';
-  } else if (value <= 1e6) {
+  } else if (value < 1e6) {
     return 'Kb';
-  } else if (value <= 1e9) {
+  } else if (value < 1e9) {
     return 'Mb';
-  } else if (value <= 1e12) {
+  } else if (value < 1e12) {
     return 'Gb';
-  } else if (value <= 1e15) {
+  } else if (value < 1e15) {
     return 'Tb';
   } else {
     return 'Pb';
@@ -43,15 +43,15 @@ export const generateUnitByBitValue = (value: number): Unit => {
  * @returns : maximum possible rolled up unit for the input byte value
  */
 export const generateUnitByByteValue = (value: number): Unit => {
-  if (value <= 1e3) {
+  if (value < 1e3) {
     return 'B';
-  } else if (value <= 1e6) {
+  } else if (value < 1e6) {
     return 'KB';
-  } else if (value <= 1e9) {
+  } else if (value < 1e9) {
     return 'MB';
-  } else if (value <= 1e12) {
+  } else if (value < 1e12) {
     return 'GB';
-  } else if (value <= 1e15) {
+  } else if (value < 1e15) {
     return 'TB';
   } else {
     return 'PB';
