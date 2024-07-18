@@ -117,7 +117,7 @@ export const CloudViewDashboardSelect = React.memo(
           serviceTypesError
             ? 'Unable to load service types'
             : errorDashboardTypes.length > 0
-            ? 'Unable of load ' +
+            ? 'Unable to load ' +
               errorDashboardTypes?.slice(0, -1) +
               ' dashboards'
             : ''

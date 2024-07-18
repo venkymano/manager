@@ -114,7 +114,7 @@ export const createDatabase = (
  *
  */
 export const getEngineDatabases = (
-  engine: Engine,
+  engine: Engine | string,
   params?: Params,
   filter?: Filter
 ) =>

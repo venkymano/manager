@@ -6,7 +6,11 @@ import Select, {
   Item,
 } from 'src/components/EnhancedSelect/Select';
 
-import { fetchUserPrefObject } from '../Utils/UserPreference';
+import { TIME_DURATION } from '../Utils/CloudPulseConstants';
+import {
+  fetchUserPrefObject,
+  updateGlobalFilterPreference,
+} from '../Utils/UserPreference';
 
 interface Props
   extends Omit<
@@ -19,6 +23,7 @@ interface Props
     timeDuration: TimeDuration,
     timeRangeLabel: string
   ) => void;
+  savePreferences: boolean;
 }
 
 const _PAST_7_DAYS = 'Last 7 Days';
@@ -68,6 +73,9 @@ export const CloudPulseTimeRangeSelect = React.memo(
       const timeDuration = getTimeDurationFromTimeRange(item.value);
       const nowInSeconds = Date.now() / 1000;
       if (handleStatsChange) {
+        updateGlobalFilterPreference({
+          [TIME_DURATION]: item.value,
+        });
         handleStatsChange(
           Math.round(generateStartTime(item.value, nowInSeconds)),
           Math.round(nowInSeconds),
@@ -78,6 +86,9 @@ export const CloudPulseTimeRangeSelect = React.memo(
     };
 
     const getSelectedTimeRange = () => {
+      if (!props.savePreferences) {
+        return undefined;
+      }
       const timeDuration = fetchUserPrefObject().timeDuration;
 
       const selectedTimeRange = options.find(
@@ -125,7 +136,7 @@ export const CloudPulseTimeRangeSelect = React.memo(
       />
     );
   },
-  (oldProps, newProps) => true
+  (oldProps, newProps) => oldProps.disabled == newProps.disabled
 );
 
 /**

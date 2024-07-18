@@ -126,16 +126,17 @@ export interface CloudPulseServiceTypeFilters {
 
 export interface CloudPulseServiceTypeFiltersConfiguration {
   apiIdField?: string;
-  apiLabelField?: string;
+  apiLabelField?: string[];
   apiUrl?: string;
   dependency?: string[];
   filterKey: string;
   filterType: string;
+  isFilterable: boolean;
   isMetricsFilter: boolean;
   isMultiSelect?: boolean;
-  isNonRequestFilter: boolean;
   maxSelections?: number;
   name: string;
+  neededInServicePage: boolean;
   options?: CloudPulseServiceTypeFiltersOptions[];
   placeholder?: string;
   priority: number;

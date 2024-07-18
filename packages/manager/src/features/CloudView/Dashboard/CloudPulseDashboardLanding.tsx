@@ -1,19 +1,18 @@
 import { Dashboard } from '@linode/api-v4';
 import React from 'react';
 
-import CloudViewIcon from 'src/assets/icons/entityIcons/cv_overview.svg';
+import CloudViewIcon from 'src/assets/icons/Monitor_icon.svg';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { Paper } from 'src/components/Paper';
 import { StyledPlaceholder } from 'src/features/StackScripts/StackScriptBase/StackScriptBase.styles';
-import { useFlags } from 'src/hooks/useFlags';
 
 import { GlobalFilters } from '../Overview/GlobalFilters';
-import { mockFilter } from '../Reusable/MockFilterBuilder';
+import { FILTER_CONFIG } from '../Utils/FilterConfig';
 import { getUserPreference } from '../Utils/UserPreference';
 import { CloudPulseWidgetFilters } from '../Widget/CloudViewWidget';
 import { CloudPulseDashboard } from './Dashboard';
 
-export const UpdatedDashBoardLanding = () => {
+export const CloudPulseDashboardLanding = () => {
   const [filterValue, setFilterValue] = React.useState<{ [key: string]: any }>(
     {}
   );
@@ -22,8 +21,6 @@ export const UpdatedDashBoardLanding = () => {
   const [isPrefLoaded, setIsPrefLoaded] = React.useState<boolean>(false);
 
   const filterReference: { [key: string]: any } = React.useRef({});
-
-  const flags = useFlags();
 
   const handleGlobalFilterChange = React.useCallback(
     (filterKey: string, value: any) => {
@@ -38,39 +35,43 @@ export const UpdatedDashBoardLanding = () => {
   }, []);
 
   const checkIfAllMandatoryFiltersAreSelected = () => {
-    flags.aclpServiceTypeFiltersMap = mockFilter();
-    if (flags && flags.aclpServiceTypeFiltersMap) {
-      const serviceTypeConfig = flags.aclpServiceTypeFiltersMap.find(
-        (filterMap) => filterMap.serviceType == dashboard?.service_type
-      );
+    if (FILTER_CONFIG && FILTER_CONFIG.get(dashboard!.service_type!)) {
+      const serviceTypeConfig = FILTER_CONFIG.get(dashboard!.service_type!);
 
-      return serviceTypeConfig?.filters.every((filter) =>
-        filterValue[filter.configuration.filterKey] &&
-        Array.isArray(filterValue[filter.configuration.filterKey])
-          ? filterValue[filter.configuration.filterKey].length > 0
-          : true
-      );
+      for (let i = 0; i < serviceTypeConfig!.filters.length; i++) {
+        if (
+          filterValue[serviceTypeConfig!.filters[i].configuration.filterKey] ==
+            undefined ||
+          (Array.isArray(
+            filterValue[serviceTypeConfig!.filters[i].configuration.filterKey]
+          ) &&
+            filterValue[serviceTypeConfig!.filters[i].configuration.filterKey]
+              .length == 0)
+        ) {
+          return false;
+        }
+      }
+
+      return true;
     }
 
     return false;
   };
 
   const getAllFilters = () => {
-    flags.aclpServiceTypeFiltersMap = mockFilter();
     const widgetFilters = [];
 
-    if (flags && flags.aclpServiceTypeFiltersMap) {
-      const serviceTypeConfig = flags.aclpServiceTypeFiltersMap.find(
-        (filterMap) => filterMap.serviceType == dashboard?.service_type
-      ) ?? { filters: [] };
+    if (FILTER_CONFIG && FILTER_CONFIG.get(dashboard!.service_type!)) {
+      const serviceTypeConfig = FILTER_CONFIG.get(dashboard!.service_type!);
 
-      for (let i = 0; i < serviceTypeConfig?.filters.length; i++) {
-        if (!serviceTypeConfig.filters[i].configuration.isNonRequestFilter) {
+      for (let i = 0; i < serviceTypeConfig!.filters.length; i++) {
+        if (serviceTypeConfig!.filters[i].configuration.isFilterable) {
           const widgetFilter = {} as CloudPulseWidgetFilters;
-          widgetFilter.filterKey =
-            serviceTypeConfig.filters[i].configuration.filterKey;
+          widgetFilter.filterKey = serviceTypeConfig!.filters[
+            i
+          ].configuration.filterKey;
           widgetFilter.filterValue = filterValue[widgetFilter.filterKey];
-          widgetFilter.isDimensionFilter = !serviceTypeConfig.filters[i]
+          widgetFilter.isDimensionFilter = !serviceTypeConfig!.filters[i]
             .configuration.isMetricsFilter;
           widgetFilters.push(widgetFilter);
         }
@@ -94,15 +95,37 @@ export const UpdatedDashBoardLanding = () => {
   }
 
   return (
-    <Paper style={{ border: 'solid 1px #e3e5e8' }}>
-      <div style={{ display: 'flex' }}>
-        <div style={{ width: '100%' }}>
-          <GlobalFilters
-            handleAnyFilterChange={handleGlobalFilterChange}
-            handleDashboardChange={dashboardChange}
-          ></GlobalFilters>
+    <>
+      <Paper style={{ border: 'solid 1px #e3e5e8' }}>
+        <div style={{ display: 'flex' }}>
+          <div style={{ width: '100%' }}>
+            <GlobalFilters
+              handleAnyFilterChange={handleGlobalFilterChange}
+              handleDashboardChange={dashboardChange}
+            ></GlobalFilters>
+          </div>
         </div>
-      </div>
+      </Paper>
+      {dashboard && !FILTER_CONFIG.get(dashboard.service_type) && (
+        <Paper>
+          <StyledPlaceholder
+            icon={CloudViewIcon}
+            subtitle="No Filters Configured for selected dashboard's service type"
+            title=""
+          />
+        </Paper>
+      )}
+      {(!dashboard ||
+        (FILTER_CONFIG.get(dashboard.service_type) &&
+          !checkIfAllMandatoryFiltersAreSelected())) && (
+        <Paper>
+          <StyledPlaceholder
+            icon={CloudViewIcon}
+            subtitle="Select Dashboard and Mandatory Global filters to continue"
+            title=""
+          />
+        </Paper>
+      )}
       {dashboard && checkIfAllMandatoryFiltersAreSelected() && (
         <CloudPulseDashboard
           resources={
@@ -120,16 +143,6 @@ export const UpdatedDashBoardLanding = () => {
           savePref={true}
         />
       )}
-
-      {(!dashboard || !checkIfAllMandatoryFiltersAreSelected()) && (
-        <Paper>
-          <StyledPlaceholder
-            icon={CloudViewIcon}
-            subtitle="Select Dashboard, Region and Resource to visualize metrics"
-            title=""
-          />
-        </Paper>
-      )}
-    </Paper>
+    </>
   );
 };

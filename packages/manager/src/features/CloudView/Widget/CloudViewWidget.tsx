@@ -222,7 +222,9 @@ export const CloudViewWidget = React.memo(
       status,
     } = useCloudViewMetricsQuery(
       getServiceType()!,
-      getCloudViewMetricsRequestFromFilter(),
+      props.nonTrivialFilters
+        ? getCloudViewMetricsRequestFromFilter()
+        : getCloudViewMetricsRequest(),
       props,
       widget.aggregate_function +
         '_' +
@@ -269,6 +271,15 @@ export const CloudViewWidget = React.memo(
       // for now , lets stick with the default theme
       // colors = COLOR_MAP.get('default')!;
 
+      const startEnd = convertTimeDurationToStartAndEndTimeRange(
+        props!.duration! ??
+          props.nonTrivialFilters?.find(
+            (filterValue) => filterValue.filterKey == 'relative_time_duration'
+          )?.filterValue
+      );
+
+      setToday(_isToday(startEnd.start, startEnd.end));
+
       if (
         status == 'success' &&
         metricsList.data &&
@@ -282,9 +293,6 @@ export const CloudViewWidget = React.memo(
             return;
           }
           const color = colors[index];
-          const startEnd = convertTimeDurationToStartAndEndTimeRange(
-            props!.duration!
-          );
           const dimension = {
             backgroundColor: color,
             data: seriesDataFormatter(
@@ -308,7 +316,6 @@ export const CloudViewWidget = React.memo(
           legendRowsData.push(legendRow);
           dimensions.push(dimension);
           index = index + 1;
-          setToday(_isToday(startEnd.start, startEnd.end));
         });
 
         formatBytesData(dimensions, legendRowsData);
@@ -415,17 +422,18 @@ export const CloudViewWidget = React.memo(
     }, []);
 
     return (
-      <Grid
-        sx={{
-          alignItems: 'center',
-          columnGap: 0.2,
-          direction: 'column',
-          flexWrap: 'nowrap',
-        }}
-        container
-        lg={widget.size}
-        xs={6}
-      >
+      // <Grid
+      //   sx={{
+      //     alignItems: 'center',
+      //     columnGap: 0.2,
+      //     direction: 'column',
+      //     flexWrap: 'nowrap',
+      //   }}
+      //   container
+      //   lg={widget.size}
+      //   xs={6}
+      // >
+      <Grid xs={widget.size}>
         <Paper
           style={{
             border: 'solid 1px #e3e5e8',
@@ -434,7 +442,7 @@ export const CloudViewWidget = React.memo(
             width: '100%',
           }}
         >
-          <Grid
+          {/* <Grid
             sx={{
               alignItems: 'center',
               columnGap: 0.2,
@@ -445,115 +453,122 @@ export const CloudViewWidget = React.memo(
             container
             lg={widget.size}
             xs={6}
-          >
-            <Grid lg="auto" xs="auto">
-              <Typography className={classes.title}>
-                {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
-                {(!isLoading || !isBytes) && `(${currentUnit})`}{' '}
-                {/* show the units of bytes data only when complete data is loaded */}
-              </Typography>
+          > */}
+          <div className={widget.metric} style={{ margin: '1%' }}>
+            <div
+              style={{
+                alignItems: 'center',
+                display: 'flex',
+                width: '100%',
+              }}
+            >
+              <Grid sx={{ marginRight: 'auto' }}>
+                <Typography className={classes.title}>
+                  {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
+                  {(!isLoading || !isBytes) && `(${currentUnit})`}{' '}
+                  {/* show the units of bytes data only when complete data is loaded */}
+                </Typography>
+              </Grid>
+              <Grid sx={{ marginRight: 5, width: 100 }}>
+                {props.availableMetrics?.scrape_interval && (
+                  <IntervalSelectComponent
+                    default_interval={widget?.time_granularity}
+                    onIntervalChange={handleIntervalChange}
+                    scrape_interval={props.availableMetrics.scrape_interval}
+                  />
+                )}
+              </Grid>
+              <Grid sx={{ marginRight: 5, width: 100 }}>
+                {props.availableMetrics?.available_aggregate_functions &&
+                  props.availableMetrics.available_aggregate_functions.length >
+                    0 && (
+                    <AggregateFunctionComponent
+                      available_aggregate_func={
+                        props.availableMetrics?.available_aggregate_functions
+                      }
+                      default_aggregate_func={widget?.aggregate_function}
+                      onAggregateFuncChange={handleAggregateFunctionChange}
+                    />
+                  )}
+              </Grid>
+              <Grid
+                sx={{
+                  marginLeft: 1,
+                  marginTop: 1.5,
+                }}
+                // lg="auto" // }}
+                // xs="auto"
+              >
+                <ZoomIcon
+                  handleZoomToggle={handleZoomToggle}
+                  zoomIn={widget?.size == 12 ? true : false}
+                />
+              </Grid>
+              {/* </Grid> */}
+            </div>
+            <Grid
+              sx={{
+                // marginLeft: 10,
+                marginTop: 1.5,
+              }}
+              // lg="auto" // }}
+              // xs="auto"
+            >
+              <Divider spacingBottom={32} spacingTop={15} />
             </Grid>
             <Grid
               sx={{
-                marginLeft: 'auto',
+                marginLeft: 10,
+                marginTop: 1.5,
               }}
-              lg="auto"
-              xs="auto"
+              // lg="auto" // }}
+              // xs="auto"
             >
-              {props.availableMetrics?.scrape_interval && (
-                <IntervalSelectComponent
-                  default_interval={widget?.time_granularity}
-                  onIntervalChange={handleIntervalChange}
-                  scrape_interval={props.availableMetrics.scrape_interval}
+              {!(
+                isLoading ||
+                (status == 'error' &&
+                  error &&
+                  error.length > 0 &&
+                  error[0].reason == jweTokenExpiryError)
+              ) && (
+                <CloudViewLineGraph // rename where we have cloudview to cloudpulse
+                  error={
+                    status == 'error'
+                      ? error && error.length > 0
+                        ? error[0].reason
+                        : 'Error while rendering widget'
+                      : undefined
+                  }
+                  formatData={
+                    isBytes
+                      ? (data: number) =>
+                          convertBytesToUnit(data * 8, currentUnit)
+                      : undefined
+                  }
+                  legendRows={
+                    legendRows && legendRows.length > 0 ? legendRows : undefined
+                  }
+                  ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
+                  data={data}
+                  formatTooltip={isBytes ? formatToolTip : undefined}
+                  gridSize={widget.size}
+                  loading={isLoading}
+                  nativeLegend={true}
+                  showToday={today}
+                  timezone={timezone}
+                  title={''}
+                  unit={!isBytes ? ` ${currentUnit}` : undefined}
                 />
               )}
+              {(isLoading ||
+                (status == 'error' &&
+                  error &&
+                  error.length > 0 &&
+                  error[0].reason == jweTokenExpiryError)) && (
+                <CircleProgress />
+              )}
             </Grid>
-            <Grid lg="auto" xs="auto">
-              {props.availableMetrics?.available_aggregate_functions &&
-                props.availableMetrics.available_aggregate_functions.length >
-                  0 && (
-                  <AggregateFunctionComponent
-                    available_aggregate_func={
-                      props.availableMetrics?.available_aggregate_functions
-                    }
-                    default_aggregate_func={widget?.aggregate_function}
-                    onAggregateFuncChange={handleAggregateFunctionChange}
-                  />
-                )}
-            </Grid>
-            <Grid
-              // sx={{
-              //   marginTop: 1.5,
-              //   marginLeft:10,
-              lg="auto" // }}
-              xs="auto"
-            >
-              <ZoomIcon
-                handleZoomToggle={handleZoomToggle}
-                zoomIn={widget?.size == 12 ? true : false}
-              />
-            </Grid>
-          </Grid>
-          {/* </div> */}
-          <Grid
-            // sx={{
-            //   marginTop: 1.5,
-            //   marginLeft:10,
-            lg="auto" // }}
-            xs="auto"
-          >
-            <Divider spacingBottom={32} spacingTop={15} />
-          </Grid>
-          <Grid
-            // sx={{
-            //   marginTop: 1.5,
-            //   marginLeft:10,
-            lg="auto" // }}
-            xs="auto"
-          >
-            {!(
-              isLoading ||
-              (status == 'error' &&
-                error &&
-                error.length > 0 &&
-                error[0].reason == jweTokenExpiryError)
-            ) && (
-              <CloudViewLineGraph // rename where we have cloudview to cloudpulse
-                error={
-                  status == 'error'
-                    ? error && error.length > 0
-                      ? error[0].reason
-                      : 'Error while rendering widget'
-                    : undefined
-                }
-                formatData={
-                  isBytes
-                    ? (data: number) =>
-                        convertBytesToUnit(data * 8, currentUnit)
-                    : undefined
-                }
-                legendRows={
-                  legendRows && legendRows.length > 0 ? legendRows : undefined
-                }
-                ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
-                data={data}
-                formatTooltip={isBytes ? formatToolTip : undefined}
-                gridSize={widget.size}
-                loading={isLoading}
-                nativeLegend={true}
-                showToday={today}
-                timezone={timezone}
-                title={''}
-                unit={!isBytes ? ` ${currentUnit}` : undefined}
-              />
-            )}
-            {(isLoading ||
-              (status == 'error' &&
-                error &&
-                error.length > 0 &&
-                error[0].reason == jweTokenExpiryError)) && <CircleProgress />}
-          </Grid>
-          {/* </div> */}
+          </div>
         </Paper>
       </Grid>
     );

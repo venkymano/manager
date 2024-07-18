@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 import {
+  useDBEngineResourcesQuery,
   useLinodeResourcesQuery,
   useLoadBalancerResourcesQuery,
 } from 'src/queries/cloudview/resources';
@@ -14,12 +15,12 @@ import {
 } from '../Utils/UserPreference';
 
 interface CloudViewResourceSelectProps {
-  // defaultValue?: any[];
   disabled: boolean;
   handleResourceChange: (resource: any) => void;
   placeholder?: string;
-  region: string | undefined;
   resourceType: string | undefined;
+  savePreferences: boolean;
+  xFilter: { [key: string]: any };
 }
 
 export const CloudViewMultiResourceSelect = React.memo(
@@ -27,70 +28,46 @@ export const CloudViewMultiResourceSelect = React.memo(
     const resourceOptions: any = {};
     const [selectedResource, setResource] = React.useState<any>([]);
     // const defaultCalls = React.useRef(false);
-    const filterResourcesByRegion = (resourcesList: any[]) => {
-      return resourcesList?.filter((resource: any) => {
-        if (props.region == undefined) {
-          return true;
-        }
-        if (resource.region) {
-          return resource.region === props.region;
-        } else if (resource.regions) {
-          return resource.regions.includes(props.region);
-        } else {
-          return false;
-        }
-      });
-    };
     const getResourceList = () => {
       return props.resourceType && resourceOptions[props.resourceType]
-        ? filterResourcesByRegion(resourceOptions[props.resourceType]?.data)
+        ? resourceOptions[props.resourceType]?.data
         : [];
     };
 
     ({ data: resourceOptions['linode'] } = useLinodeResourcesQuery(
-      props.resourceType === 'linode'
+      props.resourceType === 'linode',
+      {},
+      props.xFilter
     ));
     ({ data: resourceOptions['aclb'] } = useLoadBalancerResourcesQuery(
-      props.resourceType === 'aclb'
+      props.resourceType === 'aclb',
+      {},
+      props.xFilter
+    ));
+    ({ data: resourceOptions['dbass'] } = useDBEngineResourcesQuery(
+      // dbass integration
+      props.resourceType === 'dbass' &&
+        props.xFilter['region'] != undefined &&
+        props.xFilter['dbEngine'] != undefined, // enable only if we have dbEngine and region
+      props.xFilter,
+      {}
     ));
 
     const getSelectedResources = () => {
+      if (!props.savePreferences) {
+        return undefined;
+      }
       const defaultValue = fetchUserPrefObject()?.resources;
       const selectedResourceObj = getResourceList().filter(
         (obj) => defaultValue && defaultValue?.includes(obj.id)
       );
-      // defaultCalls.current = true;
-      // setResource(selectedResourceObj);
       props.handleResourceChange(selectedResourceObj.map((obj) => obj.id));
       return selectedResourceObj;
     };
 
-    // React.useEffect(() => {
-    //   setResource([]);
-    // }, [props.region, props.resourceType]);
-
-    // React.useEffect(() => {
-    //   if (!defaultCalls.current && resourceOptions[props.resourceType!]) {
-    //     getSelectedResources();
-    //   }
-    //   // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [resourceOptions]);
-
-    // if (!props.region || !props.resourceType || !resourceOptions[props.resourceType]) {
-    //   return (
-    //     <Select
-    //       disabled={true}
-    //       isClearable={true}
-    //       // eslint-disable-next-line @typescript-eslint/no-empty-function
-    //       onChange={() => { }}
-    //       placeholder="Select Resources"
-    //     />
-    //   );
-    // }
-
     React.useEffect(() => {
       setResource([]);
-    }, [props.region, props.resourceType]);
+    }, [props.xFilter]);
     return (
       <Autocomplete
         onChange={(_: any, resource: any, reason) => {
@@ -122,8 +99,5 @@ function compareProps(
   oldProps: CloudViewResourceSelectProps,
   newProps: CloudViewResourceSelectProps
 ) {
-  return (
-    oldProps.region == newProps.region &&
-    oldProps.resourceType == newProps.resourceType
-  );
+  return JSON.stringify(oldProps.xFilter) == JSON.stringify(newProps.xFilter);
 }

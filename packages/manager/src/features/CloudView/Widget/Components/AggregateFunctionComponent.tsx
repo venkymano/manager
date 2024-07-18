@@ -38,7 +38,12 @@ export const AggregateFunctionComponent = React.memo(
     }
 
     return (
-      <div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <Autocomplete
           isOptionEqualToValue={(option, value) => {
             return option.label == value.label;

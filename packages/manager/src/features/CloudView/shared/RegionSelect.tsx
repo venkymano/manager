@@ -14,6 +14,7 @@ import {
 export interface CloudViewRegionSelectProps {
   handleRegionChange: (region: string | undefined) => void;
   placeholder?: string;
+  savePreferences: boolean;
   selectedDashboard?: Dashboard;
 }
 
@@ -22,6 +23,9 @@ export const CloudViewRegionSelect = React.memo(
     const { data: regions } = useRegionsQuery();
 
     const getPrefferedRegion = () => {
+      if (!props.savePreferences) {
+        return undefined;
+      }
       const defaultValue = fetchUserPrefObject()?.region;
       props.handleRegionChange(defaultValue);
 

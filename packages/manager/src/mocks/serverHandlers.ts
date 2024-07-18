@@ -526,6 +526,20 @@ const cloudView = [
   rest.get('*/cloudview/namespaces', (req, res, ctx) => {
     return res(ctx.json(makeResourcePage(namespaceFactory.buildList(10))));
   }),
+  rest.get('*/monitor/services', (req, res, ctx) => {
+    return res(
+      ctx.json({
+        data: [
+          {
+            service_type: 'linode',
+          },
+          {
+            service_type: 'dbass',
+          },
+        ],
+      })
+    );
+  }),
   rest.post('*/cloudview/namespaces', async (req, res, ctx) => {
     await sleep(2000);
     return res(ctx.json({}));
@@ -564,7 +578,7 @@ const cloudView = [
   }),
 
   // dashboards
-  rest.get('*/monitors/dashboards', async (req, res, ctx) => {
+  rest.get('*/monitor/services/linode/dashboards', async (req, res, ctx) => {
     await sleep(100); // this is to test out loading feature
     // TODO, decide how to work on widgets and filters (for now keeping static ones)
     // return res(ctx.json(makeResourcePage(dashboardFactory.buildList(10))))
@@ -645,79 +659,6 @@ const cloudView = [
             ],
           },
           {
-            created: '2023-07-12T16:08:53',
-            id: req.params.id,
-            label: 'ACLB Dashboard',
-            service_type: 'aclb',
-            time_duration: {
-              unit: 'hr',
-              value: 1,
-            },
-            updated: '2023-07-12T16:08:53',
-            widgets: [
-              {
-                aggregate_function: 'sum',
-                chart_type: 'line',
-                color: 'blue',
-                filters: [],
-                group_by: '',
-                label: 'CPU',
-                metric: '200',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 12,
-                unit: '%',
-                y_label: 'count',
-              },
-              {
-                aggregate_function: 'sum',
-                chart_type: 'line',
-                color: 'red',
-                filters: [],
-                group_by: '',
-                label: 'HTTP_400',
-                metric: '400',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 6,
-                unit: '%',
-                y_label: 'count',
-              },
-              {
-                aggregate_function: 'sum',
-                chart_type: 'line',
-                color: 'yellow',
-                filters: [],
-                group_by: '',
-                label: 'HTTP_500',
-                metric: '500',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 6,
-                unit: '%',
-                y_label: 'count',
-              },
-              {
-                aggregate_function: 'sum',
-                chart_type: 'line',
-                color: 'green',
-                filters: [],
-                group_by: '',
-                label: 'Network',
-                metric: '401',
-                namespace_id: 1,
-                region_id: 1,
-                service_type: 'ACLB',
-                size: 6,
-                unit: 'Kb/s',
-                y_label: 'count',
-              },
-            ],
-          },
-          {
             created: 'Thu, 18 Apr 2024 05:31:58 GMT',
             id: 2,
             label: '1stLinodeDashboad',
@@ -776,6 +717,335 @@ const cloudView = [
     );
   }),
 
+  rest.post('*/monitor/services/dbass/token', async (req, res, ctx) => {
+    await sleep(1000);
+    return res(
+      ctx.json({
+        token:
+          'eyJhbGciOiAiZGlyIiwgImVuYyI6ICJBMTI4Q0JDLUhTMjU2IiwgImtpZCI6IDEsICJleHAiOiAxNzIxMjc4NTIxfQ..MI8jqq6lwAHl_WeIkpO20g.Kr9i0o3WohSgx51Vx5GYcWNFbW8chTOiCfoRVVJtditGglpA0kwXAwyXjQGEupwZkL4G9baOdTlmmXCLVjnMaowd7AOb03jZwzTqwIx7TCNQTv9-ccubpVlqMG3bI7qgKNM4Tv2IUjePazCMhEZtmnREufIhPNbBwnuZH9LJcTAdMLL4FoDNts0zt5q7E_PxnerZoRYBfXVUnFOFzLbs1rEOAfC8iiM3keJA-uqv2rzAEl3DFuY8QZ8hLV3t4L_8p0QMdyDr-hVGB98OhwsRwpAiAY7latKBgOjlsvWJO_xkvHoUEOw7KB3jDNBdWWtzwmVcjjHpHBA8m-LO35R1qU851EmvuGjjHi5CI2isDq0w1Eu7h7LKKwsK3MWhmBYtfTWhG4mprZDSyGeOdrcbTQ.911HKQqTfyD34NZz8mkYtQ',
+      })
+    );
+  }),
+
+  rest.get(
+    '*/monitor/services/dbass/metric-definitions',
+    async (req, res, ctx) => {
+      await sleep(1000);
+      return res(
+        ctx.json({
+          data: [
+            {
+              available_aggregate_functions: ['min', 'max', 'avg'],
+              dimensions: [
+                {
+                  dim_label: 'cpu',
+                  label: 'CPU name',
+                  values: null,
+                },
+                {
+                  dim_label: 'state',
+                  label: 'State of CPU',
+                  values: [
+                    'user',
+                    'system',
+                    'idle',
+                    'interrupt',
+                    'nice',
+                    'softirq',
+                    'steal',
+                    'wait',
+                  ],
+                },
+                {
+                  dim_label: 'LINODE_ID',
+                  label: 'Linode ID',
+                  values: null,
+                },
+              ],
+              label: 'CPU utilization',
+              metric: 'system_cpu_utilization_percent',
+              metric_type: 'gauge',
+              scrape_interval: '2m',
+              unit: 'percent',
+            },
+            {
+              available_aggregate_functions: ['min', 'max', 'avg', 'sum'],
+              dimensions: [
+                {
+                  dim_label: 'state',
+                  label: 'State of memory',
+                  values: [
+                    'used',
+                    'free',
+                    'buffered',
+                    'cached',
+                    'slab_reclaimable',
+                    'slab_unreclaimable',
+                  ],
+                },
+                {
+                  dim_label: 'LINODE_ID',
+                  label: 'Linode ID',
+                  values: null,
+                },
+              ],
+              label: 'Memory Usage',
+              metric: 'system_memory_usage_by_resource',
+              metric_type: 'gauge',
+              scrape_interval: '30s',
+              unit: 'byte',
+            },
+            {
+              available_aggregate_functions: ['min', 'max', 'avg', 'sum'],
+              dimensions: [
+                {
+                  dim_label: 'device',
+                  label: 'Device name',
+                  values: ['lo', 'eth0'],
+                },
+                {
+                  dim_label: 'direction',
+                  label: 'Direction of network transfer',
+                  values: ['transmit', 'receive'],
+                },
+                {
+                  dim_label: 'LINODE_ID',
+                  label: 'Linode ID',
+                  values: null,
+                },
+              ],
+              label: 'Network Traffic',
+              metric: 'system_network_io_by_resource',
+              metric_type: 'counter',
+              scrape_interval: '30s',
+              unit: 'byte',
+            },
+            {
+              available_aggregate_functions: ['min', 'max', 'avg', 'sum'],
+              dimensions: [
+                {
+                  dim_label: 'device',
+                  label: 'Device name',
+                  values: ['loop0', 'sda', 'sdb'],
+                },
+                {
+                  dim_label: 'direction',
+                  label: 'Operation direction',
+                  values: ['read', 'write'],
+                },
+                {
+                  dim_label: 'LINODE_ID',
+                  label: 'Linode ID',
+                  values: null,
+                },
+              ],
+              label: 'Disk I/O',
+              metric: 'system_disk_OPS_total',
+              metric_type: 'counter',
+              scrape_interval: '30s',
+              unit: 'ops_per_second',
+            },
+          ],
+        })
+      );
+    }
+  ),
+
+  rest.get('*/monitor/services/dbass/dashboards', async (req, res, ctx) => {
+    await sleep(100); // this is to test out loading feature
+    // TODO, decide how to work on widgets and filters (for now keeping static ones)
+    // return res(ctx.json(makeResourcePage(dashboardFactory.buildList(10))))
+    return res(
+      ctx.json(
+        makeResourcePage([
+          {
+            created: '2023-07-12T16:08:53',
+            id: 12,
+            label: 'Dbass Global Dashboard',
+            service_type: 'dbass',
+            time_duration: {
+              unit: 'hr',
+              value: 1,
+            },
+            updated: '2023-07-12T16:08:53',
+            widgets: [
+              {
+                aggregate_function: 'avg',
+                chart_type: 'line',
+                color: 'blue',
+                filters: [],
+                group_by: '',
+                label: 'CPU',
+                metric: 'system_memory_usage_bytes',
+                namespace_id: 1,
+                region_id: 1,
+                service_type: 'ACLB',
+                size: 12,
+                unit: '%',
+                y_label: 'count',
+              },
+              {
+                aggregate_function: 'avg',
+                chart_type: 'line',
+                color: 'red',
+                filters: [],
+                group_by: '',
+                label: 'HTTP_400',
+                metric: 'system_network_io_bytes_total',
+                namespace_id: 1,
+                region_id: 1,
+                service_type: 'ACLB',
+                size: 6,
+                unit: '%',
+                y_label: 'count',
+              },
+              {
+                aggregate_function: 'avg',
+                chart_type: 'line',
+                color: 'yellow',
+                filters: [],
+                group_by: '',
+                label: 'HTTP_500',
+                metric: 'system_cpu_utilization_ratio',
+                namespace_id: 1,
+                region_id: 1,
+                service_type: 'ACLB',
+                size: 6,
+                unit: '%',
+                y_label: 'count',
+              },
+              {
+                aggregate_function: 'avg',
+                chart_type: 'line',
+                color: 'green',
+                filters: [],
+                group_by: '',
+                label: 'Network',
+                metric: 'system_disk_operations_total',
+                namespace_id: 1,
+                region_id: 1,
+                service_type: 'ACLB',
+                size: 6,
+                unit: 'Kb/s',
+                y_label: 'count',
+              },
+            ],
+          },
+          {
+            created: 'Thu, 18 Apr 2024 05:31:58 GMT',
+            id: 22,
+            label: 'Standard Dbass Metrics Dashboard',
+            service_type: 'dbass',
+            type: 'standard',
+            updated: null,
+            widgets: [
+              {
+                aggregate_function: 'avg',
+                chart_type: 'line',
+                color: 'blue',
+                label: 'CPU utilization ratio',
+                metric: 'system_cpu_utilization_ratio',
+                service_type: 'linode',
+                size: 12,
+                unit: 'percent',
+                y_label: 'system_cpu_utilization_ratio',
+              },
+              {
+                aggregate_function: 'avg',
+                chart_type: 'line',
+                color: 'red',
+                label: 'Bytes of memory in use',
+                metric: 'system_memory_usage_bytes',
+                service_type: 'linode',
+                size: 12,
+                unit: 'byte',
+                y_label: 'system_memory_usage_bytes',
+              },
+              {
+                aggregate_function: 'avg',
+                chart_type: 'line',
+                color: 'green',
+                label: 'Number of bytes transmitted and received',
+                metric: 'system_network_io_bytes_total',
+                service_type: 'linode',
+                size: 6,
+                unit: 'bits_per_second',
+                y_label: 'system_network_io_bytes_total',
+              },
+              {
+                aggregate_function: 'avg',
+                chart_type: 'line',
+                color: 'yellow',
+                label: 'Disk operations count',
+                metric: 'system_disk_operations_total',
+                service_type: 'linode',
+                size: 6,
+                unit: 'rate',
+                y_label: 'system_disk_operations_total',
+              },
+            ],
+          },
+        ])
+      )
+    );
+  }),
+
+  rest.get('*/monitor/dashboards/12', async (req, res, ctx) => {
+    await sleep(1000);
+    return res(
+      ctx.json({
+        created: '2024-04-29T17:09:29',
+        id: 1,
+        label: 'Linode Service I/O Statistics',
+        service_type: 'dbass',
+        type: 'standard',
+        updated: null,
+        widgets: [
+          {
+            aggregate_function: 'avg',
+            chart_type: 'area',
+            color: 'blue',
+            label: 'CPU utilization',
+            metric: 'system_cpu_utilization_percent',
+            size: 12,
+            unit: '%',
+            y_label: 'system_cpu_utilization_ratio',
+          },
+          {
+            aggregate_function: 'avg',
+            chart_type: 'area',
+            color: 'red',
+            label: 'Memory Usage',
+            metric: 'system_memory_usage_by_resource',
+            size: 12,
+            unit: 'Bytes',
+            y_label: 'system_memory_usage_bytes',
+          },
+          {
+            aggregate_function: 'avg',
+            chart_type: 'area',
+            color: 'green',
+            label: 'Network Traffic',
+            metric: 'system_network_io_by_resource',
+            size: 6,
+            unit: 'Bytes',
+            y_label: 'system_network_io_bytes_total',
+          },
+          {
+            aggregate_function: 'avg',
+            chart_type: 'area',
+            color: 'yellow',
+            label: 'Disk I/O',
+            metric: 'system_disk_OPS_total',
+            size: 6,
+            unit: 'OPS',
+            y_label: 'system_disk_operations_total',
+          },
+        ],
+      })
+    );
+  }),
+
   rest.get('*/monitor/dashboards/:id', async (req, res, ctx) => {
     await sleep(100); // this is to test out loading feature
     if (req.params.id) {
@@ -784,7 +1054,7 @@ const cloudView = [
           created: '2023-07-12T16:08:53',
           id: req.params.id,
           label: 'Akamai Global Dashboard',
-          service_type: 'ACLB',
+          service_type: 'dbass',
           time_duration: {
             unit: 'hr',
             value: 1,

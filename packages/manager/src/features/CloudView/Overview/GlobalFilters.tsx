@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Dashboard } from '@linode/api-v4';
+import { Dashboard, TimeDuration } from '@linode/api-v4';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import * as React from 'react';
@@ -10,9 +10,14 @@ import { useFlags } from 'src/hooks/useFlags';
 
 import { Cached } from '@mui/icons-material';
 
+import { Box } from 'src/components/Box';
+import { ErrorState } from 'src/components/ErrorState/ErrorState';
+
 import { GlobalFilterProperties } from '../Models/GlobalFilterProperties';
-import { CloudPulseDashboardFilterBuilder } from '../Reusable/DashboardFilterBuilder';
 import { CloudViewDashboardSelect } from '../shared/DashboardSelect';
+import { CloudPulseTimeRangeSelect } from '../shared/TimeRangeSelect';
+import { FILTER_CONFIG } from '../Utils/FilterConfig';
+import { CloudPulseDashboardFilterBuilder } from './DashboardFilterBuilder';
 
 export const GlobalFilters = React.memo(
   (props: GlobalFilterProperties) => {
@@ -35,6 +40,9 @@ export const GlobalFilters = React.memo(
     );
 
     const handleGlobalRefresh = React.useCallback(() => {
+      if (!selectedDashboard) {
+        return;
+      }
       props.handleAnyFilterChange('timestamp', Date.now());
     }, []);
 
@@ -42,6 +50,15 @@ export const GlobalFilters = React.memo(
       console.log(filterKey, value);
       props.handleAnyFilterChange(filterKey, value);
     }, []);
+
+    const handleTimeRangeChange = (
+      start: number,
+      end: number,
+      timeDuration?: TimeDuration,
+      timeRangeLabel?: string
+    ) => {
+      filterChange('relative_time_duration', timeDuration);
+    };
 
     if (!flags) {
       return (
@@ -57,43 +74,60 @@ export const GlobalFilters = React.memo(
         '&:hover': {
           cursor: 'pointer',
         },
-        height: '30px',
+        // height: '30px',
         marginTop: 27,
-        width: '30px',
+        // width: '30px',
       })
     );
 
     const StyledGrid = styled(Grid, { label: 'StyledGrid' })(({ theme }) => ({
-      alignItems: 'end',
+      alignItems: 'start',
       boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'row',
+      flexGrow: 1,
       gap: 5,
       justifyContent: 'start',
-      // flexWrap:'nowrap',
       marginBottom: theme.spacing(1.25),
     }));
 
     return (
-      <StyledGrid container xs={12}>
-        <Grid sx={{ marginLeft: 2, width: 300 }}>
-          <CloudViewDashboardSelect
-            handleDashboardChange={handleDashboardChange}
-          />
-        </Grid>
-        {selectedDashboard && (
-          <CloudPulseDashboardFilterBuilder
-            dashboardId={selectedDashboard.id}
-            emitFilterChange={filterChange}
-          />
-        )}
-
-        {selectedDashboard && (
-          <Grid sx={{ marginLeft: 1, marginRight: 3 }}>
-            <StyledReload onClick={handleGlobalRefresh} />
+      <Box sx={{ flexGrow: 1 }}>
+        <Grid container sx={{width:'150%'}} lg={16}>
+          <Grid key={'selectdashboard'} sx={{ marginLeft: 2 }} xs>
+            <CloudViewDashboardSelect
+              handleDashboardChange={handleDashboardChange}
+            />
           </Grid>
-        )}
-      </StyledGrid>
+          <Grid key={'selectduration'} sx={{ marginLeft: 25 }} xs>
+            <CloudPulseTimeRangeSelect
+              disabled={!selectedDashboard}
+              handleStatsChange={handleTimeRangeChange}
+              savePreferences={true}
+            />
+          </Grid>
+          <Grid key={'selectrefresh'} sx={{ marginLeft: 1 }} xs={4}>
+            <StyledReload
+              aria-disabled={!selectedDashboard}
+              onClick={handleGlobalRefresh}
+            />
+          </Grid>
+        </Grid>
+        <StyledGrid container xs={12}>
+          <div style={{ width: '100%' }}></div>
+          {selectedDashboard &&
+            FILTER_CONFIG.get(selectedDashboard.service_type) && (
+              <CloudPulseDashboardFilterBuilder
+                dashboard={selectedDashboard}
+                emitFilterChange={filterChange}
+                serviceAnalyticsIntegration={false}
+              />
+            )}
+
+          {selectedDashboard &&
+            !FILTER_CONFIG.get(selectedDashboard.service_type) && <></>}
+        </StyledGrid>
+      </Box>
     );
   },
   (old, newProps) => true

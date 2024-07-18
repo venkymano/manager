@@ -1,5 +1,3 @@
-import { Filter } from 'src/types';
-
 export interface Namespace {
   id: number;
   label: string;

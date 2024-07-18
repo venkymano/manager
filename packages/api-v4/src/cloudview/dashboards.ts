@@ -18,7 +18,7 @@ export const getDashboardById = (dashboardId?: number) =>
 export const getDashboards = (serviceType: string) =>
   Request<ResourcePage<Dashboard>>(
     setURL(
-      `https://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services/linode/dashboards`
+      `https://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services/${encodeURIComponent(serviceType)}/dashboards`
     ),
     setMethod('GET'),
     setHeaders({

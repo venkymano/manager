@@ -23,6 +23,7 @@ import { Tabs } from 'src/components/Tabs/Tabs';
 import withLongviewClients, {
   Props as LongviewProps,
 } from 'src/containers/longview.container';
+import { CloudPulseDashboardWithFilters } from 'src/features/CloudView/Dashboard/CloudPulseDashboardWithFilters';
 import { CloudPulseDashboard } from 'src/features/CloudView/Dashboard/Dashboard';
 import { useAPIRequest } from 'src/hooks/useAPIRequest';
 import { useAccountSettings } from 'src/queries/accountSettings';
@@ -73,6 +74,10 @@ export const LongviewLanding = (props: CombinedProps) => {
     {
       routeName: `${props.match.url}/cloudpulseboard`,
       title: 'Cloud Pulse Dashboard',
+    },
+    {
+      routeName: `${props.match.url}/olddashboard`,
+      title: 'Old Cloud Pulse Dashboard',
     },
   ];
 
@@ -166,14 +171,20 @@ export const LongviewLanding = (props: CombinedProps) => {
               />
             </SafeTabPanel>
             <SafeTabPanel index={2}>
+              <CloudPulseDashboardWithFilters
+                dashboardId={1}
+                resources={[57667285, 57667325, 57667355]}
+              />
+            </SafeTabPanel>
+            <SafeTabPanel index={3}>
               <CloudPulseDashboard
                 duration={{
-                  unit: 'hr', 
-                  value: 24,
+                  unit: 'min',
+                  value: 30,
                 }}
-                dashboardId={1} // the id of dashboard
-                resources={['57667285', '57667325', '57667355']}
-              />
+                dashboardId={1}
+                resources={[57667285, 57667325, 57667355]}
+              ></CloudPulseDashboard>
             </SafeTabPanel>
           </TabPanels>
         </React.Suspense>

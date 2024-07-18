@@ -11,6 +11,7 @@ import { SafeTabPanel } from 'src/components/Tabs/SafeTabPanel';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
 import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
+import { CloudPulseDashboardWithFilters } from 'src/features/CloudView/Dashboard/CloudPulseDashboardWithFilters';
 import { useEditableLabelState } from 'src/hooks/useEditableLabelState';
 import { useFlags } from 'src/hooks/useFlags';
 import {
@@ -91,6 +92,11 @@ export const DatabaseDetail = () => {
     });
   }
 
+  tabs.push({
+    routeName: `/databases/${engine}/${id}/analytics`,
+    title: 'Monitor Analytics',
+  });
+
   const getTabIndex = () => {
     const tabChoice = tabs.findIndex((tab) =>
       Boolean(matchPath(tab.routeName, { path: location.pathname }))
@@ -153,7 +159,7 @@ export const DatabaseDetail = () => {
         title={database.label}
       />
       <Tabs index={getTabIndex()} onChange={handleTabChange}>
-        <TabLinkList tabs={tabs} />
+        <TabLinkList key={database.id} tabs={tabs} />
         <TabPanels>
           <SafeTabPanel index={0}>
             <DatabaseSummary database={database} />
@@ -169,6 +175,22 @@ export const DatabaseDetail = () => {
               <DatabaseResize database={database} />
             </SafeTabPanel>
           ) : null}
+          {flags.databaseResize ? (
+            <SafeTabPanel index={4}>
+              <CloudPulseDashboardWithFilters
+                dashboardId={12}
+                key={database.id}
+                resources={[database.id]}
+              />
+            </SafeTabPanel>
+          ) : (
+            <SafeTabPanel index={3}>
+              <CloudPulseDashboardWithFilters
+                dashboardId={12}
+                resources={[database.id]}
+              />
+            </SafeTabPanel>
+          )}
         </TabPanels>
       </Tabs>
     </>

@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Link, LinkProps, useLocation } from 'react-router-dom';
 
 import Account from 'src/assets/icons/account.svg';
-import CloudView from 'src/assets/icons/cloudview.svg';
 import Beta from 'src/assets/icons/entityIcons/beta.svg';
 import Storage from 'src/assets/icons/entityIcons/bucket.svg';
 import Database from 'src/assets/icons/entityIcons/database.svg';
@@ -22,6 +21,7 @@ import Volume from 'src/assets/icons/entityIcons/volume.svg';
 import VPC from 'src/assets/icons/entityIcons/vpc.svg';
 import TooltipIcon from 'src/assets/icons/get_help.svg';
 import Longview from 'src/assets/icons/longview.svg';
+import CloudView from 'src/assets/icons/cloudview.svg';
 import AkamaiLogo from 'src/assets/logo/akamai-logo.svg';
 import { BetaChip } from 'src/components/BetaChip/BetaChip';
 import { Divider } from 'src/components/Divider';
