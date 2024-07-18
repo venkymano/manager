@@ -22,6 +22,7 @@ const byteRegex = /[bB][yY][tT][eE][sS]{0,1}/;
  */
 
 export const generateUnitByBitValue = (value: number): Unit => {
+  //1e3 == 1000
   if (value < 1e3) {
     return 'b';
   } else if (value < 1e6) {
@@ -43,7 +44,8 @@ export const generateUnitByBitValue = (value: number): Unit => {
  * @returns : maximum possible rolled up unit for the input byte value
  */
 export const generateUnitByByteValue = (value: number): Unit => {
-  if (value < 1e3) {
+  //1e3 == 1000
+  if (value < 1e3) {  
     return 'B';
   } else if (value < 1e6) {
     return 'KB';
@@ -64,6 +66,7 @@ export const generateUnitByByteValue = (value: number): Unit => {
  * @returns : rolled up value based on maxUnit
  */
 export const convertBitsToUnit = (value: number, maxUnit: Unit) => {
+  // 1e3 == 1000
   if (maxUnit === 'Pb') {
     return value / 1e15;
   } else if (maxUnit === 'Tb') {
@@ -86,6 +89,7 @@ export const convertBitsToUnit = (value: number, maxUnit: Unit) => {
  * @returns : rolled up value based on maxUnit
  */
 export const convertBytesToUnit = (value: number, maxUnit: Unit) => {
+  // 1e3 == 1000
   if (maxUnit === 'PB') {
     return value / 1e15;
   } else if (maxUnit === 'TB') {
@@ -118,7 +122,7 @@ export const convertValueToUnit = (
   } else if (byteRegex.test(baseUnit)) {
     return convertBytesToUnit(value, unit);
   } else {
-    return 0;
+    return value;
   }
 };
 
@@ -131,7 +135,7 @@ export const convertValueToUnit = (
 export const formatToolTip = (value: number, baseUnit: string): string => {
   const _unit = generateUnitByBaseUnit(value, baseUnit);
   if (!_unit) {
-    return '';
+    return `${value} ${baseUnit}`;
   }
   let convertedValue = 0;
 
