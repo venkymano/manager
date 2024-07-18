@@ -2,6 +2,7 @@ import { GetJWETokenPayload, TimeDuration } from '@linode/api-v4';
 
 import { WithStartAndEnd } from 'src/features/Longview/request.types';
 import { useFlags } from 'src/hooks/useFlags';
+
 import { ACLP_SERVICES_FOR_REGION_FILTER } from './CloudPulseConstants';
 
 export const mapResourceIdToName = (id: string, resources: any[]) => {
@@ -25,7 +26,10 @@ export const getDimensionName = (metric: any, flag: any, resources: any[]) => {
   let labelName = '';
   Object.keys(metric).forEach((key) => {
     if (flag && key == flag.dimensionKey) {
-      const mappedName = mapResourceIdToName(metric[flag.dimensionKey], resources);
+      const mappedName = mapResourceIdToName(
+        metric[flag.dimensionKey],
+        resources
+      );
 
       if (mappedName && mappedName.length > 0) {
         labelName =
@@ -90,7 +94,7 @@ export const convertStringToCamelCasesWithSpaces = (
   return nonFormattedString;
 };
 
-export const removeObjectReference = (object: any)=> {
+export const removeObjectReference = (object: any) => {
   if (!object) {
     return null;
   }
@@ -99,19 +103,21 @@ export const removeObjectReference = (object: any)=> {
   } catch (e) {
     return null;
   }
-}
+};
 
-export const isRegionApplicable = (serviceType : string | undefined) : boolean=>{
+export const useIsRegionApplicable = (
+  serviceType: string | undefined
+): boolean => {
   const flags = useFlags();
 
   let isRegionApplicable = true;
 
-  if(serviceType &&flags && flags[ACLP_SERVICES_FOR_REGION_FILTER]){
-    const services  :Array<string> = flags[ACLP_SERVICES_FOR_REGION_FILTER];
+  if (serviceType && flags && flags[ACLP_SERVICES_FOR_REGION_FILTER]) {
+    const services: Array<string> = flags[ACLP_SERVICES_FOR_REGION_FILTER];
 
-    if(services.indexOf(serviceType) === -1){
+    if (services.indexOf(serviceType) === -1) {
       isRegionApplicable = false;
     }
   }
   return isRegionApplicable;
-}
+};
