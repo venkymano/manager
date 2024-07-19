@@ -3,7 +3,7 @@ import { Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
 
-import CloudViewIcon from 'src/assets/icons/entityIcons/cv_overview.svg';
+import CloudPulseIcon from 'src/assets/icons/entityIcons/Monitor.svg';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { Placeholder } from 'src/components/Placeholder/Placeholder';
 
@@ -133,8 +133,9 @@ export const DashBoardLanding = () => {
         !timeDuration) && (
         <Paper>
           <StyledPlaceholder
-            icon={CloudViewIcon}
-            subtitle="Select Dashboard, Region and Resource to visualize metrics"
+            icon={CloudPulseIcon}
+            isEntity
+            subtitle="Select Dashboard and filters to visualize metrics"
             title=""
           />
         </Paper>
