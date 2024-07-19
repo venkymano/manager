@@ -571,7 +571,7 @@ const cloudView = [
     // );
   }),
 
-  rest.post('*/monitors/service/*/metrics', async (req, res, ctx) => {
+  rest.post('*/monitor/services/*/metrics', async (req, res, ctx) => {
     await sleep(1000);
     const data = getMetricsResponse(req.body);
     return res(ctx.json(data));
@@ -762,7 +762,7 @@ const cloudView = [
                   values: null,
                 },
               ],
-              label: 'CPU utilization',
+              label: 'DBASS Metric1',
               metric: 'system_cpu_utilization_percent',
               metric_type: 'gauge',
               scrape_interval: '2m',
@@ -789,7 +789,7 @@ const cloudView = [
                   values: null,
                 },
               ],
-              label: 'Memory Usage',
+              label: 'DBASS Metric2',
               metric: 'system_memory_usage_by_resource',
               metric_type: 'gauge',
               scrape_interval: '30s',
@@ -814,7 +814,7 @@ const cloudView = [
                   values: null,
                 },
               ],
-              label: 'Network Traffic',
+              label: 'Database Health',
               metric: 'system_network_io_by_resource',
               metric_type: 'counter',
               scrape_interval: '30s',
@@ -839,7 +839,7 @@ const cloudView = [
                   values: null,
                 },
               ],
-              label: 'Disk I/O',
+              label: 'Database Network',
               metric: 'system_disk_OPS_total',
               metric_type: 'counter',
               scrape_interval: '30s',
@@ -1005,7 +1005,7 @@ const cloudView = [
             aggregate_function: 'avg',
             chart_type: 'area',
             color: 'blue',
-            label: 'CPU utilization',
+            label: 'DBASS Metric1',
             metric: 'system_cpu_utilization_percent',
             size: 12,
             unit: '%',
@@ -1015,7 +1015,7 @@ const cloudView = [
             aggregate_function: 'avg',
             chart_type: 'area',
             color: 'red',
-            label: 'Memory Usage',
+            label: 'DBASS Metric2',
             metric: 'system_memory_usage_by_resource',
             size: 12,
             unit: 'Bytes',
@@ -1025,7 +1025,7 @@ const cloudView = [
             aggregate_function: 'avg',
             chart_type: 'area',
             color: 'green',
-            label: 'Network Traffic',
+            label: 'Database Health',
             metric: 'system_network_io_by_resource',
             size: 6,
             unit: 'Bytes',
@@ -1035,7 +1035,7 @@ const cloudView = [
             aggregate_function: 'avg',
             chart_type: 'area',
             color: 'yellow',
-            label: 'Disk I/O',
+            label: 'Database Network',
             metric: 'system_disk_OPS_total',
             size: 6,
             unit: 'OPS',
@@ -1054,7 +1054,7 @@ const cloudView = [
           created: '2023-07-12T16:08:53',
           id: req.params.id,
           label: 'Akamai Global Dashboard',
-          service_type: 'dbass',
+          service_type: 'linode',
           time_duration: {
             unit: 'hr',
             value: 1,

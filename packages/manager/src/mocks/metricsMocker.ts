@@ -1,5 +1,10 @@
+import { convertTimeDurationToStartAndEndTimeRange } from 'src/features/CloudView/Utils/CloudPulseUtils';
+
 export const getMetricsResponse = (requestBody: any) => {
-  if (requestBody.step.unit == 'min' && requestBody.step.value == '1') {
+  if (
+    requestBody.time_granularity.unit == 'min' &&
+    requestBody.time_granularity.value == '1'
+  ) {
     // one type of response
     // Instead of setting data statically, we can get and set from API call
     return {
@@ -8,18 +13,22 @@ export const getMetricsResponse = (requestBody: any) => {
           {
             metric: {
               state:
-                requestBody.metric == 200
+                requestBody.metric == 'system_cpu_utilization_percent'
                   ? 'dimension1'
                   : 'Aggregated Resources',
             },
             values:
-              requestBody.metric == 200
+              requestBody.metric == 'system_cpu_utilization_percent'
                 ? [
                     ...getArrayDataRandomIncrementAndDecrement(
                       3,
                       60,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       4,
                       true,
                       2
@@ -30,8 +39,12 @@ export const getMetricsResponse = (requestBody: any) => {
                     ...getArrayDataRandomIncrementAndDecrement(
                       3,
                       60,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       6,
                       true,
                       3
@@ -41,15 +54,19 @@ export const getMetricsResponse = (requestBody: any) => {
                     ...getArrayDataRandomIncrementAndDecrement(
                       3,
                       60,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       8,
                       true,
                       1
                     ),
                   ],
           },
-          requestBody.metric == 200
+          requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
                   state: 'dimension2',
@@ -60,8 +77,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           5
                         ),
                       ]
@@ -70,8 +91,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           7
                         ),
                       ]
@@ -79,14 +104,18 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           9
                         ),
                       ],
               }
             : undefined,
-          requestBody.metric == 200
+          requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
                   state: 'dimension3',
@@ -97,8 +126,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           5,
                           true,
                           2
@@ -109,8 +142,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           7,
                           true,
                           2
@@ -120,8 +157,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           9,
                           true,
                           2
@@ -151,7 +192,10 @@ export const getMetricsResponse = (requestBody: any) => {
     };
   }
 
-  if (requestBody.step.unit == 'min' && requestBody.step.value == '1') {
+  if (
+    requestBody.time_granularity.unit == 'min' &&
+    requestBody.time_granularity.value == '1'
+  ) {
     // one type of response
     // Instead of setting data statically, we can get and set from API call
     return {
@@ -160,18 +204,22 @@ export const getMetricsResponse = (requestBody: any) => {
           {
             metric: {
               state:
-                requestBody.metric == 200
+                requestBody.metric == 'system_cpu_utilization_percent'
                   ? 'dimension1'
                   : 'Aggregated Resources',
             },
             values:
-              requestBody.metric == 200
+              requestBody.metric == 'system_cpu_utilization_percent'
                 ? [
                     ...getArrayDataRandomIncrementAndDecrement(
                       3,
                       60,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       4,
                       true,
                       2
@@ -182,8 +230,12 @@ export const getMetricsResponse = (requestBody: any) => {
                     ...getArrayDataRandomIncrementAndDecrement(
                       3,
                       60,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       6,
                       true,
                       3
@@ -193,15 +245,19 @@ export const getMetricsResponse = (requestBody: any) => {
                     ...getArrayDataRandomIncrementAndDecrement(
                       3,
                       60,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       8,
                       true,
                       1
                     ),
                   ],
           },
-          requestBody.metric == 200
+          requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
                   state: 'dimension2',
@@ -212,8 +268,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           5
                         ),
                       ]
@@ -222,8 +282,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           7
                         ),
                       ]
@@ -231,14 +295,18 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           9
                         ),
                       ],
               }
             : undefined,
-          requestBody.metric == 200
+          requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
                   state: 'dimension3',
@@ -249,8 +317,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           5,
                           true,
                           2
@@ -261,8 +333,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           7,
                           true,
                           2
@@ -272,8 +348,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           5,
                           60,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           9,
                           true,
                           2
@@ -338,7 +418,10 @@ export const getMetricsResponse = (requestBody: any) => {
     };
   }
 
-  if (requestBody.step.unit == 'min' && requestBody.step.value == '5') {
+  if (
+    requestBody.time_granularity.unit == 'min' &&
+    requestBody.time_granularity.value == '5'
+  ) {
     // one type of response
     return {
       data: {
@@ -346,18 +429,22 @@ export const getMetricsResponse = (requestBody: any) => {
           {
             metric: {
               state:
-                requestBody.metric == 200
+                requestBody.metric == 'system_cpu_utilization_percent'
                   ? 'dimension1'
                   : 'Aggregated Resources',
             },
             values:
-              requestBody.metric == 200
+              requestBody.metric == 'system_cpu_utilization_percent'
                 ? [
                     ...getArrayDataRandomIncrementAndDecrement(
                       1,
                       300,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       8,
                       true,
                       1
@@ -368,8 +455,12 @@ export const getMetricsResponse = (requestBody: any) => {
                     ...getArrayDataRandomIncrementAndDecrement(
                       1,
                       300,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       10,
                       true,
                       2
@@ -379,27 +470,35 @@ export const getMetricsResponse = (requestBody: any) => {
                     ...getArrayDataRandomIncrementAndDecrement(
                       1,
                       300,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       12,
                       true,
                       4
                     ),
                   ],
           },
-          requestBody.metric == 200
+          requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
                   state: 'dimension2',
                 },
                 values:
-                  requestBody.metric == 200
+                  requestBody.metric == 'system_cpu_utilization_percent'
                     ? [
                         ...getArrayDataRandomIncrementAndDecrement(
                           3,
                           300,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           5
                         ),
                       ]
@@ -408,8 +507,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           3,
                           300,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           7
                         ),
                       ]
@@ -417,8 +520,12 @@ export const getMetricsResponse = (requestBody: any) => {
                         ...getArrayDataRandomIncrementAndDecrement(
                           3,
                           300,
-                          requestBody.startTime,
-                          requestBody.endTime,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).start,
+                          convertTimeDurationToStartAndEndTimeRange(
+                            requestBody.relative_time_duration
+                          ).end,
                           9
                         ),
                       ],
@@ -481,7 +588,10 @@ export const getMetricsResponse = (requestBody: any) => {
     };
   }
 
-  if (requestBody.step.unit == 'hr' && requestBody.step.value == '2') {
+  if (
+    requestBody.time_granularity.unit == 'hr' &&
+    requestBody.time_granularity.value == '2'
+  ) {
     // one type of response
     return {
       data: {
@@ -489,7 +599,7 @@ export const getMetricsResponse = (requestBody: any) => {
           {
             metric: {
               state:
-                requestBody.metric == 200
+                requestBody.metric == 'system_cpu_utilization_percent'
                   ? 'dimension1'
                   : 'Aggregated Resources',
             },
@@ -499,20 +609,28 @@ export const getMetricsResponse = (requestBody: any) => {
                     ...getArrayDataRandomIncrementAndDecrement(
                       9,
                       7200,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       5,
                       true,
                       2
                     ),
                   ]
-                : requestBody.metric == 400
+                : requestBody.metric == 'system_cpu_utilization_percent'
                 ? [
                     ...getArrayDataRandomIncrementAndDecrement(
                       9,
                       7200,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       10,
                       true,
                       1
@@ -522,8 +640,12 @@ export const getMetricsResponse = (requestBody: any) => {
                     ...getArrayDataRandomIncrementAndDecrement(
                       9,
                       7200,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       15,
                       true,
                       4
@@ -564,7 +686,10 @@ export const getMetricsResponse = (requestBody: any) => {
     };
   }
 
-  if (requestBody.step.unit == 'day' && requestBody.step.value == '1') {
+  if (
+    requestBody.time_granularity.unit == 'day' &&
+    requestBody.time_granularity.value == '1'
+  ) {
     // one type of response
     return {
       data: {
@@ -572,18 +697,22 @@ export const getMetricsResponse = (requestBody: any) => {
           {
             metric: {
               state:
-                requestBody.metric == 200
+                requestBody.metric == 'system_cpu_utilization_percent'
                   ? 'dimension1'
                   : 'Aggregated Resources',
             },
             values:
-              requestBody.metric == 200
+              requestBody.metric == 'system_cpu_utilization_percent'
                 ? [
                     ...getArrayDataRandomIncrementAndDecrement(
                       3,
                       86400,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       6,
                       true,
                       3
@@ -594,8 +723,12 @@ export const getMetricsResponse = (requestBody: any) => {
                     ...getArrayDataRandomIncrementAndDecrement(
                       3,
                       86400,
-                      requestBody.startTime,
-                      requestBody.endTime,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).start,
+                      convertTimeDurationToStartAndEndTimeRange(
+                        requestBody.relative_time_duration
+                      ).end,
                       12,
                       true,
                       1

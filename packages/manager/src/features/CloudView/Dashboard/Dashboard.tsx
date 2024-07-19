@@ -224,7 +224,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
               if (element) {
                 const availMetrics = metricDefinitions?.data.find(
                   (availMetrics: AvailableMetrics) =>
-                    element.label === availMetrics.label
+                    element.metric === availMetrics.metric // this should be based on widget metric
                 );
                 const cloudViewWidgetProperties = getCloudViewGraphProperties({
                   ...element,

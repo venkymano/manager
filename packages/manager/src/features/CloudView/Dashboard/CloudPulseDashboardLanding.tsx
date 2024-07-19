@@ -1,7 +1,7 @@
 import { Dashboard } from '@linode/api-v4';
 import React from 'react';
 
-import CloudViewIcon from 'src/assets/icons/Monitor_icon.svg';
+import CloudViewIcon from 'src/assets/icons/Monitor_icon_idle.svg';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { Paper } from 'src/components/Paper';
 import { StyledPlaceholder } from 'src/features/StackScripts/StackScriptBase/StackScriptBase.styles';
@@ -110,6 +110,7 @@ export const CloudPulseDashboardLanding = () => {
         <Paper>
           <StyledPlaceholder
             icon={CloudViewIcon}
+            isEntity
             subtitle="No Filters Configured for selected dashboard's service type"
             title=""
           />
@@ -121,8 +122,9 @@ export const CloudPulseDashboardLanding = () => {
         <Paper>
           <StyledPlaceholder
             icon={CloudViewIcon}
-            subtitle="Select Dashboard and Mandatory Global filters to continue"
+            subtitle="Select Dashboard and filters  to visualize metrics. "
             title=""
+            isEntity
           />
         </Paper>
       )}

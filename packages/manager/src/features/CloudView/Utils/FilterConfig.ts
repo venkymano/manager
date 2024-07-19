@@ -76,26 +76,14 @@ export const DBASS_CONFIG: CloudPulseServiceTypeFilterMap = {
   filters: [
     {
       configuration: {
-        filterKey: 'region',
-        filterType: 'string',
-        isFilterable: true,
-        isMetricsFilter: false,
-        name: 'Region',
-        neededInServicePage: false,
-        priority: 1,
-        type: CloudPulseSelectTypes.predefined,
-      },
-      name: 'Region',
-    },
-    {
-      configuration: {
         apiIdField: 'id',
         apiLabelField: ['engine', 'version'],
         apiUrl: 'https://api.linode.com/v4beta/databases/engines',
         filterKey: 'dbEngine',
         filterType: 'string',
-        isFilterable: true, // isFilterable
-        isMetricsFilter: false,
+        isFilterable: false, // isFilterable -- this determines whethere you need to pass it metrics api
+        isMetricsFilter: false, // if it is false, it will go as a part of filter params, else global filter
+        isMultiSelect: true,
         name: 'DB Engine',
         neededInServicePage: false,
         placeholder: 'Select an Engine',
@@ -106,15 +94,28 @@ export const DBASS_CONFIG: CloudPulseServiceTypeFilterMap = {
     },
     {
       configuration: {
+        filterKey: 'region',
+        filterType: 'string',
+        isFilterable: false,
+        isMetricsFilter: false,
+        name: 'Region',
+        neededInServicePage: false,
+        priority: 1,
+        type: CloudPulseSelectTypes.predefined, // make it optional and by default predefined
+      },
+      name: 'Region',
+    },
+    {
+      configuration: {
         dependency: ['region', 'dbEngine'],
         filterKey: 'resource_id',
         filterType: 'string',
-        isFilterable: false,
+        isFilterable: true,
         isMetricsFilter: true,
         isMultiSelect: true,
         name: 'Resource',
         neededInServicePage: false,
-        placeholder: 'Select a Resource',
+        placeholder: 'Select a DB Cluster Name',
         priority: 3,
         type: CloudPulseSelectTypes.predefined,
       },
@@ -124,7 +125,7 @@ export const DBASS_CONFIG: CloudPulseServiceTypeFilterMap = {
       configuration: {
         filterKey: 'relative_time_duration',
         filterType: 'string',
-        isFilterable: false,
+        isFilterable: true,
         isMetricsFilter: true,
         isMultiSelect: false,
         name: 'Time Duration',
