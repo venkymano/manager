@@ -14,7 +14,7 @@ import {
   RESOURCES,
   TIME_DURATION,
 } from '../Utils/CloudPulseConstants';
-import { isRegionApplicable } from '../Utils/CloudPulseUtils';
+import { useIsRegionApplicable } from '../Utils/CloudPulseUtils';
 import { getUserPreference } from '../Utils/UserPreference';
 import { CloudPulseDashboard } from './Dashboard';
 
@@ -35,7 +35,7 @@ export const DashBoardLanding = () => {
   const [dashboard, setDashboard] = React.useState<Dashboard>();
   const [isPrefLoaded, setIsPrefLoaded] = React.useState<boolean>(false);
 
-  const isRegionAppl: boolean = isRegionApplicable(dashboard?.service_type);
+  const isRegionAppl: boolean = useIsRegionApplicable(dashboard?.service_type);
 
   const handleGlobalFilterChange = React.useCallback(
     (updatedData: any, changedFilter: string) => {
