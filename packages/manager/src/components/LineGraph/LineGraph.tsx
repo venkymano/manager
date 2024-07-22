@@ -209,38 +209,21 @@ export const LineGraph = (props: LineGraphProps) => {
               display: false,
             },
             ticks: {
-              callback(value, index, values: any) {
-                const date = new Date(0);
-                date.setUTCMilliseconds(values[index].value);
-                return showToday
-                  ? date.toLocaleDateString('en-US', {
-                      hour: 'numeric',
-                      minute: 'numeric',
-                    })
-                  : date.toLocaleDateString('en-US', {
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      month: '2-digit',
-                    });
-              },
               fontColor: theme.textColors.tableHeader,
-              fontSize: 10,
+              fontSize: 12,
               fontStyle: 'normal',
             },
             time: {
-              displayFormats: {
-                day: 'LLL dd',
-                hour: 'LLL dd',
-                millisecond: 'LLL dd',
-                minute: 'LLL dd',
-                month: 'LLL dd',
-                quarter: 'LLL dd',
-                second: 'LLL dd',
-                week: 'LLL dd',
-                year: 'LLL dd',
-              },
-              stepSize: showToday ? 8 : 20,
+              displayFormats: showToday
+                ? {
+                    hour: 'HH:00',
+                    minute: 'HH:mm',
+                  }
+                : {
+                    hour: 'LLL dd',
+                    minute: 'LLL dd',
+                  },
+              stepSize: showToday ? 3 : 5,
             },
             type: 'time',
             // This cast is because the type definition does not include adapters

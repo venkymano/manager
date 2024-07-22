@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import React, { MemoExoticComponent } from 'react';
 
 import CloudPulseCustomSelect from './CloudPulseCustomSelect';
@@ -19,7 +20,7 @@ const renderComponent = (props: any) => {
     });
   }
 
-  return <div></div>;
+  return <Box></Box>;
 };
 
 export default renderComponent;
