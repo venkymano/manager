@@ -122,9 +122,9 @@ export const CloudPulseDashboardLanding = () => {
         <Paper>
           <StyledPlaceholder
             icon={CloudViewIcon}
-            subtitle="Select Dashboard and filters  to visualize metrics. "
-            title=""
             isEntity
+            subtitle="Select Dashboard and filters  to visualize metrics."
+            title=""
           />
         </Paper>
       )}
@@ -137,8 +137,8 @@ export const CloudPulseDashboardLanding = () => {
           }
           dashboardId={dashboard.id}
           duration={filterValue['relative_time_duration']}
+          globalFilters={getAllFilters()}
           manualRefreshTimeStamp={filterValue['timestamp']}
-          nonTrivialFilter={getAllFilters()}
           onDashboardChange={dashboardChange}
           region={filterValue['region']}
           // widgetPreferences={fetchUserPrefObject().widgets}

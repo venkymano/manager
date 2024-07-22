@@ -38,11 +38,10 @@ export interface DashboardProperties {
   dashboardId: number; // need to pass the dashboardId
   duration: TimeDuration;
 
+  globalFilters?: CloudPulseWidgetFilters[];
   manualRefreshTimeStamp?: number | undefined;
-  nonTrivialFilter?: CloudPulseWidgetFilters[];
   // on any change in dashboard
   onDashboardChange?: (dashboard: Dashboard) => void;
-  region?: string;
   resources: string[];
   // widgetPreferences?: AclpWidget[]; // this is optional
   savePref?: boolean | undefined;
@@ -122,7 +121,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
     );
   }
 
-  if (!props.nonTrivialFilter && (!props.duration || !props.resources)) {
+  if (!props.globalFilters && (!props.duration || !props.resources)) {
     return (
       <ErrorState
         errorText={
@@ -196,8 +195,8 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   };
 
   const checkIfResourcesAvailable = () => {
-    if (props.nonTrivialFilter && props.nonTrivialFilter.length > 0) {
-      return props.nonTrivialFilter.some(
+    if (props.globalFilters && props.globalFilters.length > 0) {
+      return props.globalFilters.some(
         (filters) =>
           filters.filterKey == 'resource_id' && filters.filterValue.length > 0
       );
@@ -244,8 +243,8 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
                     {...cloudViewWidgetProperties}
                     authToken={jweToken?.token}
                     availableMetrics={availMetrics}
+                    globalFilters={props.globalFilters}
                     handleWidgetChange={handleWidgetChange}
-                    nonTrivialFilters={props.nonTrivialFilter}
                     resources={resources.data}
                     savePref={props.savePref}
                   />
@@ -291,11 +290,10 @@ function compareProps(
 ) {
   return (
     oldProps.dashboardId == newProps.dashboardId &&
-    oldProps.region == newProps.region &&
     oldProps.manualRefreshTimeStamp == newProps.manualRefreshTimeStamp &&
     JSON.stringify(oldProps.resources) == JSON.stringify(newProps.resources) &&
     JSON.stringify(oldProps.duration) == JSON.stringify(newProps.duration) &&
-    JSON.stringify(oldProps.nonTrivialFilter) ==
-      JSON.stringify(newProps.nonTrivialFilter)
+    JSON.stringify(oldProps.globalFilters) ==
+      JSON.stringify(newProps.globalFilters)
   );
 }

@@ -182,6 +182,13 @@ export const LongviewLanding = (props: CombinedProps) => {
                   unit: 'min',
                   value: 30,
                 }}
+                globalFilters={[
+                  {
+                    filterKey: 'test_filter',
+                    filterValue: [1, 2],
+                    isDimensionFilter: true,
+                  },
+                ]}
                 dashboardId={1}
                 resources={[57667285, 57667325, 57667355]}
               ></CloudPulseDashboard>

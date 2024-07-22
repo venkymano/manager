@@ -45,7 +45,7 @@ export const CloudPulseDashboardWithFilters = React.memo(
 
       // fill up required properties
       dashboardProps.dashboardId = props.dashboardId;
-      dashboardProps.nonTrivialFilter = constructDimesionFilters();
+      dashboardProps.globalFilters = constructDimesionFilters();
       dashboardProps.savePref = false; // no need to save pref
 
       return dashboardProps;

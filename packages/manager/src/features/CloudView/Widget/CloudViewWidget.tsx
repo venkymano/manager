@@ -1,13 +1,11 @@
 import {
   AvailableMetrics,
-  CloudViewMetricsRequest,
   Filters,
   TimeDuration,
   TimeGranularity,
   Widgets,
 } from '@linode/api-v4';
 import { Paper, Theme } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import React from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -56,9 +54,9 @@ export interface CloudViewWidgetProperties {
   availableMetrics: AvailableMetrics | undefined;
   duration: TimeDuration;
   errorLabel?: string; // error label can come from dashboard
+  globalFilters?: CloudPulseWidgetFilters[];
   // any change in the current widget, call and pass this function and handle in parent component
   handleWidgetChange: (widget: Widgets) => void;
-  nonTrivialFilters?: CloudPulseWidgetFilters[];
 
   resourceIds: string[];
   resources: any[]; // list of resources in a service type
@@ -119,39 +117,7 @@ export const CloudViewWidget = React.memo(
       isBytes ? 'b' : props.unit
     );
 
-    const getCloudViewMetricsRequest = (): CloudViewMetricsRequest => {
-      const request = {} as CloudViewMetricsRequest;
-      request.aggregate_function = widget.aggregate_function;
-      request.group_by = widget.group_by;
-      if (props && props.resources) {
-        request.resource_id = props.resourceIds.map((obj) => parseInt(obj, 10));
-      } else {
-        request.resource_id = widget.resource_id.map((obj) =>
-          parseInt(obj, 10)
-        );
-      }
-      request.metric = widget.metric!;
-      request.relative_time_duration = props.duration
-        ? props.duration!
-        : widget.time_duration;
-      request.time_granularity = {
-        unit: widget.time_granularity.unit,
-        value: widget.time_granularity.value,
-      };
-      request.filters = [
-        {
-          key: 'sample',
-          operator: 'eq',
-          value: 'sample1',
-        },
-      ];
-
-      console.log(props.nonTrivialFilters);
-      return request;
-    };
-
     const getCloudViewMetricsRequestFromFilter = (): any => {
-      console.log(props.nonTrivialFilters);
       const request: { [key: string]: any } = {};
       request.aggregate_function = widget.aggregate_function;
       request.group_by = widget.group_by;
@@ -160,26 +126,41 @@ export const CloudViewWidget = React.memo(
         unit: widget.time_granularity.unit,
         value: widget.time_granularity.value,
       };
-      for (
-        let i = 0;
-        props.nonTrivialFilters && i < props.nonTrivialFilters?.length;
-        i++
-      ) {
-        if (!props.nonTrivialFilters[i].isDimensionFilter) {
-          if (props.nonTrivialFilters[i].filterKey == 'resource') {
-            props.nonTrivialFilters[i].filterKey = 'resource_id';
+
+      if (props.globalFilters) {
+        for (
+          let i = 0;
+          props.globalFilters && i < props.globalFilters?.length;
+          i++
+        ) {
+          if (!props.globalFilters[i].isDimensionFilter) {
+            request[props.globalFilters[i].filterKey] =
+              props.globalFilters[i].filterValue;
+          } else {
+            request['filters'] = request['filters'] ?? [];
+            request['filters'].push({
+              key: props.globalFilters[i].filterKey,
+              operator: Array.isArray(props.globalFilters[i].filterValue)
+                ? 'in'
+                : 'eq',
+              value: Array.isArray(props.globalFilters[i].filterValue)
+                ? props.globalFilters[i].filterValue.join(',')
+                : props.globalFilters[i].filterValue,
+            });
           }
-          request[props.nonTrivialFilters[i].filterKey] =
-            props.nonTrivialFilters[i].filterValue;
-        } else {
-          request['filters'] = request['filters'] ?? [];
-          request['filters'].push({
-            key: props.nonTrivialFilters[i].filterKey,
-            operator: 'eq',
-            value: props.nonTrivialFilters[i].filterValue,
-          });
         }
       }
+
+      // check hybrid
+      if (!request['resource_id']) {
+        request['resource_id'] = props.resourceIds;
+      }
+
+      if (!request['relative_time_duration']) {
+        request['relative_time_duration'] = props.duration;
+      }
+
+      // any other filters apart from above two should come in globalFiltersProp
 
       return request;
     };
@@ -222,9 +203,7 @@ export const CloudViewWidget = React.memo(
       status,
     } = useCloudViewMetricsQuery(
       getServiceType()!,
-      props.nonTrivialFilters
-        ? getCloudViewMetricsRequestFromFilter()
-        : getCloudViewMetricsRequest(),
+      getCloudViewMetricsRequestFromFilter(),
       props,
       widget.aggregate_function +
         '_' +
@@ -236,7 +215,7 @@ export const CloudViewWidget = React.memo(
         '_' +
         widget.label +
         '_' +
-        props.timeStamp ?? '' + '_' + props.nonTrivialFilters,
+        props.timeStamp ?? '' + '_' + props.globalFilters,
       flags != undefined,
       flags.aclpReadEndpoint!
     ); // fetch the metrics on any property change
@@ -273,7 +252,7 @@ export const CloudViewWidget = React.memo(
 
       const startEnd = convertTimeDurationToStartAndEndTimeRange(
         props!.duration! ??
-          props.nonTrivialFilters?.find(
+          props.globalFilters?.find(
             (filterValue) => filterValue.filterKey == 'relative_time_duration'
           )?.filterValue
       );
@@ -287,7 +266,7 @@ export const CloudViewWidget = React.memo(
       ) {
         let index = 0;
 
-        metricsList.data.result.forEach((graphData) => {
+        metricsList.data.result.forEach((graphData: any) => {
           // todo, move it to utils at a widget level
           if (graphData == undefined || graphData == null) {
             return;
