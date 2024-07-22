@@ -1,7 +1,7 @@
 import { Grid, styled } from '@mui/material';
 import React from 'react';
 
-import CloudViewIcon from 'src/assets/icons/Monitor_icon.svg';
+import CloudViewIcon from 'src/assets/icons/Monitor.svg';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Paper } from 'src/components/Paper';
@@ -57,7 +57,10 @@ export const CloudPulseDashboardWithFilters = React.memo(
       return serviceTypeConfig?.filters.every(
         (filterObj) =>
           !filterObj.configuration.neededInServicePage ||
-          filterValue[filterObj.configuration.filterKey] ||
+          (filterValue[filterObj.configuration.filterKey] != undefined &&
+            (Array.isArray(filterValue[filterObj.configuration.filterKey])
+              ? filterValue[filterObj.configuration.filterKey].length > 0
+              : true)) ||
           (filterObj.configuration.filterKey == 'resource_id' &&
             props.resources &&
             props.resources.length > 0)
@@ -124,6 +127,7 @@ export const CloudPulseDashboardWithFilters = React.memo(
         <Paper>
           <StyledPlaceholder
             icon={CloudViewIcon}
+            isEntity
             subtitle={subtitle}
             title=""
           />

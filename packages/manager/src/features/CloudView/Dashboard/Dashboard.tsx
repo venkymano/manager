@@ -10,7 +10,7 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import * as React from 'react';
 
-import CloudViewIcon from 'src/assets/icons/Monitor_icon.svg';
+import CloudViewIcon from 'src/assets/icons/Monitor.svg';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Placeholder } from 'src/components/Placeholder/Placeholder';
@@ -276,7 +276,12 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   const renderPlaceHolder = (subtitle: string) => {
     return (
       <Paper>
-        <StyledPlaceholder icon={CloudViewIcon} subtitle={subtitle} title="" />
+        <StyledPlaceholder
+          icon={CloudViewIcon}
+          isEntity
+          subtitle={subtitle}
+          title=""
+        />
       </Paper>
     );
   };

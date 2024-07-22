@@ -1,7 +1,7 @@
 import { Dashboard } from '@linode/api-v4';
 import React from 'react';
 
-import CloudViewIcon from 'src/assets/icons/Monitor_icon_idle.svg';
+import CloudViewIcon from 'src/assets/icons/Monitor.svg';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { Paper } from 'src/components/Paper';
 import { StyledPlaceholder } from 'src/features/StackScripts/StackScriptBase/StackScriptBase.styles';
@@ -140,7 +140,6 @@ export const CloudPulseDashboardLanding = () => {
           globalFilters={getAllFilters()}
           manualRefreshTimeStamp={filterValue['timestamp']}
           onDashboardChange={dashboardChange}
-          region={filterValue['region']}
           // widgetPreferences={fetchUserPrefObject().widgets}
           savePref={true}
         />

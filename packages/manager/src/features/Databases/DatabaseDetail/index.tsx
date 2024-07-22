@@ -94,7 +94,7 @@ export const DatabaseDetail = () => {
 
   tabs.push({
     routeName: `/databases/${engine}/${id}/analytics`,
-    title: 'Monitor Analytics',
+    title: 'Monitor',
   });
 
   const getTabIndex = () => {

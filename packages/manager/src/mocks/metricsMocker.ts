@@ -14,7 +14,7 @@ export const getMetricsResponse = (requestBody: any) => {
             metric: {
               state:
                 requestBody.metric == 'system_cpu_utilization_percent'
-                  ? 'dimension1'
+                  ? 'dbass1'
                   : 'Aggregated Resources',
             },
             values:
@@ -69,7 +69,7 @@ export const getMetricsResponse = (requestBody: any) => {
           requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
-                  state: 'dimension2',
+                  state: 'dbass2',
                 },
                 values:
                   requestBody.metric == 200
@@ -118,7 +118,7 @@ export const getMetricsResponse = (requestBody: any) => {
           requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
-                  state: 'dimension3',
+                  state: 'dbass3',
                 },
                 values:
                   requestBody.metric == 200
@@ -205,7 +205,7 @@ export const getMetricsResponse = (requestBody: any) => {
             metric: {
               state:
                 requestBody.metric == 'system_cpu_utilization_percent'
-                  ? 'dimension1'
+                  ? 'dbass1'
                   : 'Aggregated Resources',
             },
             values:
@@ -260,7 +260,7 @@ export const getMetricsResponse = (requestBody: any) => {
           requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
-                  state: 'dimension2',
+                  state: 'dbass2',
                 },
                 values:
                   requestBody.metric == 200
@@ -309,7 +309,7 @@ export const getMetricsResponse = (requestBody: any) => {
           requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
-                  state: 'dimension3',
+                  state: 'dbass3',
                 },
                 values:
                   requestBody.metric == 200
@@ -430,7 +430,7 @@ export const getMetricsResponse = (requestBody: any) => {
             metric: {
               state:
                 requestBody.metric == 'system_cpu_utilization_percent'
-                  ? 'dimension1'
+                  ? 'dbass1'
                   : 'Aggregated Resources',
             },
             values:
@@ -485,7 +485,7 @@ export const getMetricsResponse = (requestBody: any) => {
           requestBody.metric == 'system_cpu_utilization_percent'
             ? {
                 metric: {
-                  state: 'dimension2',
+                  state: 'dbass2',
                 },
                 values:
                   requestBody.metric == 'system_cpu_utilization_percent'
@@ -600,7 +600,7 @@ export const getMetricsResponse = (requestBody: any) => {
             metric: {
               state:
                 requestBody.metric == 'system_cpu_utilization_percent'
-                  ? 'dimension1'
+                  ? 'dbass3'
                   : 'Aggregated Resources',
             },
             values:
@@ -698,7 +698,7 @@ export const getMetricsResponse = (requestBody: any) => {
             metric: {
               state:
                 requestBody.metric == 'system_cpu_utilization_percent'
-                  ? 'dimension1'
+                  ? 'dbass1'
                   : 'Aggregated Resources',
             },
             values:

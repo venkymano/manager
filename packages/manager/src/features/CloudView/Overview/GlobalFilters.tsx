@@ -12,6 +12,7 @@ import { Cached } from '@mui/icons-material';
 
 import { Box } from 'src/components/Box';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
+import { Stack } from 'src/components/Stack';
 
 import { GlobalFilterProperties } from '../Models/GlobalFilterProperties';
 import { CloudViewDashboardSelect } from '../shared/DashboardSelect';
@@ -93,28 +94,34 @@ export const GlobalFilters = React.memo(
 
     return (
       <Box sx={{ flexGrow: 1 }}>
-        <Grid container sx={{width:'150%'}} lg={16}>
-          <Grid key={'selectdashboard'} sx={{ marginLeft: 2 }} xs>
+        <Stack direction={'row'} flexGrow={1} justifyContent={'space-between'}>
+          <Box key={'selectdashboard'} sx={{ marginLeft: 2, width: '100%' }}>
             <CloudViewDashboardSelect
               handleDashboardChange={handleDashboardChange}
             />
-          </Grid>
-          <Grid key={'selectduration'} sx={{ marginLeft: 25 }} xs>
-            <CloudPulseTimeRangeSelect
-              disabled={!selectedDashboard}
-              handleStatsChange={handleTimeRangeChange}
-              savePreferences={true}
-            />
-          </Grid>
-          <Grid key={'selectrefresh'} sx={{ marginLeft: 1 }} xs={4}>
+          </Box>
+          <Stack
+            alignContent={'end'}
+            direction={'row'}
+            gap={3}
+            key={'selectduration'}
+            width={'100%'}
+          >
+            <Box sx={{ marginLeft: '50%', width: '50%' }}>
+              <CloudPulseTimeRangeSelect
+                disabled={!selectedDashboard}
+                handleStatsChange={handleTimeRangeChange}
+                savePreferences={true}
+              />
+            </Box>
             <StyledReload
               aria-disabled={!selectedDashboard}
               onClick={handleGlobalRefresh}
             />
-          </Grid>
-        </Grid>
+          </Stack>
+        </Stack>
         <StyledGrid container xs={12}>
-          <div style={{ width: '100%' }}></div>
+          <Box style={{ width: '100%' }}></Box>
           {selectedDashboard &&
             FILTER_CONFIG.get(selectedDashboard.service_type) && (
               <CloudPulseDashboardFilterBuilder
