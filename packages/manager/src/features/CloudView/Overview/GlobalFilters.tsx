@@ -1,18 +1,15 @@
 /* eslint-disable no-console */
 import { Dashboard, TimeDuration } from '@linode/api-v4';
+// import Reload from 'src/assets/icons/reload.svg';
+import Cached from '@mui/icons-material/Cached';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import * as React from 'react';
 
-import { CircleProgress } from 'src/components/CircleProgress';
-import { useFlags } from 'src/hooks/useFlags';
-// import Reload from 'src/assets/icons/reload.svg';
-
-import { Cached } from '@mui/icons-material';
-
 import { Box } from 'src/components/Box';
-import { ErrorState } from 'src/components/ErrorState/ErrorState';
+import { CircleProgress } from 'src/components/CircleProgress';
 import { Stack } from 'src/components/Stack';
+import { useFlags } from 'src/hooks/useFlags';
 
 import { GlobalFilterProperties } from '../Models/GlobalFilterProperties';
 import { CloudViewDashboardSelect } from '../shared/DashboardSelect';

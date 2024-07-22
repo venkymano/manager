@@ -13,6 +13,7 @@ import Kubernetes from 'src/assets/icons/entityIcons/kubernetes.svg';
 import Linode from 'src/assets/icons/entityIcons/linode.svg';
 import LoadBalancer from 'src/assets/icons/entityIcons/loadbalancer.svg';
 import Managed from 'src/assets/icons/entityIcons/managed.svg';
+import CloudPulse from 'src/assets/icons/entityIcons/Monitor.svg';
 import NodeBalancer from 'src/assets/icons/entityIcons/nodebalancer.svg';
 import OCA from 'src/assets/icons/entityIcons/oneclick.svg';
 import PlacementGroups from 'src/assets/icons/entityIcons/placement-groups.svg';
@@ -273,7 +274,7 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
           display: 'Monitor',
           hide: !showCloudView,
           href: '/monitor/cloudpulse',
-          icon: <CloudView />,
+          icon: <CloudPulse />,
           isBeta: false,
         },
         {

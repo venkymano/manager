@@ -32,9 +32,10 @@ import {
   getDimensionName,
 } from '../Utils/CloudPulseUtils';
 import {
-  convertBytesToUnit,
+  convertValueToUnit,
   formatToolTip,
-  generateUnitByByteValue,
+  generateUnitByBaseUnit,
+  isBitsOrBytesUnit,
 } from '../Utils/UnitConversion';
 import {
   fetchUserPrefObject,
@@ -104,7 +105,7 @@ export const CloudViewWidget = React.memo(
 
     const flags = useFlags();
 
-    const isBytes = props.unit === 'Bytes';
+    const isBitsOrBytes = isBitsOrBytesUnit(props.unit);
 
     // const [
     //   selectedInterval,
@@ -114,7 +115,7 @@ export const CloudViewWidget = React.memo(
     const [widget, setWidget] = React.useState<Widgets>({ ...props.widget }); // any change in agg_functions, step, group_by, will be published to dashboard component for save
 
     const [currentUnit, setCurrentUnit] = React.useState<any>(
-      isBytes ? 'b' : props.unit
+      generateUnitByBaseUnit(0, props.unit) ?? props.unit
     );
 
     const getCloudViewMetricsRequestFromFilter = (): any => {
@@ -311,7 +312,7 @@ export const CloudViewWidget = React.memo(
     }, [status, metricsList]);
 
     const formatBytesData = (dimensions: any, legendRowsData: any) => {
-      if ((props.unit && props.unit !== 'Bytes') || !dimensions) {
+      if ((props.unit && !isBitsOrBytes) || !dimensions) {
         return;
       }
       let maxValue = 0;
@@ -321,10 +322,11 @@ export const CloudViewWidget = React.memo(
       if (maxValue === 0) {
         return;
       }
-      const unit = generateUnitByByteValue(maxValue);
+      const unit = generateUnitByBaseUnit(maxValue, props.unit);
       setCurrentUnit(unit);
       dimensions.forEach((dimension: any, index: number) => {
-        legendRowsData[index].format = formatToolTip;
+        legendRowsData[index].format = (value: number) =>
+          formatToolTip(value, props.unit);
       });
     };
 
@@ -390,7 +392,8 @@ export const CloudViewWidget = React.memo(
       if (!props.savePref) {
         return;
       }
-      const availableWidget = fetchUserPrefObject()?.widgets[widget.label];
+      const widgets = fetchUserPrefObject()?.widgets;
+      const availableWidget = !widgets ? undefined : widgets[widget.label];
       if (!availableWidget) {
         updateWidgetPreference(widget.label, {
           [AGGREGATE_FUNCTION]: widget.aggregate_function,
@@ -421,18 +424,7 @@ export const CloudViewWidget = React.memo(
             width: '100%',
           }}
         >
-          {/* <Grid
-            sx={{
-              alignItems: 'center',
-              columnGap: 0.2,
-              direction: 'row',
-              flexWrap: 'nowrap',
-              justifyContent: 'flex-start',
-            }}
-            container
-            lg={widget.size}
-            xs={6}
-          > */}
+          {/* add further components like group by resource, aggregate_function, step here , for sample added zoom icon here*/}
           <div className={widget.metric} style={{ margin: '1%' }}>
             <div
               style={{
@@ -444,7 +436,7 @@ export const CloudViewWidget = React.memo(
               <Grid sx={{ marginRight: 'auto' }}>
                 <Typography className={classes.title}>
                   {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
-                  {(!isLoading || !isBytes) && `(${currentUnit})`}{' '}
+                  {(!isLoading || !isBitsOrBytes) && `(${currentUnit})`}{' '}
                   {/* show the units of bytes data only when complete data is loaded */}
                 </Typography>
               </Grid>
@@ -485,68 +477,52 @@ export const CloudViewWidget = React.memo(
               </Grid>
               {/* </Grid> */}
             </div>
-            <Grid
-              sx={{
-                // marginLeft: 10,
-                marginTop: 1.5,
-              }}
-              // lg="auto" // }}
-              // xs="auto"
-            >
-              <Divider spacingBottom={32} spacingTop={15} />
-            </Grid>
-            <Grid
-              sx={{
-                marginLeft: 10,
-                marginTop: 1.5,
-              }}
-              // lg="auto" // }}
-              // xs="auto"
-            >
-              {!(
-                isLoading ||
-                (status == 'error' &&
-                  error &&
-                  error.length > 0 &&
-                  error[0].reason == jweTokenExpiryError)
-              ) && (
-                <CloudViewLineGraph // rename where we have cloudview to cloudpulse
-                  error={
-                    status == 'error'
-                      ? error && error.length > 0
-                        ? error[0].reason
-                        : 'Error while rendering widget'
-                      : undefined
-                  }
-                  formatData={
-                    isBytes
-                      ? (data: number) =>
-                          convertBytesToUnit(data * 8, currentUnit)
-                      : undefined
-                  }
-                  legendRows={
-                    legendRows && legendRows.length > 0 ? legendRows : undefined
-                  }
-                  ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
-                  data={data}
-                  formatTooltip={isBytes ? formatToolTip : undefined}
-                  gridSize={widget.size}
-                  loading={isLoading}
-                  nativeLegend={true}
-                  showToday={today}
-                  timezone={timezone}
-                  title={''}
-                  unit={!isBytes ? ` ${currentUnit}` : undefined}
-                />
-              )}
-              {(isLoading ||
-                (status == 'error' &&
-                  error &&
-                  error.length > 0 &&
-                  error[0].reason == jweTokenExpiryError)) && (
-                <CircleProgress />
-              )}
-            </Grid>
+            <Divider spacingBottom={32} spacingTop={15} />
+            {!(
+              isLoading ||
+              (status == 'error' &&
+                error &&
+                error.length > 0 &&
+                error[0].reason == jweTokenExpiryError)
+            ) && (
+              <CloudViewLineGraph // rename where we have cloudview to cloudpulse
+                error={
+                  status == 'error'
+                    ? error && error.length > 0
+                      ? error[0].reason
+                      : 'Error while rendering widget'
+                    : undefined
+                }
+                formatData={
+                  isBitsOrBytes
+                    ? (data: number) =>
+                        convertValueToUnit(data, currentUnit, props.unit)
+                    : undefined
+                }
+                formatTooltip={
+                  isBitsOrBytes
+                    ? (value: number) => formatToolTip(value, props.unit)
+                    : undefined
+                }
+                legendRows={
+                  legendRows && legendRows.length > 0 ? legendRows : undefined
+                }
+                ariaLabel={props.ariaLabel ? props.ariaLabel : ''}
+                data={data}
+                gridSize={widget.size}
+                loading={isLoading}
+                nativeLegend={true}
+                showToday={today}
+                timezone={timezone}
+                title={''}
+                unit={!isBitsOrBytes ? ` ${currentUnit}` : undefined}
+              />
+            )}
+            {(isLoading ||
+              (status == 'error' &&
+                error &&
+                error.length > 0 &&
+                error[0].reason == jweTokenExpiryError)) && <CircleProgress />}
           </div>
         </Paper>
       </Grid>
