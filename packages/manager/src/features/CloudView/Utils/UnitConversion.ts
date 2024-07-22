@@ -1,19 +1,110 @@
+import { roundTo } from 'src/utilities/roundTo';
+
 export type Unit =
   | 'B'
+  | 'Bps'
   | 'GB'
+  | 'GBps'
   | 'Gb'
+  | 'Gbps'
   | 'KB'
+  | 'KBps'
   | 'Kb'
+  | 'Kbps'
   | 'MB'
+  | 'MBps'
   | 'Mb'
+  | 'Mbps'
   | 'PB'
+  | 'PBps'
   | 'Pb'
+  | 'Pbps'
   | 'TB'
+  | 'TBps'
   | 'Tb'
-  | 'b';
+  | 'Tbps'
+  | 'b'
+  | 'bps'
+  | 'd'
+  | 'h'
+  | 'm'
+  | 'min'
+  | 'ms'
+  | 's'
+  | 'w'
+  | 'y';
 
-const bitRegex = /[bB][iI][tT][sS]{0,1}/;
-const byteRegex = /[bB][yY][tT][eE][sS]{0,1}/;
+const supportedUnits = {
+  B: 'Bytes',
+  Bps: 'Bps',
+  GB: 'GB',
+  GBps: 'GBps',
+  Gb: 'Gb',
+  Gbps: 'Gbps',
+  KB: 'KB',
+  KBps: 'KBps',
+  Kb: 'Kb',
+  Kbps: 'Kbps',
+  MB: 'MB',
+  MBps: 'MBps',
+  Mb: 'Mb',
+  Mbps: 'Mbps',
+  PB: 'PB',
+  PBps: 'PBps',
+  Pb: 'Pb',
+  Pbps: 'Pbps',
+  TB: 'TB',
+  TBps: 'TBps',
+  Tb: 'Tb',
+  Tbps: 'Tbps',
+  b: 'bits',
+  bps: 'bps',
+  d: 'd',
+  h: 'h',
+  m: 'mo',
+  min: 'min',
+  ms: 'ms',
+  s: 's',
+  w: 'wk',
+  y: 'yr',
+};
+
+const timeUnits = ['d', 'h', 'm', 'min', 'ms', 's', 'w', 'y'];
+
+const multiplier: { [label: string]: number } = {
+  B: 1,
+  Bps: 1,
+  GB: Math.pow(2, 30),
+  GBps: Math.pow(2, 30),
+  Gb: 1e9,
+  Gbps: 1e9,
+  KB: Math.pow(2, 10),
+  KBps: Math.pow(2, 10),
+  Kb: 1e3,
+  Kbps: 1e3,
+  MB: Math.pow(2, 20),
+  MBps: Math.pow(2, 20),
+  Mb: 1e6,
+  Mbps: 1e6,
+  PB: Math.pow(2, 50),
+  PBps: Math.pow(2, 50),
+  Pb: 1e15,
+  Pbps: 1e15,
+  TB: Math.pow(2, 40),
+  TBps: Math.pow(2, 40),
+  Tb: 1e12,
+  Tbps: 1e12,
+  b: 1,
+  bps: 1,
+  d: 24 * 60 * 60 * 1000,
+  h: 1000 * 60 * 60,
+  m: 1000 * 60 * 60 * 24 * 30,
+  min: 1000 * 60,
+  ms: 1,
+  s: 1000,
+  w: 1000 * 60 * 60 * 24 * 7,
+  y: 1000 * 60 * 60 * 24 * 365,
+};
 
 /**
  *
@@ -22,16 +113,15 @@ const byteRegex = /[bB][yY][tT][eE][sS]{0,1}/;
  */
 
 export const generateUnitByBitValue = (value: number): Unit => {
-  //1e3 == 1000
-  if (value < 1e3) {
+  if (value < multiplier.kb) {
     return 'b';
-  } else if (value < 1e6) {
+  } else if (value < multiplier.Mb) {
     return 'Kb';
-  } else if (value < 1e9) {
+  } else if (value < multiplier.Gb) {
     return 'Mb';
-  } else if (value < 1e12) {
+  } else if (value < multiplier.Tb) {
     return 'Gb';
-  } else if (value < 1e15) {
+  } else if (value < multiplier.Pb) {
     return 'Tb';
   } else {
     return 'Pb';
@@ -44,19 +134,38 @@ export const generateUnitByBitValue = (value: number): Unit => {
  * @returns : maximum possible rolled up unit for the input byte value
  */
 export const generateUnitByByteValue = (value: number): Unit => {
-  //1e3 == 1000
-  if (value < 1e3) {  
+  if (value < multiplier.KB) {
     return 'B';
-  } else if (value < 1e6) {
+  } else if (value < multiplier.MB) {
     return 'KB';
-  } else if (value < 1e9) {
+  } else if (value < multiplier.GB) {
     return 'MB';
-  } else if (value < 1e12) {
+  } else if (value < multiplier.TB) {
     return 'GB';
-  } else if (value < 1e15) {
+  } else if (value < multiplier.PB) {
     return 'TB';
   } else {
     return 'PB';
+  }
+};
+
+export const generateUnitByTimeValue = (value: number): Unit => {
+  if (value < multiplier.s) {
+    return 'ms';
+  } else if (value < multiplier.min) {
+    return 's';
+  } else if (value < multiplier.h) {
+    return 'min';
+  } else if (value < multiplier.d) {
+    return 'h';
+  } else if (value < multiplier.w) {
+    return 'd';
+  } else if (value < multiplier.m) {
+    return 'w';
+  } else if (value < multiplier.y) {
+    return 'm';
+  } else {
+    return 'y';
   }
 };
 /**
@@ -65,43 +174,16 @@ export const generateUnitByByteValue = (value: number): Unit => {
  * @param maxUnit : maximum possible unit based on which value will be rolled up
  * @returns : rolled up value based on maxUnit
  */
-export const convertBitsToUnit = (value: number, maxUnit: Unit) => {
-  // 1e3 == 1000
-  if (maxUnit === 'Pb') {
-    return value / 1e15;
-  } else if (maxUnit === 'Tb') {
-    return value / 1e12;
-  } else if (maxUnit === 'Gb') {
-    return value / 1e9;
-  } else if (maxUnit === 'Mb') {
-    return value / 1e6;
-  } else if (maxUnit === 'Kb') {
-    return value / 1e3;
-  } else {
-    return Math.round(value);
-  }
-};
+export const convertValueToMaxUnit = (
+  value: number,
+  maxUnit: Unit | string
+) => {
+  const convertingValue = multiplier[maxUnit] ?? 1;
 
-/**
- *
- * @param value : byte value to be rolled up based on maxUnit
- * @param maxUnit : maximum possible unit based on which value will be rolled up
- * @returns : rolled up value based on maxUnit
- */
-export const convertBytesToUnit = (value: number, maxUnit: Unit) => {
-  // 1e3 == 1000
-  if (maxUnit === 'PB') {
-    return value / 1e15;
-  } else if (maxUnit === 'TB') {
-    return value / 1e12;
-  } else if (maxUnit === 'GB') {
-    return value / 1e9;
-  } else if (maxUnit === 'MB') {
-    return value / 1e6;
-  } else if (maxUnit === 'KB') {
-    return value / 1e3;
+  if (convertingValue === 1) {
+    return roundTo(value);
   } else {
-    return Math.round(value);
+    return value / convertingValue;
   }
 };
 
@@ -114,16 +196,9 @@ export const convertBytesToUnit = (value: number, maxUnit: Unit) => {
  */
 export const convertValueToUnit = (
   value: number,
-  unit: Unit,
-  baseUnit: string
+  unit: Unit | string
 ): number => {
-  if (bitRegex.test(baseUnit)) {
-    return convertBitsToUnit(value, unit);
-  } else if (byteRegex.test(baseUnit)) {
-    return convertBytesToUnit(value, unit);
-  } else {
-    return value;
-  }
+  return convertValueToMaxUnit(value, unit);
 };
 
 /**
@@ -133,19 +208,22 @@ export const convertValueToUnit = (
  * @returns : formatted string for the value rolled up to higher possible unit according to base unit.
  */
 export const formatToolTip = (value: number, baseUnit: string): string => {
-  const _unit = generateUnitByBaseUnit(value, baseUnit);
-  if (!_unit) {
-    return `${value} ${baseUnit}`;
+  const unit = generateCurrentUnit(baseUnit);
+  let generatedUnit = baseUnit;
+  if (unit.endsWith('b') || unit.endsWith('bps')) {
+    generatedUnit = generateUnitByBitValue(value);
+  } else if (unit.endsWith('B') || unit.endsWith('Bps')) {
+    generatedUnit = generateUnitByByteValue(value);
+  } else if (timeUnits.includes(unit)) {
+    generatedUnit = generateUnitByTimeValue(value);
   }
-  let convertedValue = 0;
+  const convertedValue = convertValueToMaxUnit(value, generatedUnit);
 
-  if (bitRegex.test(baseUnit)) {
-    convertedValue = convertBitsToUnit(value, _unit);
+  if (unit.endsWith('ps')) {
+    return `${roundTo(convertedValue)} ${generatedUnit}/s`;
   } else {
-    convertedValue = convertBytesToUnit(value, _unit);
+    return `${roundTo(convertedValue)} ${generatedUnit}`;
   }
-
-  return `${Math.round(convertedValue * 100) / 100} ${_unit}`;
 };
 
 /**
@@ -157,21 +235,35 @@ export const formatToolTip = (value: number, baseUnit: string): string => {
 export const generateUnitByBaseUnit = (
   value: number,
   baseUnit: string
-): Unit | undefined => {
-  if (bitRegex.test(baseUnit)) {
-    return generateUnitByBitValue(value);
-  } else if (byteRegex.test(baseUnit)) {
-    return generateUnitByByteValue(value);
-  } else {
-    return undefined;
+): Unit | string => {
+  const unit = generateCurrentUnit(baseUnit);
+  let generatedUnit = baseUnit;
+  if (unit.endsWith('b') || unit.endsWith('bps')) {
+    generatedUnit = generateUnitByBitValue(value);
+  } else if (unit.endsWith('B') || unit.endsWith('Bps')) {
+    generatedUnit = generateUnitByByteValue(value);
+  } else if (timeUnits.includes(unit)) {
+    generatedUnit = generateUnitByTimeValue(value);
   }
+  return generatedUnit;
 };
 
-/**
- *
- * @param baseUnit : base unit value to match with bits & bytes regex
- * @returns : true if baseUnit is bytes or bits else false
- */
-export const isBitsOrBytesUnit = (baseUnit: string): boolean => {
-  return bitRegex.test(baseUnit) || byteRegex.test(baseUnit);
+export const generateCurrentUnit = (baseUnit: string): string => {
+  let unit: string = baseUnit;
+
+  for (const [key, value] of Object.entries(supportedUnits)) {
+    if (value === baseUnit) {
+      unit = key;
+      break;
+    }
+  }
+
+  return unit;
+};
+
+export const transformData = (data: any[], baseUnit: string): number[][] => {
+  const unit: string = generateCurrentUnit(baseUnit);
+
+  const multi: number = multiplier[unit] ?? 1;
+  return data.map((d) => [d[0], Number(d[1]) * multi]);
 };
