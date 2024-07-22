@@ -177,16 +177,20 @@ export const LongviewLanding = (props: CombinedProps) => {
               />
             </SafeTabPanel>
             <SafeTabPanel index={3}>
-              <CloudPulseDashboard
-                duration={{
-                  unit: 'min',
-                  value: 30,
-                }}
+              <CloudPulseDashboard // there should be no validation for global filters
                 globalFilters={[
                   {
                     filterKey: 'test_filter',
                     filterValue: [1, 2],
                     isDimensionFilter: true,
+                  },
+                  {
+                    filterKey: 'relative_time_duration',
+                    filterValue: {
+                      unit: 'min',
+                      value: 30,
+                    },
+                    isDimensionFilter: false,
                   },
                 ]}
                 dashboardId={1}

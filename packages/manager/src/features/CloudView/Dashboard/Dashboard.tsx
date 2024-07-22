@@ -121,7 +121,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
     );
   }
 
-  if (!props.globalFilters && (!props.duration || !props.resources)) {
+  if (!props.globalFilters && !props.resources) {
     return (
       <ErrorState
         errorText={

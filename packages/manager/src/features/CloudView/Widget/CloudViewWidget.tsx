@@ -21,6 +21,9 @@ import { isToday as _isToday } from 'src/utilities/isToday';
 import { roundTo } from 'src/utilities/roundTo';
 import { getMetrics } from 'src/utilities/statMetrics';
 
+import CloudPulseCustomSelect, {
+  CloudPulseSelectTypes,
+} from '../shared/CloudPulseCustomSelect';
 import {
   AGGREGATE_FUNCTION,
   SIZE,

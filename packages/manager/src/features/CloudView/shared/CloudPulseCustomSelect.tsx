@@ -17,12 +17,12 @@ export interface CloudPulseCustomSelectProps {
   errorText?: string;
   filterKey: string;
   filterType: string;
-  handleSelectionChange: (filterKey: string, label: any) => void;
-  isMultiSelect: boolean;
+  handleSelectionChange: (filterKey: string, value: any) => void;
+  isMultiSelect?: boolean;
   maxSelections?: number;
   options?: CloudPulseServiceTypeFiltersOptions[];
   placeholder?: string;
-  savePreferences: boolean;
+  savePreferences?: boolean;
   type: CloudPulseSelectTypes;
 }
 
