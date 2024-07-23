@@ -38,7 +38,6 @@ import {
   formatToolTip,
   generateCurrentUnit,
   generateUnitByBaseUnit,
-
   transformData,
 } from '../Utils/UnitConversion';
 import {
@@ -244,7 +243,10 @@ export const CloudViewWidget = React.memo(
           const startEnd = convertTimeDurationToStartAndEndTimeRange(
             props!.duration!
           );
-          const transformedData = {metric: graphData.metric, values: transformData(graphData.values, props.unit)};
+          const transformedData = {
+            metric: graphData.metric,
+            values: transformData(graphData.values, props.unit),
+          };
           const dimension = {
             backgroundColor: color,
             data: seriesDataFormatter(
@@ -260,8 +262,7 @@ export const CloudViewWidget = React.memo(
           // construct a legend row with the dimension
           const legendRow = {
             data: getMetrics(dimension.data as number[][]),
-            format: (value: number) =>
-              formatToolTip(value, props.unit),
+            format: (value: number) => formatToolTip(value, props.unit),
             legendColor: color,
             legendTitle: dimension.label,
           };
@@ -271,20 +272,16 @@ export const CloudViewWidget = React.memo(
           setToday(_isToday(startEnd.start, startEnd.end));
         });
 
-        console.log(legendRowsData);
-
         generateMaxUnit(dimensions, legendRowsData);
         // chart dimensions
         setData(dimensions);
         setLegendRows(legendRowsData);
-
       }
 
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status, metricsList]);
 
     const generateMaxUnit = (dimensions: any, legendRowsData: any) => {
-
       let maxValue = 0;
       dimensions?.forEach((_: any, index: number) => {
         maxValue = Math.max(maxValue, legendRowsData[index]?.data.max ?? 0);
@@ -292,7 +289,6 @@ export const CloudViewWidget = React.memo(
 
       const unit = generateUnitByBaseUnit(maxValue, props.unit);
       setCurrentUnit(unit);
-
     };
 
     const handleZoomToggle = React.useCallback((zoomInValue: boolean) => {
@@ -389,7 +385,10 @@ export const CloudViewWidget = React.memo(
               <Grid sx={{ marginRight: 'auto' }}>
                 <Typography className={classes.title}>
                   {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
-                  {!isLoading && `(${currentUnit})`}{' '}
+                  {!isLoading &&
+                    `(${currentUnit}${
+                      props.unit.endsWith('ps') ? '/s' : ''
+                    })`}{' '}
                 </Typography>
               </Grid>
               <Grid sx={{ marginRight: 5, width: 100 }}>
@@ -435,12 +434,11 @@ export const CloudViewWidget = React.memo(
                       : 'Error while rendering widget'
                     : undefined
                 }
-                formatData={
-                    (data: number) =>
-                        convertValueToUnit(data, currentUnit)
+                formatData={(data: number) =>
+                  convertValueToUnit(data, currentUnit)
                 }
-                formatTooltip={
-                    (value: number) => formatToolTip(value, props.unit)
+                formatTooltip={(value: number) =>
+                  formatToolTip(value, props.unit)
                 }
                 legendRows={
                   legendRows && legendRows.length > 0 ? legendRows : undefined
