@@ -54,7 +54,6 @@ export const CloudViewRegionSelect = React.memo(
           props.handleRegionChange(value);
         }}
         currentCapability={undefined}
-        fullWidth
         isClearable={true}
         label=""
         noMarginTop

@@ -587,8 +587,8 @@ const cloudView = [
         makeResourcePage([
           {
             created: '2023-07-12T16:08:53',
-            id: req.params.id,
-            label: 'Akamai Global Dashboard',
+            id: 25,
+            label: 'Linode Global Dashboard',
             service_type: 'linode',
             time_duration: {
               unit: 'hr',
@@ -606,7 +606,7 @@ const cloudView = [
                 metric: 'system_memory_usage_bytes',
                 namespace_id: 1,
                 region_id: 1,
-                service_type: 'ACLB',
+                service_type: 'linode',
                 size: 12,
                 unit: '%',
                 y_label: 'count',
@@ -621,7 +621,7 @@ const cloudView = [
                 metric: 'system_network_io_bytes_total',
                 namespace_id: 1,
                 region_id: 1,
-                service_type: 'ACLB',
+                service_type: 'linode',
                 size: 6,
                 unit: '%',
                 y_label: 'count',
@@ -636,7 +636,7 @@ const cloudView = [
                 metric: 'system_cpu_utilization_ratio',
                 namespace_id: 1,
                 region_id: 1,
-                service_type: 'ACLB',
+                service_type: 'linode',
                 size: 6,
                 unit: '%',
                 y_label: 'count',
@@ -651,7 +651,7 @@ const cloudView = [
                 metric: 'system_disk_operations_total',
                 namespace_id: 1,
                 region_id: 1,
-                service_type: 'ACLB',
+                service_type: 'linode',
                 size: 6,
                 unit: 'Kb/s',
                 y_label: 'count',
@@ -661,7 +661,7 @@ const cloudView = [
           {
             created: 'Thu, 18 Apr 2024 05:31:58 GMT',
             id: 2,
-            label: '1stLinodeDashboad',
+            label: 'Linode Service I/O Statistics',
             service_type: 'linode',
             type: 'standard',
             updated: null,
@@ -934,7 +934,7 @@ const cloudView = [
           {
             created: 'Thu, 18 Apr 2024 05:31:58 GMT',
             id: 22,
-            label: 'Standard Dbass Metrics Dashboard',
+            label: 'Dbass Metric Stats',
             service_type: 'dbass',
             type: 'standard',
             updated: null,
@@ -995,7 +995,7 @@ const cloudView = [
     return res(
       ctx.json({
         created: '2024-04-29T17:09:29',
-        id: 1,
+        id: 12,
         label: 'Linode Service I/O Statistics',
         service_type: 'dbass',
         type: 'standard',
@@ -1053,7 +1053,7 @@ const cloudView = [
         ctx.json({
           created: '2023-07-12T16:08:53',
           id: req.params.id,
-          label: 'Akamai Global Dashboard',
+          label: 'Linode Global Dashboard',
           service_type: 'linode',
           time_duration: {
             unit: 'hr',

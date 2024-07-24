@@ -87,7 +87,7 @@ export const CloudPulseTimeRangeSelect = React.memo(
 
     const getSelectedTimeRange = () => {
       if (!props.savePreferences) {
-        return undefined;
+        return options[0];
       }
       const timeDuration = fetchUserPrefObject().timeDuration;
 

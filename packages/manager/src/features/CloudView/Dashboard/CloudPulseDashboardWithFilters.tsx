@@ -15,7 +15,7 @@ import { CloudPulseDashboard, DashboardProperties } from './Dashboard';
 
 export interface CloudPulseDashboardWithFiltersProp {
   dashboardId: number;
-  resources: number[]; // the id of the resources
+  resource: number; // the id of the resources
 }
 
 export const CloudPulseDashboardWithFilters = React.memo(
@@ -109,7 +109,7 @@ export const CloudPulseDashboardWithFilters = React.memo(
       // push passed resource
       dimensionFilters.push({
         filterKey: 'resource_id',
-        filterValue: props.resources,
+        filterValue: [props.resource],
         isDimensionFilter: false,
       });
 
@@ -181,7 +181,6 @@ function compareProps(
 ) {
   return (
     oldProps.dashboardId == newProps.dashboardId &&
-    oldProps.resources.length == newProps.resources.length &&
-    oldProps.resources.every((item) => newProps.resources.includes(item))
+    oldProps.resource == newProps.resource
   );
 }

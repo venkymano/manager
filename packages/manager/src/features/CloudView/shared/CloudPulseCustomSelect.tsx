@@ -9,10 +9,12 @@ import {
   fetchUserPrefObject,
   updateGlobalFilterPreference,
 } from '../Utils/UserPreference';
+import { RESOURCES } from '../Utils/CloudPulseConstants';
 
 export interface CloudPulseCustomSelectProps {
   apiResponseIdField?: string;
   apiResponseLabelField?: string[];
+  clearSelections?: string[];
   dataApiUrl?: string;
   errorText?: string;
   filterKey: string;
@@ -29,7 +31,6 @@ export interface CloudPulseCustomSelectProps {
 export enum CloudPulseSelectTypes {
   dynamic,
   static,
-  predefined,
 }
 
 export const CloudPulseCustomSelect = React.memo(
@@ -124,6 +125,12 @@ export const CloudPulseCustomSelect = React.memo(
               );
               updateGlobalFilterPreference({
                 [props.filterKey]: value ? value.id.toString() : null,
+              });
+            }
+
+            if (props.clearSelections && value == null) {
+              props.clearSelections.forEach((selection) => {
+                updateGlobalFilterPreference({ [selection]: undefined });
               });
             }
 

@@ -9,8 +9,9 @@ import { CircleProgress } from 'src/components/CircleProgress';
 import { CloudPulseServiceTypeFilters } from 'src/featureFlags';
 
 import RenderComponent from '../shared/CloudPulseComponentRenderer';
-import { CloudPulseSelectTypes } from '../shared/CloudPulseCustomSelect';
+import { RESOURCES } from '../Utils/CloudPulseConstants';
 import { FILTER_CONFIG } from '../Utils/FilterConfig';
+import { Box } from 'src/components/Box';
 
 export interface DashboardWithFilterProps {
   dashboard: Dashboard;
@@ -117,8 +118,36 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
         placeholder: config.configuration.placeholder,
         savePreferences: !props.serviceAnalyticsIntegration,
         selectedDashboard: props.dashboard,
-        type: CloudPulseSelectTypes.predefined,
       };
+    };
+
+    const getDepedendantConfig = (filterKey: string): string[] => {
+      const serviceTypeConfig = FILTER_CONFIG.get(
+        props.dashboard.service_type!
+      );
+
+      const dependants: string[] = [];
+
+      for (
+        let i = 0;
+        serviceTypeConfig && i < serviceTypeConfig?.filters.length;
+        i++
+      ) {
+        const filter = serviceTypeConfig.filters[i];
+        if (
+          filter.configuration &&
+          filter.configuration.dependency != undefined &&
+          filter.configuration.dependency.includes(filterKey)
+        ) {
+          dependants.push(
+            filter.configuration.filterKey == 'resource_id'
+              ? RESOURCES
+              : filter.configuration.filterKey
+          );
+        }
+      }
+
+      return dependants;
     };
 
     const getResourcesProperties = (config: CloudPulseServiceTypeFilters) => {
@@ -131,7 +160,6 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
         placeholder: config.configuration.placeholder,
         resourceType: props.dashboard?.service_type,
         savePreferences: !props.serviceAnalyticsIntegration,
-        type: CloudPulseSelectTypes.predefined,
         xFilter: buildXFilter(config),
       };
     };
@@ -159,7 +187,6 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
         key: config.configuration.filterKey,
         placeholder: config.configuration.placeholder,
         savePreferences: !props.serviceAnalyticsIntegration,
-        type: CloudPulseSelectTypes.predefined,
       };
     };
 
@@ -169,6 +196,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
       return {
         apiResponseIdField: config.configuration.apiIdField,
         apiResponseLabelField: config.configuration.apiLabelField,
+        clearSelections: getDepedendantConfig(config.configuration.filterKey),
         componentKey: 'customDropDown', // needed for renderer to choose the component
         dataApiUrl: config.configuration.apiUrl,
         filterKey: config.configuration.filterKey,
@@ -237,7 +265,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
               if (index % 3 == 0) {
                 return (
                   <>
-                    <div style={{ width: '100%' }}></div>
+                    <Box style={{ width: '100%' }}></Box>
                     <Grid
                       key={filter.configuration.filterKey}
                       sx={{ marginLeft: 2 }}
@@ -252,7 +280,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
                 <Grid
                   key={filter.configuration.filterKey}
                   sx={{ marginLeft: 2 }}
-                  xs
+                  xs={filter.configuration.filterKey != 'region'}
                 >
                   {RenderComponent({ ...getProps(filter), key: index })}
                 </Grid>

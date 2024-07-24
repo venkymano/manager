@@ -140,7 +140,7 @@ export interface CloudPulseServiceTypeFiltersConfiguration {
   options?: CloudPulseServiceTypeFiltersOptions[];
   placeholder?: string;
   priority: number;
-  type: CloudPulseSelectTypes;
+  type?: CloudPulseSelectTypes;
 }
 
 export interface CloudPulseServiceTypeFiltersOptions {

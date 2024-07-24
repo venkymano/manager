@@ -179,15 +179,14 @@ export const DatabaseDetail = () => {
             <SafeTabPanel index={4}>
               <CloudPulseDashboardWithFilters
                 dashboardId={12}
-                key={database.id}
-                resources={[database.id]}
+                resource={database.id}
               />
             </SafeTabPanel>
           ) : (
             <SafeTabPanel index={3}>
               <CloudPulseDashboardWithFilters
                 dashboardId={12}
-                resources={[database.id]}
+                resource={database.id}
               />
             </SafeTabPanel>
           )}

@@ -67,7 +67,7 @@ export const GlobalFilters = React.memo(
     const StyledReload = styled(Cached, { label: 'StyledReload' })(
       ({ theme }) => ({
         '&:active': {
-          color: 'green',
+          color: `${selectedDashboard ? 'green' : 'grey'}`,
         },
         '&:hover': {
           cursor: 'pointer',
@@ -114,10 +114,11 @@ export const GlobalFilters = React.memo(
             <StyledReload
               aria-disabled={!selectedDashboard}
               onClick={handleGlobalRefresh}
+              sx={{ color: `${selectedDashboard ? undefined : 'lightgrey'}` }}
             />
           </Stack>
         </Stack>
-        <StyledGrid container xs={12}>
+        <Grid container xs={12}>
           <Box style={{ width: '100%' }}></Box>
           {selectedDashboard &&
             FILTER_CONFIG.get(selectedDashboard.service_type) && (
@@ -130,7 +131,7 @@ export const GlobalFilters = React.memo(
 
           {selectedDashboard &&
             !FILTER_CONFIG.get(selectedDashboard.service_type) && <></>}
-        </StyledGrid>
+        </Grid>
       </Box>
     );
   },

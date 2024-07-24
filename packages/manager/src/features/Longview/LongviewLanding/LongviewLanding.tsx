@@ -25,6 +25,7 @@ import withLongviewClients, {
 } from 'src/containers/longview.container';
 import { CloudPulseDashboardWithFilters } from 'src/features/CloudView/Dashboard/CloudPulseDashboardWithFilters';
 import { CloudPulseDashboard } from 'src/features/CloudView/Dashboard/Dashboard';
+import { CloudPulseTimeRangeSelect } from 'src/features/CloudView/shared/TimeRangeSelect';
 import { useAPIRequest } from 'src/hooks/useAPIRequest';
 import { useAccountSettings } from 'src/queries/accountSettings';
 import { getAPIErrorOrDefault } from 'src/utilities/errorUtils';
@@ -177,25 +178,29 @@ export const LongviewLanding = (props: CombinedProps) => {
               />
             </SafeTabPanel>
             <SafeTabPanel index={3}>
-              <CloudPulseDashboard // there should be no validation for global filters
-                globalFilters={[
-                  {
-                    filterKey: 'test_filter',
-                    filterValue: [1, 2],
-                    isDimensionFilter: true,
-                  },
-                  {
-                    filterKey: 'relative_time_duration',
-                    filterValue: {
-                      unit: 'min',
-                      value: 30,
+              <div style={{display:'flex', flexDirection:'column'}}>
+                <div style={{'marginLeft':'80%'}}>
+                <CloudPulseTimeRangeSelect
+                  handleStatsChange={() => {}}
+                  savePreferences={false}                  
+                ></CloudPulseTimeRangeSelect>
+                </div>
+                
+                <CloudPulseDashboard // there should be no validation for global filters
+                  globalFilters={[
+                    {
+                      filterKey: 'relative_time_duration',
+                      filterValue: {
+                        unit: 'day',
+                        value: 30,
+                      },
+                      isDimensionFilter: false,
                     },
-                    isDimensionFilter: false,
-                  },
-                ]}
-                dashboardId={1}
-                resources={[57667285, 57667325, 57667355]}
-              ></CloudPulseDashboard>
+                  ]}
+                  dashboardId={1}
+                  resources={[57667285]}
+                ></CloudPulseDashboard>
+              </div>
             </SafeTabPanel>
           </TabPanels>
         </React.Suspense>
