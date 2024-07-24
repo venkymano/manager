@@ -113,7 +113,7 @@ const multiplier: { [label: string]: number } = {
  */
 
 export const generateUnitByBitValue = (value: number): Unit => {
-  if (value < multiplier.kb) {
+  if (value < multiplier.Kb) {
     return 'b';
   } else if (value < multiplier.Mb) {
     return 'Kb';
