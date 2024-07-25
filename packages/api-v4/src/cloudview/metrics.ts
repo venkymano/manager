@@ -28,7 +28,7 @@ export const getCloudViewMetricsAPI = (
 ) =>
   Request<CloudViewMetricsResponse>(
     setURL(
-      `${readApiEndpoint}/${encodeURIComponent(
+      `https://aclp-us-ord.cloud-observability-dev.akadns.net/v1/monitor/services/${encodeURIComponent(
         serviceType!
       )}/metrics`
     ),
