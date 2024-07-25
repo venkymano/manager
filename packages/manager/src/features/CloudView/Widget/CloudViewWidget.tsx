@@ -36,8 +36,9 @@ import {
 import {
   convertValueToUnit,
   formatToolTip,
+  generateCurrentUnit,
   generateUnitByBaseUnit,
-  isBitsOrBytesUnit,
+  transformData,
 } from '../Utils/UnitConversion';
 import {
   fetchUserPrefObject,
@@ -108,8 +109,6 @@ export const CloudViewWidget = React.memo(
 
     const flags = useFlags();
 
-    const isBitsOrBytes = isBitsOrBytesUnit(props.unit);
-
     // const [
     //   selectedInterval,
     //   setSelectedInterval,
@@ -117,9 +116,7 @@ export const CloudViewWidget = React.memo(
 
     const [widget, setWidget] = React.useState<Widgets>({ ...props.widget }); // any change in agg_functions, step, group_by, will be published to dashboard component for save
 
-    const [currentUnit, setCurrentUnit] = React.useState<any>(
-      generateUnitByBaseUnit(0, props.unit) ?? props.unit
-    );
+    const [currentUnit, setCurrentUnit] = React.useState<any>();
 
     const getCloudViewMetricsRequest = (): CloudViewMetricsRequest => {
       const request = {} as CloudViewMetricsRequest;
@@ -200,7 +197,6 @@ export const CloudViewWidget = React.memo(
       flags != undefined,
       flags.aclpReadEndpoint!
     ); // fetch the metrics on any property change
-
     React.useEffect(() => {
       // on any change in the widget object, just publish the changes to parent component using a callback function
       if (
@@ -240,30 +236,33 @@ export const CloudViewWidget = React.memo(
 
         metricsList.data.result.forEach((graphData) => {
           // todo, move it to utils at a widget level
-          if (graphData == undefined || graphData == null) {
+          if (!graphData) {
             return;
           }
           const color = colors[index];
           const startEnd = convertTimeDurationToStartAndEndTimeRange(
             props!.duration!
           );
+          const transformedData = {
+            metric: graphData.metric,
+            values: transformData(graphData.values, props.unit),
+          };
           const dimension = {
             backgroundColor: color,
             data: seriesDataFormatter(
-              graphData.values,
-              startEnd ? startEnd.start : graphData.values[0][0],
+              transformedData.values,
+              startEnd ? startEnd.start : transformedData.values[0][0],
               startEnd
                 ? startEnd.end
-                : graphData.values[graphData.values.length - 1][0]
+                : transformedData.values[transformedData.values.length - 1][0]
             ),
-            label: getLabelName(graphData.metric, getServiceType()!),
+            label: getLabelName(transformedData.metric, getServiceType()!),
           };
 
           // construct a legend row with the dimension
           const legendRow = {
             data: getMetrics(dimension.data as number[][]),
-            format: (value: number) =>
-              tooltipValueFormatter(value, widget.unit),
+            format: (value: number) => formatToolTip(value, props.unit),
             legendColor: color,
             legendTitle: dimension.label,
           };
@@ -273,11 +272,7 @@ export const CloudViewWidget = React.memo(
           setToday(_isToday(startEnd.start, startEnd.end));
         });
 
-        formatBytesData(dimensions, legendRowsData);
-        // chart dimensions
-        setData(dimensions);
-        setLegendRows(legendRowsData);
-
+        generateMaxUnit(dimensions, legendRowsData);
         // chart dimensions
         setData(dimensions);
         setLegendRows(legendRowsData);
@@ -286,23 +281,14 @@ export const CloudViewWidget = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status, metricsList]);
 
-    const formatBytesData = (dimensions: any, legendRowsData: any) => {
-      if ((props.unit && !isBitsOrBytes) || !dimensions) {
-        return;
-      }
+    const generateMaxUnit = (dimensions: any, legendRowsData: any) => {
       let maxValue = 0;
-      dimensions?.forEach((dimension: any, index: number) => {
+      dimensions?.forEach((_: any, index: number) => {
         maxValue = Math.max(maxValue, legendRowsData[index]?.data.max ?? 0);
       });
-      if (maxValue === 0) {
-        return;
-      }
+
       const unit = generateUnitByBaseUnit(maxValue, props.unit);
       setCurrentUnit(unit);
-      dimensions.forEach((dimension: any, index: number) => {
-        legendRowsData[index].format = (value: number) =>
-          formatToolTip(value, props.unit);
-      });
     };
 
     const handleZoomToggle = React.useCallback((zoomInValue: boolean) => {
@@ -377,7 +363,6 @@ export const CloudViewWidget = React.memo(
         });
       }
     }, []);
-
     return (
       <Grid xs={widget.size}>
         <Paper
@@ -400,8 +385,10 @@ export const CloudViewWidget = React.memo(
               <Grid sx={{ marginRight: 'auto' }}>
                 <Typography className={classes.title}>
                   {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
-                  {(!isLoading || !isBitsOrBytes) && `(${currentUnit})`}{' '}
-                  {/* show the units of bytes data only when complete data is loaded */}
+                  {!isLoading &&
+                    `(${currentUnit}${
+                      props.unit.endsWith('ps') ? '/s' : ''
+                    })`}{' '}
                 </Typography>
               </Grid>
               <Grid sx={{ marginRight: 5, width: 100 }}>
@@ -447,16 +434,11 @@ export const CloudViewWidget = React.memo(
                       : 'Error while rendering widget'
                     : undefined
                 }
-                formatData={
-                  isBitsOrBytes
-                    ? (data: number) =>
-                        convertValueToUnit(data, currentUnit, props.unit)
-                    : undefined
+                formatData={(data: number) =>
+                  convertValueToUnit(data, currentUnit)
                 }
-                formatTooltip={
-                  isBitsOrBytes
-                    ? (value: number) => formatToolTip(value, props.unit)
-                    : undefined
+                formatTooltip={(value: number) =>
+                  formatToolTip(value, props.unit)
                 }
                 legendRows={
                   legendRows && legendRows.length > 0 ? legendRows : undefined
@@ -469,7 +451,7 @@ export const CloudViewWidget = React.memo(
                 showToday={today}
                 timezone={timezone}
                 title={''}
-                unit={!isBitsOrBytes ? ` ${currentUnit}` : undefined}
+                // unit={!isBitsOrBytes ? ` ${currentUnit}` : undefined}
               />
             )}
             {(isLoading ||
