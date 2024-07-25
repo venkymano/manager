@@ -32,9 +32,13 @@ export const getCloudViewMetricsAPI = (
     //     serviceType!
     //   )}/metrics`
     // ),
+
     setURL(
-      'https://aclp-us-ord.cloud-observability-dev.akadns.net/v1/monitor/services/linode/metrics'
+      `https://aclp-us-ord.cloud-observability-dev.akadns.net/v1/monitor/services/${encodeURIComponent(
+        serviceType!
+      )}/metrics`
     ),
+
     setMethod('POST'),
     setData(metricsRequest),
     setHeaders({
