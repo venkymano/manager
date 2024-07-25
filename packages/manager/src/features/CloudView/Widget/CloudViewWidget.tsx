@@ -386,9 +386,12 @@ export const CloudViewWidget = React.memo(
                 <Typography className={classes.title}>
                   {convertStringToCamelCasesWithSpaces(`${props.widget.label}`)}{' '}
                   {!isLoading &&
-                    `(${currentUnit}${
+                    (
+                      currentUnit ?
+                      `(${currentUnit}${
                       props.unit.endsWith('ps') ? '/s' : ''
-                    })`}{' '}
+                    })` : `(${props.unit})`
+                    )}
                 </Typography>
               </Grid>
               <Grid sx={{ marginRight: 5, width: 100 }}>

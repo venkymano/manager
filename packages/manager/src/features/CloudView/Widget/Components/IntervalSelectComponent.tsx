@@ -41,7 +41,7 @@ export const all_interval_options = [
     value: 1,
   },
   {
-    label: '1 days',
+    label: '1 day',
     unit: 'days',
     value: 1,
   },
