@@ -48,11 +48,11 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
     }
 
     if (label === _PAST_7_DAYS) {
-      return { unit: 'day', value: 7 };
+      return { unit: 'days', value: 7 };
     }
 
     if (label === _PAST_30_DAYS) {
-      return { unit: 'day', value: 30 };
+      return { unit: 'days', value: 30 };
     }
 
     return { unit: 'min', value: 30 };
@@ -79,7 +79,7 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
 
   const getSelectedTimeRange = ()=>{
     const timeDuration = fetchUserPrefObject().timeDuration;
-    
+
     const selectedTimeRange = options.find((option) => option.label === timeDuration);
 
     return selectedTimeRange ?? options[0];
@@ -95,7 +95,7 @@ export const CloudPulseTimeRangeSelect = React.memo((props: Props) => {
 
     /*
       Why division by 1000?
-  
+
       Because the Longview API doesn't expect the start and date time
       to the nearest millisecond - if you send anything more than 10 digits
       you won't get any data back
