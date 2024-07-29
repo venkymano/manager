@@ -15,7 +15,7 @@ import { GlobalFilterProperties } from '../Models/GlobalFilterProperties';
 import { CloudViewDashboardSelect } from '../shared/DashboardSelect';
 import { CloudPulseTimeRangeSelect } from '../shared/TimeRangeSelect';
 import { FILTER_CONFIG } from '../Utils/FilterConfig';
-import { CloudPulseDashboardFilterBuilder } from './DashboardFilterBuilder';
+import { CloudPulseDashboardFilterBuilder } from '../shared/CloudPulseDashboardFilterBuilder';
 
 export const GlobalFilters = React.memo(
   (props: GlobalFilterProperties) => {
@@ -125,7 +125,7 @@ export const GlobalFilters = React.memo(
               <CloudPulseDashboardFilterBuilder
                 dashboard={selectedDashboard}
                 emitFilterChange={filterChange}
-                serviceAnalyticsIntegration={false}
+                isServiceAnalyticsIntegration={false}
               />
             )}
 

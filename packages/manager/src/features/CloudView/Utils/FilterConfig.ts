@@ -1,4 +1,4 @@
-import { CloudPulseServiceTypeFilterMap } from 'src/featureFlags';
+import { CloudPulseServiceTypeFilterMap } from './models';
 
 import { CloudPulseSelectTypes } from '../shared/CloudPulseCustomSelect';
 

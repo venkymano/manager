@@ -11,21 +11,18 @@ import * as React from 'react';
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 import { Box } from 'src/components/Box';
 import Select from 'src/components/EnhancedSelect/Select';
-import { TextField } from 'src/components/TextField';
 import { Typography } from 'src/components/Typography';
 import { useCloudViewDashboardsQuery } from 'src/queries/cloudview/dashboards';
 import { useCloudViewServices } from 'src/queries/cloudview/services';
 
 import {
   DASHBOARD_ID,
-  REGION,
-  RESOURCES,
-  WIDGETS,
 } from '../Utils/CloudPulseConstants';
 import {
   fetchUserPrefObject,
   updateGlobalFilterPreference,
 } from '../Utils/UserPreference';
+import { FILTER_CONFIG } from '../Utils/FilterConfig';
 export interface CloudViewDashbboardSelectProps {
   handleDashboardChange: (dashboard: Dashboard | undefined) => void;
 }
@@ -99,6 +96,33 @@ export const CloudViewDashboardSelect = React.memo(
       return undefined;
     };
 
+    const clearSelectedFilters = (dashboard: Dashboard): {[key:string]: number | undefined} => {
+
+      const clearKeys : {[key:string] : number | undefined} = {};
+
+      clearKeys[DASHBOARD_ID] = dashboard ? dashboard.id : undefined;
+
+      getUniqueFilterKeys()
+      .forEach(filter => {
+        clearKeys[filter] = undefined;
+      })
+
+      return clearKeys;
+
+    }
+
+    const getUniqueFilterKeys = (): string[] => {
+      const uniqueKeys = new Set<string>();
+    
+      FILTER_CONFIG.forEach((config) => {
+        config.filters.forEach((filter) => {
+          uniqueKeys.add(filter.configuration.filterKey);
+        });
+      });
+    
+      return Array.from(uniqueKeys);
+    };
+
     if (!dashboardsList || dashboardsList.length == 0) {
       return (
         <Select
@@ -123,12 +147,7 @@ export const CloudViewDashboardSelect = React.memo(
             : ''
         }
         onChange={(_: any, dashboard: Dashboard) => {
-          updateGlobalFilterPreference({
-            [DASHBOARD_ID]: dashboard?.id,
-            [REGION]: null,
-            [RESOURCES]: [],
-            [WIDGETS]: {},
-          });
+          updateGlobalFilterPreference(clearSelectedFilters(dashboard));
           props.handleDashboardChange(dashboard);
         }}
         options={

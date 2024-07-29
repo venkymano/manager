@@ -13,7 +13,7 @@ import { RESOURCES } from '../Utils/CloudPulseConstants';
 
 export interface CloudPulseCustomSelectProps {
   apiResponseIdField?: string;
-  apiResponseLabelField?: string[];
+  apiResponseLabelField?: string;
   clearSelections?: string[];
   dataApiUrl?: string;
   errorText?: string;
@@ -47,7 +47,7 @@ export const CloudPulseCustomSelect = React.memo(
       props.dataApiUrl != undefined,
       props.filterKey,
       props.apiResponseIdField ? props.apiResponseIdField : 'id',
-      props.apiResponseLabelField ? props.apiResponseLabelField : ['label']
+      props.apiResponseLabelField ? props.apiResponseLabelField : 'label'
     );
 
     const getSelectedValues = () => {
