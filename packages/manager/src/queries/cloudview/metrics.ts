@@ -4,7 +4,7 @@ import {
   CloudViewMetricsResponse,
   getCloudViewMetricsAPI,
 } from '@linode/api-v4';
-import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useCloudViewMetricsQuery = (
   serviceType: string,
@@ -17,7 +17,13 @@ export const useCloudViewMetricsQuery = (
   const queryClient = useQueryClient();
   return useQuery<CloudViewMetricsResponse, APIError[]>(
     [request, widgetProps, serviceType, props.authToken], // querykey and dashboardId makes this uniquely identifiable
-    () => getCloudViewMetricsAPI(props.authToken,readApiEndpoint, serviceType, request),
+    () =>
+      getCloudViewMetricsAPI(
+        props.authToken,
+        readApiEndpoint,
+        serviceType,
+        request
+      ),
     {
       enabled: !!enabled,
       onError(err: APIError[]) {
@@ -35,8 +41,8 @@ export const useCloudViewMetricsQuery = (
         }
       },
       refetchInterval: 6000000,
+      refetchOnWindowFocus: false,
       retry: 0,
-      refetchOnWindowFocus: false
     }
   );
 };
