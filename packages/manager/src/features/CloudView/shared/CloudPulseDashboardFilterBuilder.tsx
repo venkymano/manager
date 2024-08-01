@@ -244,8 +244,12 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
           <Grid
             item
             key={filter.configuration.filterKey}
-            sx={{ marginLeft: 2 }}
-            xs
+            xs={12}
+            sm={6}
+            lg={4}
+            xl={4}   
+            columnGap={1} 
+            // sx={{marginLeft:1}}        
           >
             {RenderComponent({
               ...getProps(filter),

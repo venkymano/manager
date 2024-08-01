@@ -10,6 +10,7 @@ import {
   fetchUserPrefObject,
   updateGlobalFilterPreference,
 } from '../Utils/UserPreference';
+import { Box } from '@mui/material';
 
 export interface CloudViewRegionSelectProps {
   handleRegionChange: (region: string | undefined) => void;
@@ -48,7 +49,8 @@ export const CloudViewRegionSelect = React.memo(
     }
 
     return (
-      <RegionSelect
+      <Box sx={{width:'95%'}}>
+          <RegionSelect
         handleSelection={(value) => {
           updateGlobalFilterPreference({ [REGION]: value, [RESOURCES]: [] });
           props.handleRegionChange(value);
@@ -59,8 +61,9 @@ export const CloudViewRegionSelect = React.memo(
         noMarginTop
         placeholder={props.placeholder}
         regions={regions ? regions : []}
-        selectedId={getPrefferedRegion()!}
+        selectedId={getPrefferedRegion()!}        
       />
+      </Box>      
     );
   },
   compareProps

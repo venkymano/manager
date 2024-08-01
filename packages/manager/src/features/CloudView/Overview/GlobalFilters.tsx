@@ -118,8 +118,7 @@ export const GlobalFilters = React.memo(
             />
           </Stack>
         </Stack>
-        <Grid container xs={12}>
-          <Box style={{ width: '100%' }}></Box>
+        <Grid container>          
           {selectedDashboard &&
             FILTER_CONFIG.get(selectedDashboard.service_type) && (
               <CloudPulseDashboardFilterBuilder

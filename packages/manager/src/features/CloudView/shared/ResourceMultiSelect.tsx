@@ -46,9 +46,7 @@ export const CloudViewMultiResourceSelect = React.memo(
     ));
     ({ data: resourceOptions['dbass'] } = useDBEngineResourcesQuery(
       // dbass integration
-      props.resourceType === 'dbass' &&
-        props.xFilter['region'] != undefined &&
-        props.xFilter['dbEngine'] != undefined, // enable only if we have dbEngine and region
+      props.resourceType === 'dbass' && !props.disabled,
       props.xFilter,
       {}
     ));
@@ -89,6 +87,7 @@ export const CloudViewMultiResourceSelect = React.memo(
         options={getResourceList()}
         placeholder={props.placeholder ?? 'Select Resources'}
         value={getSelectedResources()}
+        style={{width:'95%'}}
       />
     );
   },

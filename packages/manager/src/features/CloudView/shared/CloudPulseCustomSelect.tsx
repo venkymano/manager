@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
-import Select from 'src/components/EnhancedSelect';
 import { CloudPulseServiceTypeFiltersOptions } from 'src/featureFlags';
 import { useGetCustomFiltersQuery } from 'src/queries/cloudview/customfilters';
 
@@ -9,7 +8,7 @@ import {
   fetchUserPrefObject,
   updateGlobalFilterPreference,
 } from '../Utils/UserPreference';
-import { RESOURCES } from '../Utils/CloudPulseConstants';
+import { Chip } from '@mui/material';
 
 export interface CloudPulseCustomSelectProps {
   apiResponseIdField?: string;
@@ -19,7 +18,7 @@ export interface CloudPulseCustomSelectProps {
   errorText?: string;
   filterKey: string;
   filterType: string;
-  handleSelectionChange: (filterKey: string, value: any) => void;
+  handleSelectionChange: (filterKey: string, value: string | string[] | number | number[] | undefined) => void;
   isMultiSelect?: boolean;
   maxSelections?: number;
   options?: CloudPulseServiceTypeFiltersOptions[];
@@ -35,7 +34,8 @@ export enum CloudPulseSelectTypes {
 
 export const CloudPulseCustomSelect = React.memo(
   (props: CloudPulseCustomSelectProps) => {
-    const [selectedResource, setResource] = React.useState<any>();
+    const [selectedResource, setResource] = React.useState<CloudPulseServiceTypeFiltersOptions | 
+    CloudPulseServiceTypeFiltersOptions[]>();
     const defaultSet = React.useRef(false);
 
     const {
@@ -50,66 +50,58 @@ export const CloudPulseCustomSelect = React.memo(
       props.apiResponseLabelField ? props.apiResponseLabelField : 'label'
     );
 
-    const getSelectedValues = () => {
-      // if there is no preferences, just return undefined
-      if (!props.savePreferences) {
-        return undefined;
+    React.useEffect(() => {
+
+      if(props.savePreferences) {
+        const defaultValue = fetchUserPrefObject()[props.filterKey];
+
+        setResource(getDefaultSelectionsFromPreferences(defaultValue, 
+                                props.type==CloudPulseSelectTypes.static?props.options:queriedResources))
       }
 
-      if (props.type == CloudPulseSelectTypes.static) {
-        const defaultValue = fetchUserPrefObject()[props.filterKey];
-        if (props.isMultiSelect && Array.isArray(defaultValue)) {
-          const selectedValues = props.options?.filter((obj) =>
-            defaultValue.includes(obj.id)
-          );
-          props.handleSelectionChange(
-            props.filterKey,
-            selectedValues!.map((obj) => obj.id)
-          );
-          return selectedValues;
-        } else if (!props.isMultiSelect) {
-          const selectedValue = props.options?.find(
-            (obj) => obj.id == defaultValue
-          );
-          if (selectedValue) {
-            props.handleSelectionChange(props.filterKey, selectedValue.id);
-          }
-          return selectedValue;
-        }
-      } else if (queriedResources && queriedResources.length > 0) {
-        const defaultValue = fetchUserPrefObject()[props.filterKey];
-        if (props.isMultiSelect && Array.isArray(defaultValue)) {
-          const selectedValues = queriedResources?.filter((obj) =>
-            defaultValue.includes(obj.id)
-          );
-          props.handleSelectionChange(
-            props.filterKey,
-            selectedValues.map((obj) => obj.id)
-          );
-          return selectedValues;
-        } else if (!props.isMultiSelect) {
-          const selectedValue = queriedResources?.find(
-            (obj) => obj.id == defaultValue
-          );
+    }, [props.savePreferences]);
 
-          if (selectedValue) {
-            props.handleSelectionChange(props.filterKey, selectedValue.id);
-          }
-          return selectedValue;
-        }
+    const getDefaultSelectionsFromPreferences = (defaultValue: string | string[] | number | number[] | null, 
+      options:CloudPulseServiceTypeFiltersOptions[] | undefined
+    ): CloudPulseServiceTypeFiltersOptions[]| CloudPulseServiceTypeFiltersOptions | undefined  => {
+
+      if(!options || options.length == 0) {
+        return props.isMultiSelect ? [] : undefined;
       }
+
+      if (props.isMultiSelect && Array.isArray(defaultValue)) {
+        
+        const selectedValues = options?.filter((obj:CloudPulseServiceTypeFiltersOptions) =>
+          Array.of(...defaultValue).includes(obj.id)
+        );
+        props.handleSelectionChange(
+          props.filterKey,
+          selectedValues!.map((obj) => obj.id)
+        );
+        return selectedValues;
+      } else if (!props.isMultiSelect) {
+        const selectedValue = options.find(
+          (obj) => obj.id == defaultValue
+        );
+        if (selectedValue) {
+          props.handleSelectionChange(props.filterKey, selectedValue.id);
+        }
+        return selectedValue;
+      }
+
+      return props.isMultiSelect ? [] : undefined;
     };
 
-    if (
-      props.type == CloudPulseSelectTypes.static ||
-      (!isLoading && !isError && queriedResources)
-    ) {
-      return (
+      if(queriedResources) {
+        console.log(queriedResources.length)
+        console.log(queriedResources)
+      }
+      return (        
         <Autocomplete
           multiple={
-            props.isMultiSelect != undefined ? props.isMultiSelect : false
+            props.isMultiSelect
           }
-          onChange={(_: any, value: any) => {
+          onChange={(_, value) => {
             if (Array.isArray(value)) {
               props.handleSelectionChange(
                 props.filterKey,
@@ -121,10 +113,10 @@ export const CloudPulseCustomSelect = React.memo(
             } else {
               props.handleSelectionChange(
                 props.filterKey,
-                value ? value.id.toString() : null
+                value ? value.id.toString() : undefined
               );
               updateGlobalFilterPreference({
-                [props.filterKey]: value ? value.id.toString() : null,
+                [props.filterKey]: value ? value?.id.toString() : null,
               });
             }
 
@@ -142,31 +134,28 @@ export const CloudPulseCustomSelect = React.memo(
               value = value.slice(0, props.maxSelections);
             }
 
-            setResource(value);
+            setResource(value ?? undefined);
           }}
+          disabled={isLoading && isError && !queriedResources}
           options={
             props.type == CloudPulseSelectTypes.static
               ? props.options!
               : queriedResources!
           }
-          defaultValue={getSelectedValues() ?? undefined}
           label=""
           placeholder={props.placeholder ? props.placeholder : 'Select a Value'}
-          // value={props.isMultiSelect ? getSelectedValues() : undefined!}
+          value={selectedResource ?? []}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          renderTags={(tagValue, getTagProps) => {
+            return tagValue.map((option, index) => (
+              <Chip {...getTagProps({index})} key={option.id} label={option.label} />
+            ))
+          }}
+          style={{
+            width:'95%'
+          }}
         />
       );
-    } else {
-      return (
-        <Select
-          disabled={true}
-          errorText={isError ? 'Error while reading filters from API' : ''}
-          label=""
-          onChange={() => {}}
-          options={[]}
-          placeholder={props.placeholder ? props.placeholder : 'Select a Value'}
-        />
-      );
-    }
   },
   compareProps
 );

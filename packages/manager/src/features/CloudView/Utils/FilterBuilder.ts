@@ -1,7 +1,7 @@
 import { FILTER_CONFIG } from './FilterConfig';
 
 import type { CloudPulseServiceTypeFilters } from './models';
-import type { Dashboard, TimeDuration } from '@linode/api-v4';
+import type { Dashboard, Filter, TimeDuration } from '@linode/api-v4';
 
 export const getRegionProperties = (
   config: CloudPulseServiceTypeFilters,
@@ -60,20 +60,52 @@ export const getTimeDurationProperties = (
 };
 
 export const buildXFilter = (
-  config: CloudPulseServiceTypeFilters,
-  dependentFilters: { [key: string]: any }
-) => {
-  const xFilterObj: any = {};
-
-  if (config.configuration.dependency) {
-    for (let i = 0; i < config.configuration.dependency.length; i++) {
-      xFilterObj[config.configuration.dependency[i]] =
-        dependentFilters[config.configuration.dependency[i]];
+    config: CloudPulseServiceTypeFilters,
+    dependentFilters: {
+      [key: string]:
+        | TimeDuration
+        | number
+        | number[]
+        | string
+        | string[]
+        | undefined;
     }
-  }
+  ) => {
+    const filters: Filter[] = [];
+  
+    if (config.configuration.dependency) {
+      for (let i = 0; i < config.configuration.dependency.length; i++) {
+        if (dependentFilters[config.configuration.dependency[i]]) {
+          const value = dependentFilters[config.configuration.dependency[i]];
+          const key = config.configuration.dependency[i];
+          if (Array.isArray(value)) {
+            const orCondition = value.map((val) => ({ [key]: val }));
+            filters.push({ '+or': orCondition });
+          } else {
+            filters.push({ [key]: value });
+          }
+        }
+      }
+    }
+  
+    return { '+and': [...filters] };
+  };
 
-  return xFilterObj;
-};
+// export const buildXFilter = (
+//   config: CloudPulseServiceTypeFilters,
+//   dependentFilters: { [key: string]: any }
+// ) => {
+//   const xFilterObj: any = {};
+
+//   if (config.configuration.dependency) {
+//     for (let i = 0; i < config.configuration.dependency.length; i++) {
+//       xFilterObj[config.configuration.dependency[i]] =
+//         dependentFilters[config.configuration.dependency[i]];
+//     }
+//   }
+
+//   return xFilterObj;
+// };
 
 export const checkIfWeNeedToDisableFilterByFilterKey = (
   filterKey: string,

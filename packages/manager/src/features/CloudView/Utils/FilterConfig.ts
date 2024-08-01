@@ -16,6 +16,31 @@ export const LINODE_CONFIG: CloudPulseServiceTypeFilterMap = {
       },
       name: 'Region',
     },
+    // {
+    //   configuration: {
+    //     filterKey: 'dbEngine',
+    //     filterType: 'string',
+    //     isFilterable: true, // isFilterable -- this determines whethere you need to pass it metrics api
+    //     isMetricsFilter: false, // if it is false, it will go as a part of filter params, else global filter
+    //     isMultiSelect: true,
+    //     name: 'DB Engine',
+    //     neededInServicePage: false,
+    //     options: [
+    //       {
+    //         id: 'mysql',
+    //         label: 'MySQL',
+    //       },
+    //       {
+    //         id: 'postgresql',
+    //         label: 'PostgreSQL',
+    //       },
+    //     ],
+    //     placeholder: 'Select an Engine',
+    //     priority: 2,
+    //     type: CloudPulseSelectTypes.static,
+    //   },
+    //   name: 'DB Engine',
+    // },
     {
       configuration: {
         dependency: ['region'],
@@ -102,6 +127,31 @@ export const DBASS_CONFIG: CloudPulseServiceTypeFilterMap = {
         priority: 3,
       },
       name: 'Resources',
+    },
+    {
+      configuration: {
+        filterKey: 'nodeType',
+        filterType: 'string',
+        isFilterable: true, // isFilterable -- this determines whethere you need to pass it metrics api
+        isMetricsFilter: false, // if it is false, it will go as a part of filter params, else global filter
+        isMultiSelect: false,
+        name: 'Node Type',
+        neededInServicePage: false,
+        options: [
+          {
+            id: 'primary',
+            label: 'Primary',
+          },
+          {
+            id: 'secondary',
+            label: 'Secondary',
+          },
+        ],
+        placeholder: 'Select a Node Type',
+        priority: 2,
+        type: CloudPulseSelectTypes.static,
+      },
+      name: 'DB Engine',
     },
     {
       configuration: {
