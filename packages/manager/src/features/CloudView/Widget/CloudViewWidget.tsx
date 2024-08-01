@@ -123,9 +123,9 @@ export const CloudViewWidget = React.memo(
       request.aggregate_function = widget.aggregate_function;
       request.group_by = widget.group_by;
       if (props && props.resources) {
-        request.resource_id = props.resourceIds.map((obj) => parseInt(obj, 10));
+        request.resource_ids = props.resourceIds.map((obj) => parseInt(obj, 10));
       } else {
-        request.resource_id = widget.resource_id.map((obj) =>
+        request.resource_ids = widget.resource_id.map((obj) =>
           parseInt(obj, 10)
         );
       }
