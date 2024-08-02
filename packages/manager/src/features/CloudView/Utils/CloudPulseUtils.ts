@@ -48,11 +48,11 @@ export const getDimensionName = (metric: any, flag: any, resources: any[]) => {
 // returns a list of resource IDs to be passed as part of getJWEToken call
 export const getResourceIDsPayload = (resources: any) => {
   const jweTokenPayload: GetJWETokenPayload = {
-    resource_id: [],
+    resource_ids: [],
   };
 
   if (resources?.data) {
-    jweTokenPayload.resource_id = resources?.data?.map(
+    jweTokenPayload.resource_ids = resources?.data?.map(
       (resource: any) => resource.id
     );
   }
