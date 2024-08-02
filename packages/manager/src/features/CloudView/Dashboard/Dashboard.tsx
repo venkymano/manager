@@ -52,9 +52,9 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   // returns a list of resource IDs to be passed as part of getJWEToken call
   const getResourceIDsPayload = () => {
     const jweTokenPayload: GetJWETokenPayload = {
-      resource_id: [],
+      resource_ids: [],
     };
-    jweTokenPayload.resource_id = resources
+    jweTokenPayload.resource_ids = resources
       ? resources.data?.map((resource: any) => resource.id)
       : undefined!;
 
