@@ -16,7 +16,7 @@ import { ResourcePage as Page } from 'src/types';
 export const getCloudViewServiceTypes = () =>
   Request<ServiceTypesList>(
     setURL(
-      `https://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services`
+      `https://blr-lhv95n.bangalore.corp.akamai.com:9000/v4beta/monitor/services`
     ),
     setMethod('GET'),
     setHeaders({
@@ -36,7 +36,7 @@ export const getMetricDefinitionsByServiceType = (serviceType: string) => {
   return Request<Page<MetricDefinitions>>(
     // setURL(`${API_ROOT}/monitor/services/${serviceType}/metricDefinitions`),
     setURL(
-      `https://blr-lhv95n.bangalore.corp.akamai.com:9000/v4/monitor/services/${serviceType}/metric-definitions`
+      `https://blr-lhv95n.bangalore.corp.akamai.com:9000/v4beta/monitor/services/${serviceType}/metric-definitions`
     ),
     setMethod('GET'),
     setHeaders({

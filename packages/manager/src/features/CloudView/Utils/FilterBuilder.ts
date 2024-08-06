@@ -46,7 +46,7 @@ export const getResourcesProperties = (
 
 export const getTimeDurationProperties = (
   config: CloudPulseServiceTypeFilters,
-  handleTimeRangeChange: (timeDuration: TimeDuration) => void,
+  handleTimeRangeChange: (start:number, end:number, timeDuration: TimeDuration, label:string) => void,
   isServiceAnalyticsIntegration: boolean
 ) => {
   return {

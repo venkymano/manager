@@ -165,7 +165,7 @@ export interface JWEToken {
 }
 
 export interface GetJWETokenPayload {
-  resource_id: number[];
+  resource_ids: number[];
 }
 
 export interface ServiceTypesList {

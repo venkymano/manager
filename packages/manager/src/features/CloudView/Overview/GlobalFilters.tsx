@@ -16,6 +16,7 @@ import { CloudViewDashboardSelect } from '../shared/DashboardSelect';
 import { CloudPulseTimeRangeSelect } from '../shared/TimeRangeSelect';
 import { FILTER_CONFIG } from '../Utils/FilterConfig';
 import { CloudPulseDashboardFilterBuilder } from '../shared/CloudPulseDashboardFilterBuilder';
+import { Divider } from 'src/components/Divider';
 
 export const GlobalFilters = React.memo(
   (props: GlobalFilterProperties) => {
@@ -92,7 +93,7 @@ export const GlobalFilters = React.memo(
     return (
       <Box sx={{ flexGrow: 1 }}>
         <Stack direction={'row'} flexGrow={1} justifyContent={'space-between'}>
-          <Box key={'selectdashboard'} sx={{ marginLeft: 2, width: '100%' }}>
+          <Box key={'selectdashboard'} sx={{ width: '84%' }}>
             <CloudViewDashboardSelect
               handleDashboardChange={handleDashboardChange}
             />
@@ -102,9 +103,9 @@ export const GlobalFilters = React.memo(
             direction={'row'}
             gap={3}
             key={'selectduration'}
-            width={'100%'}
+            width={'182%'}
           >
-            <Box sx={{ marginLeft: '50%', width: '50%' }}>
+            <Box sx={{ marginLeft: '51.5%', width: '90%' }}>
               <CloudPulseTimeRangeSelect
                 disabled={!selectedDashboard}
                 handleStatsChange={handleTimeRangeChange}
@@ -118,6 +119,7 @@ export const GlobalFilters = React.memo(
             />
           </Stack>
         </Stack>
+        {selectedDashboard &&<Divider sx={{marginTop:4}}></Divider>}
         <Grid container>          
           {selectedDashboard &&
             FILTER_CONFIG.get(selectedDashboard.service_type) && (

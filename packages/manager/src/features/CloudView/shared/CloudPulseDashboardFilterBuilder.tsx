@@ -24,6 +24,7 @@ import { FILTER_CONFIG } from '../Utils/FilterConfig';
 
 import type { CloudPulseServiceTypeFilters } from '../Utils/models';
 import type { Dashboard, TimeDuration } from '@linode/api-v4';
+import { Divider } from 'src/components/Divider';
 
 export interface CloudPulseDashboardFilterBuilderProps {
   /**
@@ -109,7 +110,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
     );
 
     const handleTimeRangeChange = React.useCallback(
-      (timeDuration: TimeDuration) => {
+      (start:number, end:number, timeDuration: TimeDuration, label:string) => {
         emitFilterChangeByFilterKey(RELATIVE_TIME_DURATION, timeDuration);
       },
       [emitFilterChangeByFilterKey]
@@ -238,7 +239,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
         .filter((config) =>
           isServiceAnalyticsIntegration
             ? config.configuration.neededInServicePage
-            : !config.configuration.neededInServicePage
+            : !(config.configuration.name == 'Time Duration') // apart from time duration render everything
         )
         .map((filter, index) => (
           <Grid
@@ -275,17 +276,16 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
 
     return (
       <Grid container>
-        <Grid item key={'toggleFilter'} sx={{ marginLeft: 2 }} xs={12}>
-          <Box>
-            <Button onClick={toggleShowFilter} sx={{ marginTop: 2 }}>
-              {showFilter ? (
-                <KeyboardArrowDownIcon />
-              ) : (
-                <KeyboardArrowRightIcon />
-              )}
-              <Typography>Filters</Typography>
-            </Button>
-          </Box>
+        <Grid item key={'toggleFilter'} xs={12}>
+        <Button onClick={toggleShowFilter} sx={{ marginLeft: -3, marginTop: 1 }} buttonType='secondary'>
+            {showFilter ? (
+            <KeyboardArrowDownIcon />
+            ) : (
+            <KeyboardArrowRightIcon />
+            )}
+            <Typography>Filters</Typography>
+        </Button>
+        <Divider sx={{marginTop:1}}></Divider>
         </Grid>
         {showFilter && <RenderFilters />}
       </Grid>
@@ -299,7 +299,6 @@ function compareProps(
   newProps: CloudPulseDashboardFilterBuilderProps
 ) {
   return (
-    oldProps.dashboard?.id === newProps.dashboard?.id &&
-    !newProps.isServiceAnalyticsIntegration
+    oldProps.dashboard?.id === newProps.dashboard?.id
   );
 }

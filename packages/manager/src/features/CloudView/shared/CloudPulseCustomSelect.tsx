@@ -52,11 +52,17 @@ export const CloudPulseCustomSelect = React.memo(
 
     React.useEffect(() => {
 
-      if(props.savePreferences) {
+      if(props.savePreferences && !selectedResource) {
         const defaultValue = fetchUserPrefObject()[props.filterKey];
 
         setResource(getDefaultSelectionsFromPreferences(defaultValue, 
                                 props.type==CloudPulseSelectTypes.static?props.options:queriedResources))
+      } else {
+        if(!props.savePreferences && !selectedResource) {
+          setResource(getDefaultSelectionsFromPreferences(null, 
+            props.type==CloudPulseSelectTypes.static?props.options:queriedResources
+          ))
+        }
       }
 
     }, [props.savePreferences]);
@@ -67,6 +73,13 @@ export const CloudPulseCustomSelect = React.memo(
 
       if(!options || options.length == 0) {
         return props.isMultiSelect ? [] : undefined;
+      }
+
+      if(!defaultValue && !props.savePreferences) {
+
+        props.handleSelectionChange(props.filterKey, props.isMultiSelect ? Array.of(options[0].id) : 
+      options[0].id);
+        return props.isMultiSelect ? Array.of(options[0]) : options[0];
       }
 
       if (props.isMultiSelect && Array.isArray(defaultValue)) {
@@ -101,7 +114,7 @@ export const CloudPulseCustomSelect = React.memo(
           multiple={
             props.isMultiSelect
           }
-          onChange={(_, value) => {
+          onChange={(_, value:CloudPulseServiceTypeFiltersOptions | CloudPulseServiceTypeFiltersOptions[]) => {
             if (Array.isArray(value)) {
               props.handleSelectionChange(
                 props.filterKey,
@@ -134,7 +147,7 @@ export const CloudPulseCustomSelect = React.memo(
               value = value.slice(0, props.maxSelections);
             }
 
-            setResource(value ?? undefined);
+            setResource(Array.isArray(value)? [...value] : {...value});
           }}
           disabled={isLoading && isError && !queriedResources}
           options={
@@ -142,6 +155,7 @@ export const CloudPulseCustomSelect = React.memo(
               ? props.options!
               : queriedResources!
           }
+          getOptionLabel={(option) => option.label ?? ''}
           label=""
           placeholder={props.placeholder ? props.placeholder : 'Select a Value'}
           value={selectedResource ?? []}

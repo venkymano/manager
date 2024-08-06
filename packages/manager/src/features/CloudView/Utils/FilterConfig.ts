@@ -136,7 +136,7 @@ export const DBASS_CONFIG: CloudPulseServiceTypeFilterMap = {
         isMetricsFilter: false, // if it is false, it will go as a part of filter params, else global filter
         isMultiSelect: false,
         name: 'Node Type',
-        neededInServicePage: false,
+        neededInServicePage: true,
         options: [
           {
             id: 'primary',
@@ -151,7 +151,7 @@ export const DBASS_CONFIG: CloudPulseServiceTypeFilterMap = {
         priority: 2,
         type: CloudPulseSelectTypes.static,
       },
-      name: 'DB Engine',
+      name: 'Node Type',
     },
     {
       configuration: {
@@ -161,7 +161,7 @@ export const DBASS_CONFIG: CloudPulseServiceTypeFilterMap = {
         isMetricsFilter: true,
         isMultiSelect: false,
         name: 'Time Duration',
-        neededInServicePage: true,
+        neededInServicePage: false,
         placeholder: 'Select Duration',
         priority: 4,
       },

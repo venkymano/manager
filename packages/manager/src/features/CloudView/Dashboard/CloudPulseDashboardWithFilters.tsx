@@ -8,10 +8,12 @@ import { Paper } from 'src/components/Paper';
 import { Placeholder } from 'src/components/Placeholder/Placeholder';
 import { useCloudViewDashboardByIdQuery } from 'src/queries/cloudview/dashboards';
 
-import { CloudPulseDashboardFilterBuilder } from '../Overview/DashboardFilterBuilder';
+import { CloudPulseDashboardFilterBuilder } from '../shared/CloudPulseDashboardFilterBuilder';
 import { FILTER_CONFIG } from '../Utils/FilterConfig';
 import { CloudPulseWidgetFilters } from '../Widget/CloudViewWidget';
 import { CloudPulseDashboard, DashboardProperties } from './Dashboard';
+import { CloudPulseTimeRangeSelect } from '../shared/TimeRangeSelect';
+import { TimeDuration } from '@linode/api-v4';
 
 export interface CloudPulseDashboardWithFiltersProp {
   dashboardId: number;
@@ -122,6 +124,25 @@ export const CloudPulseDashboardWithFilters = React.memo(
       flex: 'auto',
     });
 
+    const handleTimeRangeChange = (
+      start: number,
+      end: number,
+      timeDuration?: TimeDuration,
+      timeRangeLabel?: string
+    ) => {
+      emitFilterChange('relative_time_duration', timeDuration);
+    };
+
+    const checkIfFilterBuilderNeeded = () => {
+
+      if(!dashboard) {
+        return false;
+      }
+
+      return FILTER_CONFIG.get(dashboard?.service_type)?.filters
+            .some(filterObj => filterObj.configuration.neededInServicePage)
+    }
+
     const renderPlaceHolder = (subtitle: string) => {
       return (
         <Paper>
@@ -157,11 +178,18 @@ export const CloudPulseDashboardWithFilters = React.memo(
       <>
         <Paper style={{ border: 'solid 1px #e3e5e8' }}>
           <Grid container>
-            <CloudPulseDashboardFilterBuilder
+          <Grid sx={{ marginLeft: '70%', width: '90%' }} lg={12} xs={12}>
+              <CloudPulseTimeRangeSelect
+                disabled={!dashboard}
+                handleStatsChange={handleTimeRangeChange}
+                savePreferences={true}
+              />
+          </Grid>            
+            {checkIfFilterBuilderNeeded() && <CloudPulseDashboardFilterBuilder
               dashboard={dashboard}
               emitFilterChange={emitFilterChange}
-              serviceAnalyticsIntegration={true}
-            />
+              isServiceAnalyticsIntegration={true}
+            />}
           </Grid>
         </Paper>
         {checkMandatoryFiltersSelected() && (
