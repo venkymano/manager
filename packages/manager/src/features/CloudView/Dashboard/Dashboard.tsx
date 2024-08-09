@@ -10,7 +10,7 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import * as React from 'react';
 
-import CloudViewIcon from 'src/assets/icons/Monitor.svg';
+import CloudPulseIcon from 'src/assets/icons/entityIcons/Monitor.svg';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Placeholder } from 'src/components/Placeholder/Placeholder';
@@ -76,6 +76,8 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   const {
     data: jweToken,
     isError: isJweTokenError,
+    isLoading: isJweTokenLoading,
+    isSuccess,
   } = useCloudViewJWEtokenQuery(
     dashboard ? dashboard.service_type! : undefined!,
     getResourceIDsPayload(),
@@ -105,7 +107,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
       </Paper>
     );
   }
-  if (dashboard && dashboard.service_type && isLoading) {
+  if (dashboard && dashboard.service_type && (isLoading || isJweTokenLoading)) {
     return <CircleProgress />;
   }
 
@@ -257,7 +259,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
         );
       } else {
         return renderPlaceHolder(
-          'Select Service Type, Region and Resource to visualize metrics'
+          'Select Dashboard, Region and Resource to visualize metrics'
         );
       }
     } else {
@@ -270,18 +272,14 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   const StyledPlaceholder = styled(Placeholder, {
     label: 'StyledPlaceholder',
   })({
+    color: '#00b159',
     flex: 'auto',
   });
 
   const renderPlaceHolder = (subtitle: string) => {
     return (
       <Paper>
-        <StyledPlaceholder
-          icon={CloudViewIcon}
-          isEntity
-          subtitle={subtitle}
-          title=""
-        />
+        <StyledPlaceholder icon={CloudPulseIcon} subtitle={subtitle} title="" />
       </Paper>
     );
   };

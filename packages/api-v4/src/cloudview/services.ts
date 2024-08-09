@@ -1,4 +1,4 @@
-import { API_ROOT } from '../constants';
+import { BETA_API_ROOT } from '../constants';
 import Request, { setHeaders, setMethod, setURL } from '../request';
 import {
   MetricDefinitions,
@@ -28,7 +28,7 @@ export const getMonitorServiceTypeInformationByServiceType = (
   serviceType: string
 ) =>
   Request<MonitorServiceType>(
-    setURL(`${API_ROOT}/monitor/services/${serviceType}`),
+    setURL(`${BETA_API_ROOT}/monitor/services/${serviceType}`),
     setMethod('GET')
   );
 

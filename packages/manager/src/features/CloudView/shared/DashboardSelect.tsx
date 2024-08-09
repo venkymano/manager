@@ -107,6 +107,8 @@ export const CloudViewDashboardSelect = React.memo(
         clearKeys[filter] = undefined;
       })
 
+      clearKeys['resources'] = undefined;
+
       return clearKeys;
 
     }

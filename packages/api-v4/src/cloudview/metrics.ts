@@ -27,8 +27,13 @@ export const getCloudViewMetricsAPI = (
   metricsRequest?: any,  
 ) =>
   Request<CloudViewMetricsResponse>(
+    // setURL(
+    //   `${readApiEndpoint}/${encodeURIComponent(
+    //     serviceType!
+    //   )}/metrics`
+    // ),
+
     setURL(
-      // `https://aclp-us-ord.cloud-observability-dev.akadns.net/v1/monitor/services/${encodeURIComponent(
       `https://metrics-query.aclp.linode.com/v1/monitor/services/${encodeURIComponent(
         serviceType!
       )}/metrics`
@@ -37,9 +42,7 @@ export const getCloudViewMetricsAPI = (
     setMethod('POST'),
     setData(metricsRequest),
     setHeaders({
-      // Authorization: `Bearer ${jweToken}`,
-      // 'Authentication-type' : "jwe"
-      Authorization: `${jweToken}`,
+      Authorization: `Bearer ${jweToken}`,
       'Authentication-type': 'jwe',
     })
   );

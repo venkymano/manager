@@ -68,7 +68,7 @@ export interface CloudViewMetricsRequest {
   counter: number;
   startTime: number;
   endTime: number;
-  resource_id: number[];
+  resource_ids: number[];
 }
 
 export interface CloudViewMetricsResponse {
