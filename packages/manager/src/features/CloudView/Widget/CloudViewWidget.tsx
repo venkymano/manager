@@ -1,13 +1,11 @@
 import {
   AvailableMetrics,
-  CloudViewMetricsRequest,
   Filters,
   TimeDuration,
   TimeGranularity,
   Widgets,
 } from '@linode/api-v4';
 import { Paper, Theme } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 import React from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -23,6 +21,9 @@ import { isToday as _isToday } from 'src/utilities/isToday';
 import { roundTo } from 'src/utilities/roundTo';
 import { getMetrics } from 'src/utilities/statMetrics';
 
+import CloudPulseCustomSelect, {
+  CloudPulseSelectTypes,
+} from '../shared/CloudPulseCustomSelect';
 import {
   AGGREGATE_FUNCTION,
   SIZE,
@@ -58,6 +59,7 @@ export interface CloudViewWidgetProperties {
   availableMetrics: AvailableMetrics | undefined;
   duration: TimeDuration;
   errorLabel?: string; // error label can come from dashboard
+  globalFilters?: CloudPulseWidgetFilters[];
   // any change in the current widget, call and pass this function and handle in parent component
   handleWidgetChange: (widget: Widgets) => void;
 
@@ -71,13 +73,11 @@ export interface CloudViewWidgetProperties {
   widget: Widgets; // this comes from dashboard, has inbuilt metrics, agg_func,group_by,filters,gridsize etc , also helpful in publishing any changes
 }
 
-const StyledZoomIcon = styled(ZoomIcon, {
-  label: 'StyledZoomIcon',
-})({
-  display: 'inline-block',
-  marginLeft: '10px',
-  marginTop: '10px',
-});
+export interface CloudPulseWidgetFilters {
+  filterKey: string;
+  filterValue: any;
+  isDimensionFilter: boolean;
+}
 
 const useStyles = makeStyles()((theme: Theme) => ({
   title: {
@@ -118,8 +118,8 @@ export const CloudViewWidget = React.memo(
 
     const [currentUnit, setCurrentUnit] = React.useState<any>();
 
-    const getCloudViewMetricsRequest = (): CloudViewMetricsRequest => {
-      const request = {} as CloudViewMetricsRequest;
+    const getCloudViewMetricsRequestFromFilter = (): any => {
+      const request: { [key: string]: any } = {};
       request.aggregate_function = widget.aggregate_function;
       request.group_by = widget.group_by;
       if (props && props.resources) {
@@ -130,16 +130,46 @@ export const CloudViewWidget = React.memo(
         );
       }
       request.metric = widget.metric!;
-      request.relative_time_duration = props.duration
-        ? props.duration!
-        : widget.time_duration;
-      request.time_granularity =
-        widget.time_granularity.unit === 'Auto'
-          ? undefined
-          : {
-              unit: widget.time_granularity.unit,
-              value: widget.time_granularity.value,
-            };
+      request.time_granularity = {
+        unit: widget.time_granularity.unit,
+        value: widget.time_granularity.value,
+      };
+
+      if (props.globalFilters) {
+        for (
+          let i = 0;
+          props.globalFilters && i < props.globalFilters?.length;
+          i++
+        ) {
+          if (!props.globalFilters[i].isDimensionFilter) {
+            request[props.globalFilters[i].filterKey] =
+              props.globalFilters[i].filterValue;
+          } else {
+            request['filters'] = request['filters'] ?? [];
+            request['filters'].push({
+              key: props.globalFilters[i].filterKey,
+              operator: Array.isArray(props.globalFilters[i].filterValue)
+                ? 'in'
+                : 'eq',
+              value: Array.isArray(props.globalFilters[i].filterValue)
+                ? props.globalFilters[i].filterValue.join(',')
+                : props.globalFilters[i].filterValue,
+            });
+          }
+        }
+      }
+
+      // check hybrid
+      if (!request['resource_id']) {
+        request['resource_id'] = props.resourceIds;
+      }
+
+      if (!request['relative_time_duration']) {
+        request['relative_time_duration'] = props.duration;
+      }
+
+      // any other filters apart from above two should come in globalFiltersProp
+
       return request;
     };
 
@@ -181,7 +211,7 @@ export const CloudViewWidget = React.memo(
       status,
     } = useCloudViewMetricsQuery(
       getServiceType()!,
-      getCloudViewMetricsRequest(),
+      getCloudViewMetricsRequestFromFilter(),
       props,
       widget.aggregate_function +
         '_' +
@@ -193,7 +223,7 @@ export const CloudViewWidget = React.memo(
         '_' +
         widget.label +
         '_' +
-        props.timeStamp ?? '',
+        props.timeStamp ?? '' + '_' + props.globalFilters,
       flags != undefined,
       flags.aclpReadEndpoint!
     ); // fetch the metrics on any property change
@@ -227,6 +257,15 @@ export const CloudViewWidget = React.memo(
       // for now , lets stick with the default theme
       // colors = COLOR_MAP.get('default')!;
 
+      const startEnd = convertTimeDurationToStartAndEndTimeRange(
+        props!.duration! ??
+          props.globalFilters?.find(
+            (filterValue) => filterValue.filterKey == 'relative_time_duration'
+          )?.filterValue
+      );
+
+      setToday(_isToday(startEnd.start, startEnd.end));
+
       if (
         status == 'success' &&
         metricsList.data &&
@@ -234,7 +273,7 @@ export const CloudViewWidget = React.memo(
       ) {
         let index = 0;
 
-        metricsList.data.result.forEach((graphData) => {
+        metricsList.data.result.forEach((graphData: any) => {
           // todo, move it to utils at a widget level
           if (!graphData) {
             return;
@@ -269,7 +308,6 @@ export const CloudViewWidget = React.memo(
           legendRowsData.push(legendRow);
           dimensions.push(dimension);
           index = index + 1;
-          setToday(_isToday(startEnd.start, startEnd.end));
         });
 
         generateMaxUnit(dimensions, legendRowsData);
@@ -364,6 +402,17 @@ export const CloudViewWidget = React.memo(
       }
     }, []);
     return (
+      // <Grid
+      //   sx={{
+      //     alignItems: 'center',
+      //     columnGap: 0.2,
+      //     direction: 'column',
+      //     flexWrap: 'nowrap',
+      //   }}
+      //   container
+      //   lg={widget.size}
+      //   xs={6}
+      // >
       <Grid xs={widget.size}>
         <Paper
           style={{
@@ -416,10 +465,20 @@ export const CloudViewWidget = React.memo(
                     />
                   )}
               </Grid>
-              <StyledZoomIcon
-                handleZoomToggle={handleZoomToggle}
-                zoomIn={widget?.size == 12 ? true : false}
-              />
+              <Grid
+                sx={{
+                  marginLeft: 1,
+                  marginTop: 1.5,
+                }}
+                // lg="auto" // }}
+                // xs="auto"
+              >
+                <ZoomIcon
+                  handleZoomToggle={handleZoomToggle}
+                  zoomIn={widget?.size == 12 ? true : false}
+                />
+              </Grid>
+              {/* </Grid> */}
             </div>
             <Divider spacingBottom={32} spacingTop={15} />
             {!(

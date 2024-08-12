@@ -7,3 +7,5 @@ export * from './services';
 export * from './dashboards';
 
 export * from './metrics';
+
+export * from './customfilters';

@@ -15,7 +15,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     position: 'absolute',
     top: '45%',
     transform: 'translate(-50%, -50%)',
-  }
+  },
 }));
 
 export interface CloudViewLineGraphProps extends LineGraphProps {
@@ -43,23 +43,20 @@ export const CloudViewLineGraph = React.memo(
       : undefined;
 
     return (
-      <React.Fragment>
-
-        <div style={{ position: 'relative' }}>
-          {error ? (
-            <div style={{ height: props.chartHeight || '300px' }}>
-              <ErrorState errorText={error} />
-            </div>
-          ) : (
-            <LineGraph
-              {...rest}
-              ariaLabel={ariaLabel!}
-              legendRows={props.legendRows}
-            />
-          )}
-          {message && <div className={classes.message}>{message}</div>}
-        </div>
-      </React.Fragment>
+      <div style={{ position: 'relative' }}>
+        {error ? (
+          <div style={{ height: props.chartHeight || '300px' }}>
+            <ErrorState errorText={error} />
+          </div>
+        ) : (
+          <LineGraph
+            {...rest}
+            ariaLabel={ariaLabel!}
+            legendRows={props.legendRows}
+          />
+        )}
+        {message && <div className={classes.message}>{message}</div>}
+      </div>
     );
   }
 );

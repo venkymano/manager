@@ -24,6 +24,7 @@ import { useGetCloudViewMetricDefinitionsByServiceType } from 'src/queries/cloud
 import { removeObjectReference } from '../Utils/CloudPulseUtils';
 import { fetchUserPrefObject } from '../Utils/UserPreference';
 import {
+  CloudPulseWidgetFilters,
   CloudViewWidget,
   CloudViewWidgetProperties,
 } from '../Widget/CloudViewWidget';
@@ -37,10 +38,10 @@ export interface DashboardProperties {
   dashboardId: number; // need to pass the dashboardId
   duration: TimeDuration;
 
+  globalFilters?: CloudPulseWidgetFilters[];
   manualRefreshTimeStamp?: number | undefined;
   // on any change in dashboard
   onDashboardChange?: (dashboard: Dashboard) => void;
-  region?: string;
   resources: string[];
   // widgetPreferences?: AclpWidget[]; // this is optional
   savePref?: boolean | undefined;
@@ -63,7 +64,6 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   const {
     data: dashboard,
     isError: isDashboardFetchError,
-    isSuccess: isDashboardSuccess,
   } = useCloudViewDashboardByIdQuery(props.dashboardId!, props.savePref);
 
   const { data: resources } = useResourcesQuery(
@@ -115,6 +115,24 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
     return <ErrorState errorText={'Error loading metric definitions'} />;
   }
 
+  if (isDashboardFetchError) {
+    return (
+      <Paper style={{ height: '100%' }}>
+        <StyledErrorState title="Failed to get Dashboard Details" />
+      </Paper>
+    );
+  }
+
+  if (!props.globalFilters && !props.resources) {
+    return (
+      <ErrorState
+        errorText={
+          'Either pass Filters or pass Resources and Duration directly'
+        }
+      />
+    );
+  }
+
   const getCloudViewGraphProperties = (widget: Widgets) => {
     const graphProp: CloudViewWidgetProperties = {} as CloudViewWidgetProperties;
     graphProp.widget = { ...widget };
@@ -153,7 +171,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   };
 
   const handleWidgetChange = (widget: Widgets) => {
-    if (dashboard && props.onDashboardChange) {
+    if (dashboard) {
       const dashboardObj = { ...dashboardRef.current } as Dashboard;
 
       if (dashboardObj) {
@@ -163,7 +181,11 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
 
         dashboardObj.widgets![index] = { ...widget };
 
-        props.onDashboardChange({ ...dashboardObj });
+        dashboardRef.current = { ...dashboardObj };
+
+        if (props.onDashboardChange) {
+          props.onDashboardChange({ ...dashboardObj });
+        }
       }
     }
   };
@@ -174,25 +196,36 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
     return index < 0 ? all_interval_options[0] : all_interval_options[index];
   };
 
+  const checkIfResourcesAvailable = () => {
+    if (props.globalFilters && props.globalFilters.length > 0) {
+      return props.globalFilters.some(
+        (filters) =>
+          filters.filterKey == 'resource_id' && filters.filterValue.length > 0
+      );
+    }
+    return false;
+  };
+
   const RenderWidgets = () => {
     if (dashboard != undefined) {
       if (
         dashboard.service_type &&
-        props.resources &&
-        props.resources.length > 0 &&
+        ((props.resources && props.resources.length > 0) ||
+          checkIfResourcesAvailable()) &&
         jweToken?.token &&
         resources?.data
       ) {
         // maintain a copy
-        dashboardRef.current = removeObjectReference(dashboard);
-        const newDashboard: Dashboard = removeObjectReference(dashboard);
+        dashboardRef.current = dashboardRef.current
+          ? dashboardRef.current
+          : removeObjectReference(dashboard);
         return (
           <Grid columnSpacing={1.5} container rowSpacing={0} spacing={2}>
-            {{ ...newDashboard }.widgets.map((element, index) => {
+            {{ ...dashboardRef.current }.widgets.map((element, index) => {
               if (element) {
                 const availMetrics = metricDefinitions?.data.find(
                   (availMetrics: AvailableMetrics) =>
-                    element.label === availMetrics.label
+                    element.metric === availMetrics.metric // this should be based on widget metric
                 );
                 const cloudViewWidgetProperties = getCloudViewGraphProperties({
                   ...element,
@@ -212,6 +245,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
                     {...cloudViewWidgetProperties}
                     authToken={jweToken?.token}
                     availableMetrics={availMetrics}
+                    globalFilters={props.globalFilters}
                     handleWidgetChange={handleWidgetChange}
                     resources={resources.data}
                     savePref={props.savePref}
@@ -251,4 +285,18 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
   };
 
   return <RenderWidgets />;
-});
+}, compareProps);
+
+function compareProps(
+  oldProps: DashboardProperties,
+  newProps: DashboardProperties
+) {
+  return (
+    oldProps.dashboardId == newProps.dashboardId &&
+    oldProps.manualRefreshTimeStamp == newProps.manualRefreshTimeStamp &&
+    JSON.stringify(oldProps.resources) == JSON.stringify(newProps.resources) &&
+    JSON.stringify(oldProps.duration) == JSON.stringify(newProps.duration) &&
+    JSON.stringify(oldProps.globalFilters) ==
+      JSON.stringify(newProps.globalFilters)
+  );
+}

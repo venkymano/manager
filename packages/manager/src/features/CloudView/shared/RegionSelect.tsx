@@ -10,9 +10,12 @@ import {
   fetchUserPrefObject,
   updateGlobalFilterPreference,
 } from '../Utils/UserPreference';
+import { Box } from '@mui/material';
 
 export interface CloudViewRegionSelectProps {
   handleRegionChange: (region: string | undefined) => void;
+  placeholder?: string;
+  savePreferences: boolean;
   selectedDashboard?: Dashboard;
 }
 
@@ -21,6 +24,9 @@ export const CloudViewRegionSelect = React.memo(
     const { data: regions } = useRegionsQuery();
 
     const getPrefferedRegion = () => {
+      if (!props.savePreferences) {
+        return undefined;
+      }
       const defaultValue = fetchUserPrefObject()?.region;
       props.handleRegionChange(defaultValue);
 
@@ -35,6 +41,7 @@ export const CloudViewRegionSelect = React.memo(
           handleSelection={(value) => {}}
           label=""
           noMarginTop
+          placeholder={props.placeholder}
           regions={[]}
           selectedId={''}
         />
@@ -42,19 +49,29 @@ export const CloudViewRegionSelect = React.memo(
     }
 
     return (
-      <RegionSelect
+      <Box sx={{width:'95%'}}>
+          <RegionSelect
         handleSelection={(value) => {
           updateGlobalFilterPreference({ [REGION]: value, [RESOURCES]: [] });
           props.handleRegionChange(value);
         }}
         currentCapability={undefined}
-        fullWidth
         isClearable={true}
         label=""
         noMarginTop
+        placeholder={props.placeholder}
         regions={regions ? regions : []}
-        selectedId={getPrefferedRegion()!}
+        selectedId={getPrefferedRegion()!}        
       />
+      </Box>      
     );
-  }
+  },
+  compareProps
 );
+
+function compareProps(
+  oldProps: CloudViewRegionSelectProps,
+  newProps: CloudViewRegionSelectProps
+) {
+  return oldProps.selectedDashboard?.id == newProps.selectedDashboard?.id;
+}

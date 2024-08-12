@@ -1,10 +1,14 @@
-import { getLinodes, getLoadbalancers } from '@linode/api-v4';
+import { getDatabases, getLinodes, getLoadbalancers } from '@linode/api-v4';
 import { useQuery } from '@tanstack/react-query';
 
 import { queryPresets } from '../base';
 
+import { Engine } from '@linode/api-v4';
+
 import type {
   APIError,
+  Database,
+  DatabaseInstance,
   Filter,
   Linode,
   Loadbalancer,
@@ -38,6 +42,18 @@ export const useLinodeResourcesQuery = (
   );
 };
 
+export const useDBEngineResourcesQuery = (
+  runQuery: boolean,
+  filter: Filter = {},
+  params: Params = {}
+) => {
+  return useQuery<ResourcePage<DatabaseInstance>, APIError[]>(
+    [QUERY_KEY, 'paginated', params, filter],
+    () => getDatabases(params, filter),
+    { ...queryPresets.longLived, enabled: runQuery, keepPreviousData: true }
+  );
+}
+
 export const useResourcesQuery = (
   enabled: boolean,
   params: Params = {},
@@ -61,6 +77,8 @@ const callAppropriateServicesForResources = (
       return () => getLinodes(params, filter);
     case 'aclb':
       return () => getLoadbalancers(params, filter);
+    case 'dbass':
+      return () => getDatabases(params, filter);
     default:
       return () => getLinodes(params, filter);
   }

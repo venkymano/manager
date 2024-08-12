@@ -119,7 +119,6 @@ export const DashBoardLanding = () => {
             duration={timeDuration}
             manualRefreshTimeStamp={timeStamp}
             onDashboardChange={dashboardChange}
-            region={region}
             resources={resources}
             // widgetPreferences={fetchUserPrefObject().widgets}
             savePref={true}

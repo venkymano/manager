@@ -1,5 +1,3 @@
-import { Filter } from 'src/types';
-
 export interface Namespace {
   id: number;
   label: string;
@@ -62,7 +60,7 @@ export interface Filters {
 
 export interface CloudViewMetricsRequest {
   metric: string; // done
-  filters: Filter[]; // widget level
+  filters: Filters[]; // widget level
   aggregate_function: string; // come from widget
   group_by: string; // come from widget
   relative_time_duration: TimeDuration; // come from dashboard

@@ -23,7 +23,9 @@ import { Tabs } from 'src/components/Tabs/Tabs';
 import withLongviewClients, {
   Props as LongviewProps,
 } from 'src/containers/longview.container';
+import { CloudPulseDashboardWithFilters } from 'src/features/CloudView/Dashboard/CloudPulseDashboardWithFilters';
 import { CloudPulseDashboard } from 'src/features/CloudView/Dashboard/Dashboard';
+import { CloudPulseTimeRangeSelect } from 'src/features/CloudView/shared/TimeRangeSelect';
 import { useAPIRequest } from 'src/hooks/useAPIRequest';
 import { useAccountSettings } from 'src/queries/accountSettings';
 import { getAPIErrorOrDefault } from 'src/utilities/errorUtils';
@@ -73,6 +75,10 @@ export const LongviewLanding = (props: CombinedProps) => {
     {
       routeName: `${props.match.url}/cloudpulseboard`,
       title: 'Cloud Pulse Dashboard',
+    },
+    {
+      routeName: `${props.match.url}/olddashboard`,
+      title: 'Old Cloud Pulse Dashboard',
     },
   ];
 
@@ -166,14 +172,35 @@ export const LongviewLanding = (props: CombinedProps) => {
               />
             </SafeTabPanel>
             <SafeTabPanel index={2}>
-              <CloudPulseDashboard
-                duration={{
-                  unit: 'hr', 
-                  value: 24,
-                }}
-                dashboardId={1} // the id of dashboard
-                resources={['57667285', '57667325', '57667355']}
+              <CloudPulseDashboardWithFilters
+                dashboardId={1}
+                resources={[57667285, 57667325, 57667355]}
               />
+            </SafeTabPanel>
+            <SafeTabPanel index={3}>
+              <div style={{display:'flex', flexDirection:'column'}}>
+                <div style={{'marginLeft':'80%'}}>
+                <CloudPulseTimeRangeSelect
+                  handleStatsChange={() => {}}
+                  savePreferences={false}                  
+                ></CloudPulseTimeRangeSelect>
+                </div>
+                
+                <CloudPulseDashboard // there should be no validation for global filters
+                  globalFilters={[
+                    {
+                      filterKey: 'relative_time_duration',
+                      filterValue: {
+                        unit: 'day',
+                        value: 30,
+                      },
+                      isDimensionFilter: false,
+                    },
+                  ]}
+                  dashboardId={1}
+                  resources={[57667285]}
+                ></CloudPulseDashboard>
+              </div>
             </SafeTabPanel>
           </TabPanels>
         </React.Suspense>

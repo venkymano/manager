@@ -1,3 +1,7 @@
+import { StringLocale } from 'yup/lib/locale';
+
+import { CloudPulseSelectTypes } from './features/CloudView/shared/CloudPulseCustomSelect';
+
 import type { Doc } from './features/OneClickApps/types';
 import type { TPAProvider } from '@linode/api-v4/lib/profile';
 import type { NoticeVariant } from 'src/components/Notice/Notice';
@@ -47,8 +51,9 @@ type OneClickApp = Record<string, string>;
 export interface Flags {
   aclb: boolean;
   aclbFullCreateFlow: boolean;
-  aclpResourceTypeMap: CloudPulseResourceTypeMap[];
   aclpReadEndpoint: string;
+  aclpResourceTypeMap: CloudPulseResourceTypeMap[];
+  aclpServiceTypeFiltersMap: CloudPulseServiceTypeFilterMap[];
   apiMaintenance: APIMaintenance;
   cloudView: boolean;
   databaseBeta: boolean;
@@ -107,6 +112,40 @@ export interface PromotionalOffer {
 export interface CloudPulseResourceTypeMap {
   dimensionKey: string;
   serviceType: string;
+}
+
+export interface CloudPulseServiceTypeFilterMap {
+  filters: CloudPulseServiceTypeFilters[];
+  serviceType: string;
+}
+
+export interface CloudPulseServiceTypeFilters {
+  configuration: CloudPulseServiceTypeFiltersConfiguration;
+  name: string;
+}
+
+export interface CloudPulseServiceTypeFiltersConfiguration {
+  apiIdField?: string;
+  apiLabelField?: string[];
+  apiUrl?: string;
+  dependency?: string[];
+  filterKey: string;
+  filterType: string;
+  isFilterable: boolean;
+  isMetricsFilter: boolean;
+  isMultiSelect?: boolean;
+  maxSelections?: number;
+  name: string;
+  neededInServicePage: boolean;
+  options?: CloudPulseServiceTypeFiltersOptions[];
+  placeholder?: string;
+  priority: number;
+  type?: CloudPulseSelectTypes;
+}
+
+export interface CloudPulseServiceTypeFiltersOptions {
+  id: string;
+  label: string;
 }
 
 /**

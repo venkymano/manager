@@ -18,7 +18,7 @@ const fetchUserPreference = () => {
   return getUserPreferences();
 };
 
-export const fetchUserPrefObject = () => {
+export const fetchUserPrefObject: any = () => {
   return { ...userPreference };
 };
 
