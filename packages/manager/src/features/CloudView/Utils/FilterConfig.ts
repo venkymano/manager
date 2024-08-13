@@ -44,7 +44,7 @@ export const LINODE_CONFIG: CloudPulseServiceTypeFilterMap = {
     {
       configuration: {
         dependency: ['region'],
-        filterKey: 'resource_id',
+        filterKey: 'resource_ids',
         filterType: 'string',
         isFilterable: true,
         isMetricsFilter: true,
@@ -116,7 +116,7 @@ export const DBASS_CONFIG: CloudPulseServiceTypeFilterMap = {
     {
       configuration: {
         dependency: ['region', 'dbEngine'],
-        filterKey: 'resource_id',
+        filterKey: 'resource_ids',
         filterType: 'string',
         isFilterable: true,
         isMetricsFilter: true,

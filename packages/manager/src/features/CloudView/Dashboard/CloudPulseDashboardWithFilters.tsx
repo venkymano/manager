@@ -63,7 +63,7 @@ export const CloudPulseDashboardWithFilters = React.memo(
             (Array.isArray(filterValue[filterObj.configuration.filterKey])
               ? filterValue[filterObj.configuration.filterKey].length > 0
               : true)) ||
-          (filterObj.configuration.filterKey == 'resource_id' &&
+          (filterObj.configuration.filterKey == 'resource_ids' &&
             props.resources &&
             props.resources.length > 0)
       );
@@ -110,7 +110,7 @@ export const CloudPulseDashboardWithFilters = React.memo(
 
       // push passed resource
       dimensionFilters.push({
-        filterKey: 'resource_id',
+        filterKey: 'resource_ids',
         filterValue: [props.resource],
         isDimensionFilter: false,
       });

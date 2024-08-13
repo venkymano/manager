@@ -296,6 +296,9 @@ export const CloudViewWidget = React.memo(
                 : transformedData.values[transformedData.values.length - 1][0]
             ),
             label: getLabelName(transformedData.metric, getServiceType()!),
+            fill: widget.chart_type === 'area'? true :false,
+            borderColor: color,
+
           };
 
           // construct a legend row with the dimension

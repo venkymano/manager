@@ -10,7 +10,7 @@ const Components: { [key: string]: MemoExoticComponent<any> } = {
   customDropDown: CloudPulseCustomSelect,
   region: CloudViewRegionSelect,
   relative_time_duration: CloudPulseTimeRangeSelect,
-  resource_id: CloudViewMultiResourceSelect,
+  resource_ids: CloudViewMultiResourceSelect,
 };
 
 const renderComponent = (props: any) => {

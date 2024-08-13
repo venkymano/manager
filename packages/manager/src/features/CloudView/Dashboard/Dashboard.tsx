@@ -200,7 +200,7 @@ export const CloudPulseDashboard = React.memo((props: DashboardProperties) => {
     if (props.globalFilters && props.globalFilters.length > 0) {
       return props.globalFilters.some(
         (filters) =>
-          filters.filterKey == 'resource_id' && filters.filterValue.length > 0
+          filters.filterKey == 'resource_ids' && filters.filterValue.length > 0
       );
     }
     return false;

@@ -131,8 +131,8 @@ export const CloudPulseDashboardLanding = () => {
       {dashboard && checkIfAllMandatoryFiltersAreSelected() && (
         <CloudPulseDashboard
           resources={
-            filterValue['resource_id']
-              ? filterValue['resource_id'].map((obj: any) => obj.toString())
+            filterValue['resource_ids']
+              ? filterValue['resource_ids'].map((obj: any) => obj.toString())
               : undefined
           }
           dashboardId={dashboard.id}

@@ -48,19 +48,19 @@ it('test getResourceIDsPayload happy path', () => {
   };
   const result = getResourceIDsPayload(resourcesData);
 
-  expect(result.resource_id.length).toBe(3);
+  expect(result.resource_ids.length).toBe(3);
 });
 
 it('test getResourceIDsPayload undefined resources', () => {
   const result = getResourceIDsPayload(undefined);
 
-  expect(result.resource_id.length).toBe(0);
+  expect(result.resource_ids.length).toBe(0);
 });
 
 it('test getResourceIDsPayload empty resources', () => {
   const result = getResourceIDsPayload([]);
 
-  expect(result.resource_id.length).toBe(0);
+  expect(result.resource_ids.length).toBe(0);
 });
 
 it('test getDimensionName happy path', () => {

@@ -55,11 +55,11 @@ export const CloudPulseTimeRangeSelect = React.memo(
       }
 
       if (label === _PAST_7_DAYS) {
-        return { unit: 'day', value: 7 };
+        return { unit: 'days', value: 7 };
       }
 
       if (label === _PAST_30_DAYS) {
-        return { unit: 'day', value: 30 };
+        return { unit: 'days', value: 30 };
       }
 
       return { unit: 'min', value: 30 };

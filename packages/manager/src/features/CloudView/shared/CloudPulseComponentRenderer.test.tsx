@@ -42,7 +42,7 @@ describe('ComponentRenderer component tests', () => {
   }),
     it('it should render provided resource filter in props', () => {
       const resourceProps = linodeFilterConfig?.filters.find(
-        (filter) => filter.configuration.filterKey == 'resource_id'
+        (filter) => filter.configuration.filterKey == 'resource_ids'
       );
 
       const mockDashboard = {

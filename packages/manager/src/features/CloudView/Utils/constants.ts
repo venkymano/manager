@@ -20,4 +20,4 @@ export const TIME_GRANULARITY = 'timeGranularity';
 
 export const RELATIVE_TIME_DURATION = 'relative_time_duration';
 
-export const RESOURCE_ID = 'resource_id';
+export const RESOURCE_ID = 'resource_ids';
