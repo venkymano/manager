@@ -160,8 +160,8 @@ export const CloudViewWidget = React.memo(
       }
 
       // check hybrid
-      if (!request['resource_id']) {
-        request['resource_id'] = props.resourceIds;
+      if (!request['resource_ids']) {
+        request['resource_ids'] = props.resourceIds;
       }
 
       if (!request['relative_time_duration']) {
