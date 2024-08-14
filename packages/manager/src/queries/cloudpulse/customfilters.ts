@@ -3,12 +3,32 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getAll } from 'src/utilities/getAll';
 
-import type { Filter, Params } from '@linode/api-v4';
-import type { CloudPulseServiceTypeFiltersOptions } from 'src/features/CloudPulse/Utils/models';
+import type {
+  DatabaseEngine,
+  DatabaseInstance,
+  DatabaseType,
+  Filter,
+  Params,
+} from '@linode/api-v4';
+import type {
+  MutationKey,
+  QueryFunction,
+  QueryKey,
+} from '@tanstack/react-query';
+import type {
+  CloudPulseServiceTypeFiltersOptions,
+  QueryFunctionSingleType,
+  QueryFunctionType,
+} from 'src/features/CloudPulse/Utils/models';
 
-interface CustomFilterQueryProps {
+export interface CustomFilterQueryProps {
+  apiFactoryFunction?: {
+    queryFn: QueryFunction<Awaited<QueryFunctionType>>;
+    queryKey: QueryKey;
+  };
   enabled: boolean;
   filter?: Filter;
+  filterKey?: string;
   idField: string;
   labelField: string;
   params?: Params;
@@ -18,31 +38,48 @@ interface CustomFilterQueryProps {
 export const useGetCustomFiltersQuery = (
   queryProps: CustomFilterQueryProps
 ) => {
-  const { enabled, filter, idField, labelField, params, url } = queryProps;
+  const { apiFactoryFunction, enabled, idField, labelField } = queryProps;
 
   return useQuery<
-    { [key: string]: unknown }[], // the use case here is api url and api response here is not consistent across multiple service types, it can list of db engines, list of node types etc.,
+    QueryFunctionType,
     unknown,
     CloudPulseServiceTypeFiltersOptions[]
   >({
     // receive filters and  return only id and label
     enabled,
-    queryFn: () => getAllFilters(params, filter, url),
-    queryKey: [url, filter],
-    select: (filters) => {
+    ...apiFactoryFunction,
+    select: (filters: QueryFunctionType) => {
       // whatever field we receive, just return id and label
-      return filters.map(
-        (filter: {
-          [key: string]: unknown;
-        }): CloudPulseServiceTypeFiltersOptions => {
-          return {
-            id: String(filter[idField]),
-            label: String(filter[labelField]),
-          };
-        }
-      );
+      return filters
+        .filter(
+          (filter) =>
+            filter !== undefined &&
+            getStringValue(filter, idField) &&
+            getStringValue(filter, labelField)
+        )
+        .map(
+          (filter): CloudPulseServiceTypeFiltersOptions => {
+            return {
+              id: getStringValue(filter, idField) ?? '',
+              label: getStringValue(filter, labelField) ?? '',
+            };
+          }
+        );
     },
   });
+};
+
+const getStringValue = (
+  filter: QueryFunctionSingleType,
+  fieldKey: string
+): string | undefined => {
+  if (fieldKey in filter) {
+    const value = filter[fieldKey as keyof typeof filter];
+    if (value) {
+      return String(value);
+    }
+  }
+  return undefined;
 };
 
 export const getAllFilters = (

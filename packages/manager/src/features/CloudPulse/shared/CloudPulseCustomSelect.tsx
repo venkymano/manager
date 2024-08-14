@@ -12,12 +12,18 @@ import { getUserPreferenceObject as fetchUserPrefObject } from '../Utils/UserPre
 
 import type { FilterValueType } from '../Dashboard/CloudPulseDashboardLanding';
 import type { CloudPulseServiceTypeFiltersOptions } from '../Utils/models';
+import type { QueryFunction } from '@tanstack/react-query';
 
 /**
  * This is the properties requires for CloudPulseCustomSelect Components
  *
  */
 export interface CloudPulseCustomSelectProps {
+  apiFactoryFunction?: {
+    queryFn: QueryFunction<Awaited<any>, readonly [...any]>;
+    queryKey: any;
+  };
+
   /**
    * The id field of the response returned from the API
    */
@@ -64,11 +70,11 @@ export interface CloudPulseCustomSelectProps {
    * @param value - The selected filter value
    */
   handleSelectionChange: (filterKey: string, value: FilterValueType) => void;
-
   /**
    * If true, multiselect is allowed, otherwise false
    */
   isMultiSelect?: boolean;
+
   /**
    * The maximum selections that the user can make incase of multiselect
    */
@@ -103,6 +109,7 @@ export enum CloudPulseSelectTypes {
 export const CloudPulseCustomSelect = React.memo(
   (props: CloudPulseCustomSelectProps) => {
     const {
+      apiFactoryFunction,
       apiResponseIdField,
       apiResponseLabelField,
       clearSelections,
@@ -129,8 +136,9 @@ export const CloudPulseCustomSelect = React.memo(
       isError,
       isLoading,
     } = useGetCustomFiltersQuery({
+      apiFactoryFunction,
       enabled:
-        dataApiUrl !== undefined && (disabled !== undefined ? !disabled : true), // enable the query only if we have a valid api URL
+        apiFactoryFunction !== undefined && (disabled !== undefined ? !disabled : true), // enable the query only if we have a valid api URL
       filter: {},
       idField: apiResponseIdField ? apiResponseIdField : 'id',
       labelField: apiResponseLabelField ? apiResponseLabelField : 'label',
@@ -182,7 +190,7 @@ export const CloudPulseCustomSelect = React.memo(
       staticErrorText = 'Pass predefined options for static select type';
     }
 
-    if (CloudPulseSelectTypes.dynamic === type && !dataApiUrl) {
+    if (CloudPulseSelectTypes.dynamic === type && !apiFactoryFunction) {
       staticErrorText = 'Pass API Url for dynamic select type';
     }
 

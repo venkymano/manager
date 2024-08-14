@@ -1,3 +1,9 @@
+import { API_ROOT } from 'src/constants';
+import { databaseFactory } from 'src/factories';
+import { databaseQueries } from 'src/queries/databases/databases';
+import { getAllDatabases } from 'src/queries/databases/requests';
+import { linodeQueries } from 'src/queries/linodes/linodes';
+
 import { CloudPulseSelectTypes } from './models';
 
 import type { CloudPulseServiceTypeFilterMap } from './models';
@@ -46,6 +52,40 @@ export const LINODE_CONFIG: Readonly<CloudPulseServiceTypeFilterMap> = {
         priority: 3,
       },
       name: TIME_DURATION,
+    },
+    {
+      configuration: {
+        apiFactoryFunction: { ...databaseQueries.databases._ctx.all() },
+        // apiUrl: `${API_ROOT}/databases/instances`,
+        filterKey: 'clusterKey',
+        filterType: 'string',
+        isFilterable: true,
+        isMetricsFilter: false,
+        isMultiSelect: false,
+        name: 'DB Cluster',
+        neededInServicePage: true,
+        placeholder: 'Select DB Cluster',
+        priority: 3,
+        type: CloudPulseSelectTypes.dynamic,
+      },
+      name: 'DB Cluster',
+    },
+    {
+      configuration: {
+        apiFactoryFunction: { ...databaseQueries.types },
+        // apiUrl: `${API_ROOT}/databases/types`,
+        filterKey: 'cluster',
+        filterType: 'string',
+        isFilterable: true,
+        isMetricsFilter: false,
+        isMultiSelect: false,
+        name: 'DB Cluster types',
+        neededInServicePage: true,
+        placeholder: 'Select DB types',
+        priority: 3,
+        type: CloudPulseSelectTypes.dynamic,
+      },
+      name: 'DB Cluster types',
     },
   ],
   serviceType: 'linode',

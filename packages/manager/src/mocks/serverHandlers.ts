@@ -185,12 +185,12 @@ const entityTransfers = [
 ];
 
 const databases = [
-  http.get('*/databases/instances', () => {
+  http.get('*/databases/instancess', () => {
     const databases = databaseInstanceFactory.buildList(5);
     return HttpResponse.json(makeResourcePage(databases));
   }),
 
-  http.get('*/databases/types', () => {
+  http.get('*/databases/typess', () => {
     const standardTypes = [
       databaseTypeFactory.build({
         class: 'nanode',

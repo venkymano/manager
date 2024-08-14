@@ -1,3 +1,19 @@
+import { Keys } from 'react-hook-form/dist/types/path/common';
+
+import type {
+  DatabaseEngine,
+  DatabaseInstance,
+  DatabaseType,
+  Filter,
+  Linode,
+  Volume,
+} from '@linode/api-v4';
+import type {
+  MutationKey,
+  QueryFunction,
+  QueryKey,
+} from '@tanstack/react-query';
+
 /**
  * The CloudPulseServiceTypeMap has list of filters to be built for different service types like dbaas, linode etc.,The properties here are readonly as it is only for reading and can't be modified in code
  */
@@ -30,10 +46,29 @@ export interface CloudPulseServiceTypeFilters {
   name: string;
 }
 
+export type QueryFunctionType =
+  | DatabaseEngine[]
+  | DatabaseInstance[]
+  | DatabaseType[]
+  | Linode[]
+  | Volume[];
+
+export type QueryFunctionSingleType =
+  | DatabaseEngine
+  | DatabaseInstance
+  | DatabaseType
+  | Linode
+  | Volume;
+
 /**
  * CloudPulseServiceTypeFiltersConfiguration is the actual configuration of the filter component
  */
 export interface CloudPulseServiceTypeFiltersConfiguration {
+  apiFactoryFunction?: {
+    queryFn: QueryFunction<Awaited<QueryFunctionType>>;
+    queryKey: QueryKey;
+  };
+
   /**
    * This is an optional field, it is required if the filter API response doesn't have id and we need to map it from the response
    */
@@ -68,7 +103,6 @@ export interface CloudPulseServiceTypeFiltersConfiguration {
    * If this is true, we will pass the filter in the metrics api otherwise, we don't
    */
   isFilterable: boolean;
-
   /**
    * If this is true, we will pass the filter as a explicit key in the request else inside the filters object of metrics request
    */
@@ -101,6 +135,7 @@ export interface CloudPulseServiceTypeFiltersConfiguration {
    *  This controls the order of rendering the filtering componenents
    */
   priority: number;
+
   /**
    * default is predefined filters like (region, resources, timeduration) or dynamic / static
    */
