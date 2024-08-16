@@ -1,18 +1,11 @@
-import { Keys } from 'react-hook-form/dist/types/path/common';
-
 import type {
   DatabaseEngine,
   DatabaseInstance,
   DatabaseType,
-  Filter,
   Linode,
   Volume,
 } from '@linode/api-v4';
-import type {
-  MutationKey,
-  QueryFunction,
-  QueryKey,
-} from '@tanstack/react-query';
+import type { QueryFunction, QueryKey } from '@tanstack/react-query';
 
 /**
  * The CloudPulseServiceTypeMap has list of filters to be built for different service types like dbaas, linode etc.,The properties here are readonly as it is only for reading and can't be modified in code
@@ -53,12 +46,17 @@ export type QueryFunctionType =
   | Linode[]
   | Volume[];
 
-export type QueryFunctionSingleType =
-  | DatabaseEngine
-  | DatabaseInstance
-  | DatabaseType
-  | Linode
-  | Volume;
+export type QueryFunctionSingleType = SingleType<QueryFunctionType>;
+
+type SingleType<T> = T extends (infer U)[] ? U : never;
+
+export type QueryOptionMap = {
+  DatabaseEngine: DatabaseEngine[];
+  DatabaseType: DatabaseType[];
+  // Add future options here as needed
+};
+
+export type QueryFunctionTypes<T extends keyof QueryOptionMap> = QueryOptionMap[T];
 
 /**
  * CloudPulseServiceTypeFiltersConfiguration is the actual configuration of the filter component

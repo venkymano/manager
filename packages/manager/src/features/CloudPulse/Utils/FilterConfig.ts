@@ -1,8 +1,4 @@
-import { API_ROOT } from 'src/constants';
-import { databaseFactory } from 'src/factories';
 import { databaseQueries } from 'src/queries/databases/databases';
-import { getAllDatabases } from 'src/queries/databases/requests';
-import { linodeQueries } from 'src/queries/linodes/linodes';
 
 import { CloudPulseSelectTypes } from './models';
 

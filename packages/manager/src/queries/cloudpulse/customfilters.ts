@@ -3,18 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getAll } from 'src/utilities/getAll';
 
-import type {
-  DatabaseEngine,
-  DatabaseInstance,
-  DatabaseType,
-  Filter,
-  Params,
-} from '@linode/api-v4';
-import type {
-  MutationKey,
-  QueryFunction,
-  QueryKey,
-} from '@tanstack/react-query';
+import type { Filter, Params } from '@linode/api-v4';
+import type { QueryFunction, QueryKey } from '@tanstack/react-query';
 import type {
   CloudPulseServiceTypeFiltersOptions,
   QueryFunctionSingleType,
