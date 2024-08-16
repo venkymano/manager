@@ -285,9 +285,25 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
             )}
             <Typography>Filters</Typography>
         </Button>
-        <Divider sx={{marginTop:1}}></Divider>
         </Grid>
-        {showFilter && <RenderFilters />}
+        <Grid display={showFilter ? 'block' : 'none'} item xs={12}>
+          <Divider />
+        </Grid>
+        <Grid
+          columnSpacing={2}
+          container
+          display={showFilter ? 'flex' : 'none'}
+          item
+          maxHeight={'120px'}
+          mb={1}
+          overflow={'auto'}
+          px={2}
+          py={1}
+          rowGap={2}
+          xs={12}
+        >
+          <RenderFilters />
+        </Grid>
       </Grid>
     );
   },
