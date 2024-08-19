@@ -98,7 +98,6 @@ export const getCustomSelectProperties = (
   handleCustomSelectChange: (filterKey: string, value: FilterValueType) => void
 ): CloudPulseCustomSelectProps => {
   const {
-    apiFactoryFunction,
     apiIdField,
     apiLabelField,
     apiV4QueryKey,
@@ -111,7 +110,6 @@ export const getCustomSelectProperties = (
   } = props.config.configuration;
   const { dashboard, dependentFilters, isServiceAnalyticsIntegration } = props;
   return {
-    apiFactoryFunction,
     apiResponseIdField: apiIdField,
     apiResponseLabelField: apiLabelField,
     apiV4QueryKey,

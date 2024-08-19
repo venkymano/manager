@@ -4,29 +4,23 @@ import React from 'react';
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 import { useGetCustomFiltersQuery } from 'src/queries/cloudpulse/customfilters';
 
+import { getUserPreferenceObject as fetchUserPrefObject } from '../Utils/UserPreference';
 import {
   callSelectionChangeAndUpdateGlobalFilters,
   getDefaultSelectionsFromPreferences,
 } from './CloudPulseCustomSelectUtils';
-import { getUserPreferenceObject as fetchUserPrefObject } from '../Utils/UserPreference';
 
 import type { FilterValueType } from '../Dashboard/CloudPulseDashboardLanding';
 import type {
   CloudPulseServiceTypeFiltersOptions,
   QueryFunctionAndKey,
 } from '../Utils/models';
-import type { QueryFunction } from '@tanstack/react-query';
 
 /**
  * This is the properties requires for CloudPulseCustomSelect Components
  *
  */
 export interface CloudPulseCustomSelectProps {
-  apiFactoryFunction?: {
-    queryFn: QueryFunction<Awaited<any>, readonly [...any]>;
-    queryKey: any;
-  };
-
   /**
    * The id field of the response returned from the API
    */
@@ -112,7 +106,6 @@ export enum CloudPulseSelectTypes {
 export const CloudPulseCustomSelect = React.memo(
   (props: CloudPulseCustomSelectProps) => {
     const {
-      apiFactoryFunction,
       apiResponseIdField,
       apiResponseLabelField,
       apiV4QueryKey,
@@ -193,7 +186,7 @@ export const CloudPulseCustomSelect = React.memo(
       staticErrorText = 'Pass predefined options for static select type';
     }
 
-    if (CloudPulseSelectTypes.dynamic === type && !apiFactoryFunction) {
+    if (CloudPulseSelectTypes.dynamic === type && !apiV4QueryKey) {
       staticErrorText = 'Pass API Url for dynamic select type';
     }
 

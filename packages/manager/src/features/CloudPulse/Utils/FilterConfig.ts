@@ -1,4 +1,3 @@
-import { databaseQueries } from 'src/queries/databases/databases';
 
 import { CloudPulseSelectTypes } from './models';
 
@@ -48,41 +47,7 @@ export const LINODE_CONFIG: Readonly<CloudPulseServiceTypeFilterMap> = {
         priority: 3,
       },
       name: TIME_DURATION,
-    },
-    {
-      configuration: {
-        apiV4QueryKey: { ...databaseQueries.engines },
-        // apiUrl: `${API_ROOT}/databases/instances`,
-        filterKey: 'clusterKey',
-        filterType: 'string',
-        isFilterable: true,
-        isMetricsFilter: false,
-        isMultiSelect: false,
-        name: 'DB Cluster',
-        neededInServicePage: true,
-        placeholder: 'Select DB Cluster',
-        priority: 3,
-        type: CloudPulseSelectTypes.dynamic,
-      },
-      name: 'DB Cluster',
-    },
-    {
-      configuration: {
-        apiV4QueryKey: { ...databaseQueries.types },
-        // apiUrl: `${API_ROOT}/databases/types`,
-        filterKey: 'cluster',
-        filterType: 'string',
-        isFilterable: true,
-        isMetricsFilter: false,
-        isMultiSelect: false,
-        name: 'DB Cluster types',
-        neededInServicePage: true,
-        placeholder: 'Select DB types',
-        priority: 3,
-        type: CloudPulseSelectTypes.dynamic,
-      },
-      name: 'DB Cluster types',
-    },
+    }
   ],
   serviceType: 'linode',
 };
