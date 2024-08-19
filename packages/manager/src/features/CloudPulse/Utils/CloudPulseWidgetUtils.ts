@@ -12,12 +12,17 @@ import {
   seriesDataFormatter,
 } from './utils';
 
+import type { FilterValueType } from '../Dashboard/CloudPulseDashboardLanding';
 import type { CloudPulseResources } from '../shared/CloudPulseResourcesSelect';
-import type { LegendRow } from '../Widget/CloudPulseWidget';
+import type {
+  CloudPulseMetricsAdditionalFilters,
+  LegendRow,
+} from '../Widget/CloudPulseWidget';
 import type {
   CloudPulseMetricsList,
   CloudPulseMetricsRequest,
   CloudPulseMetricsResponse,
+  Filters,
   TimeDuration,
   Widgets,
 } from '@linode/api-v4';
@@ -256,6 +261,24 @@ export const getCloudPulseMetricRequest = (
             value: widget.time_granularity.value,
           },
   };
+};
+
+export const constructAdditionalRequestFilters = (
+  additionalFilters: CloudPulseMetricsAdditionalFilters[]
+): Filters[] => {
+  const filters: Filters[] = [];
+  for (const filter of additionalFilters) {
+    if (filter) {
+      filters.push({
+        key: filter.filterKey,
+        operator: Array.isArray(filter.filterValue) ? 'in' : 'eq',
+        value: Array.isArray(filter.filterValue)
+          ? Array.of(filter.filterValue).join(',')
+          : String(filter.filterValue),
+      });
+    }
+  }
+  return filters;
 };
 
 /**

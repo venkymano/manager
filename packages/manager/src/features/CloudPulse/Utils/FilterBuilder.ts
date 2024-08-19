@@ -11,6 +11,7 @@ import type {
 } from '../shared/CloudPulseResourcesSelect';
 import type { CloudPulseTimeRangeSelectProps } from '../shared/CloudPulseTimeRangeSelect';
 import type { Dashboard, Filter, TimeDuration } from '@linode/api-v4';
+import { CloudPulseMetricsAdditionalFilters } from '../Widget/CloudPulseWidget';
 
 interface CloudPulseFilterProperties {
   config: CloudPulseServiceTypeFilters;
@@ -251,4 +252,33 @@ export const checkIfAllMandatoryFiltersAreSelected = (
     const value = filterValue[filterKey];
     return value !== undefined && (!Array.isArray(value) || value.length > 0);
   });
+};
+
+
+export const getFiltersForMetricsCallFromCustomSelect = (
+  selectedFilters: {
+    [key: string]: FilterValueType;
+  },
+  serviceType: string
+): CloudPulseMetricsAdditionalFilters[] => {
+  const serviceTypeConfig = FILTER_CONFIG.get(serviceType);
+  const result: CloudPulseMetricsAdditionalFilters[] = [];
+
+  if (serviceTypeConfig) {
+    for (const filter of serviceTypeConfig.filters) {
+      const { configuration } = filter;
+      if (
+        configuration.isFilterable &&
+        selectedFilters[configuration.filterKey]
+      ) {
+        result.push({
+          filterKey: configuration.filterKey,
+          filterValue: selectedFilters[configuration.filterKey],
+          isDimensionFilter: !configuration.isMetricsFilter,
+        });
+      }
+    }
+  }
+
+  return result;
 };

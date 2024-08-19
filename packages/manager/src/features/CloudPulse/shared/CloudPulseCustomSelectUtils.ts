@@ -70,7 +70,7 @@ interface CloudPulseCustomSelectionChangeProps {
  * @param defaultSelectionProps - The props needed for getting the default selections
  * @returns
  */
-export const getDefaultSelectionsFromPreferences = (
+export const getDefaultSelectionsFromPreferencesAndPublishSelectionChanges = (
   defaultValue:
     | { [key: string]: AclpWidget }
     | number

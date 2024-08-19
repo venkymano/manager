@@ -7,7 +7,7 @@ import { useGetCustomFiltersQuery } from 'src/queries/cloudpulse/customfilters';
 import { getUserPreferenceObject as fetchUserPrefObject } from '../Utils/UserPreference';
 import {
   callSelectionChangeAndUpdateGlobalFilters,
-  getDefaultSelectionsFromPreferences,
+  getDefaultSelectionsFromPreferencesAndPublishSelectionChanges,
 } from './CloudPulseCustomSelectUtils';
 
 import type { FilterValueType } from '../Dashboard/CloudPulseDashboardLanding';
@@ -149,13 +149,16 @@ export const CloudPulseCustomSelect = React.memo(
           ? fetchUserPrefObject()[filterKey]
           : undefined;
         setResource(
-          getDefaultSelectionsFromPreferences(defaultValue, {
-            filterKey,
-            handleSelectionChange,
-            isMultiSelect: isMultiSelect ?? false,
-            options: options ?? [],
-            savePreferences: savePreferences ?? false,
-          })
+          getDefaultSelectionsFromPreferencesAndPublishSelectionChanges(
+            defaultValue,
+            {
+              filterKey,
+              handleSelectionChange,
+              isMultiSelect: isMultiSelect ?? false,
+              options: options ?? [],
+              savePreferences: savePreferences ?? false,
+            }
+          )
         );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps

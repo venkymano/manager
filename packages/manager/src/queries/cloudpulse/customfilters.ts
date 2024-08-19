@@ -53,7 +53,7 @@ export const useGetCustomFiltersQuery = (
     CloudPulseServiceTypeFiltersOptions[]
   >({
     // receive filters and  return only id and label
-    enabled,
+    enabled: enabled && apiV4QueryKey !== undefined,
     ...apiV4QueryKey,
     select: (
       filters: QueryFunctionType
