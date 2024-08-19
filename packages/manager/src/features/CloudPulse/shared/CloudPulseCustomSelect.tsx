@@ -7,11 +7,14 @@ import { useGetCustomFiltersQuery } from 'src/queries/cloudpulse/customfilters';
 import {
   callSelectionChangeAndUpdateGlobalFilters,
   getDefaultSelectionsFromPreferences,
-} from '../Utils/CustomSelectUtils';
+} from './CloudPulseCustomSelectUtils';
 import { getUserPreferenceObject as fetchUserPrefObject } from '../Utils/UserPreference';
 
 import type { FilterValueType } from '../Dashboard/CloudPulseDashboardLanding';
-import type { CloudPulseServiceTypeFiltersOptions } from '../Utils/models';
+import type {
+  CloudPulseServiceTypeFiltersOptions,
+  QueryFunctionAndKey,
+} from '../Utils/models';
 import type { QueryFunction } from '@tanstack/react-query';
 
 /**
@@ -35,14 +38,14 @@ export interface CloudPulseCustomSelectProps {
   apiResponseLabelField?: string;
 
   /**
+   * The api URL which contains the list of filters, passed when the select type is dynamic
+   */
+  apiV4QueryKey?: QueryFunctionAndKey;
+
+  /**
    * The selections to be cleared on some filter updates
    */
   clearSelections?: string[];
-
-  /**
-   * The api URL which contains the list of filters, passed when the select type is dynamic
-   */
-  dataApiUrl?: string;
 
   /**
    * This property says, whether or not to disable the selection component
@@ -112,8 +115,8 @@ export const CloudPulseCustomSelect = React.memo(
       apiFactoryFunction,
       apiResponseIdField,
       apiResponseLabelField,
+      apiV4QueryKey,
       clearSelections,
-      dataApiUrl,
       disabled,
       filterKey,
       handleSelectionChange,
@@ -136,13 +139,13 @@ export const CloudPulseCustomSelect = React.memo(
       isError,
       isLoading,
     } = useGetCustomFiltersQuery({
-      apiFactoryFunction,
+      apiV4QueryKey,
       enabled:
-        apiFactoryFunction !== undefined && (disabled !== undefined ? !disabled : true), // enable the query only if we have a valid api URL
+        apiV4QueryKey !== undefined &&
+        (disabled !== undefined ? !disabled : true), // enable the query only if we have a valid api URL
       filter: {},
       idField: apiResponseIdField ? apiResponseIdField : 'id',
       labelField: apiResponseLabelField ? apiResponseLabelField : 'label',
-      url: dataApiUrl ?? '',
     });
 
     let staticErrorText = '';
@@ -163,7 +166,7 @@ export const CloudPulseCustomSelect = React.memo(
         );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [savePreferences, options, dataApiUrl]); // only execute this use efffect one time or if savePreferences or options or dataApiUrl changes
+    }, [savePreferences, options, apiV4QueryKey]); // only execute this use efffect one time or if savePreferences or options or dataApiUrl changes
 
     const handleChange = (
       _: React.SyntheticEvent,
@@ -235,7 +238,7 @@ function compareProps(
 ): boolean {
   // these properties can be extended going forward
   const keysToCompare: (keyof CloudPulseCustomSelectProps)[] = [
-    'dataApiUrl',
+    'apiV4QueryKey',
     'disabled',
   ];
 

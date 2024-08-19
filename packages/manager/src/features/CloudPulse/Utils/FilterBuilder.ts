@@ -101,7 +101,7 @@ export const getCustomSelectProperties = (
     apiFactoryFunction,
     apiIdField,
     apiLabelField,
-    apiUrl,
+    apiV4QueryKey,
     filterKey,
     filterType,
     isMultiSelect,
@@ -114,7 +114,7 @@ export const getCustomSelectProperties = (
     apiFactoryFunction,
     apiResponseIdField: apiIdField,
     apiResponseLabelField: apiLabelField,
-    dataApiUrl: apiUrl,
+    apiV4QueryKey,
     disabled: checkIfWeNeedToDisableFilterByFilterKey(
       filterKey,
       dependentFilters ?? {},

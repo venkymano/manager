@@ -51,7 +51,7 @@ export const LINODE_CONFIG: Readonly<CloudPulseServiceTypeFilterMap> = {
     },
     {
       configuration: {
-        apiFactoryFunction: { ...databaseQueries.databases._ctx.all() },
+        apiV4QueryKey: { ...databaseQueries.engines },
         // apiUrl: `${API_ROOT}/databases/instances`,
         filterKey: 'clusterKey',
         filterType: 'string',
@@ -68,7 +68,7 @@ export const LINODE_CONFIG: Readonly<CloudPulseServiceTypeFilterMap> = {
     },
     {
       configuration: {
-        apiFactoryFunction: { ...databaseQueries.types },
+        apiV4QueryKey: { ...databaseQueries.types },
         // apiUrl: `${API_ROOT}/databases/types`,
         filterKey: 'cluster',
         filterType: 'string',
