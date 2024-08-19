@@ -1,10 +1,4 @@
-import type {
-  DatabaseEngine,
-  DatabaseInstance,
-  DatabaseType,
-  Linode,
-  Volume,
-} from '@linode/api-v4';
+import type { DatabaseEngine, DatabaseType } from '@linode/api-v4';
 import type { QueryFunction, QueryKey } from '@tanstack/react-query';
 
 /**
@@ -39,24 +33,35 @@ export interface CloudPulseServiceTypeFilters {
   name: string;
 }
 
-export type QueryFunctionType =
-  | DatabaseEngine[]
-  | DatabaseInstance[]
-  | DatabaseType[]
-  | Linode[]
-  | Volume[];
+/**
+ * As of now, the list of possible custom filters are engine, database type, this union type will be expanded if we start enhancing our custom select config
+ */
+export type QueryFunctionType = DatabaseEngine[] | DatabaseType[];
 
-export type QueryFunctionSingleType = SingleType<QueryFunctionType>;
+/**
+ * The non array types of QueryFunctionType like DatabaseEngine|DatabaseType
+ */
+export type QueryFunctionNonArrayType = SingleType<QueryFunctionType>;
 
+/**
+ * This infers the type from the QueryFunctionType and makes it a single object type, and by using this we can maintain only QueryFunctionType and NonArray Types are automatically identified
+ */
 type SingleType<T> = T extends (infer U)[] ? U : never;
 
-export type QueryOptionMap = {
-  DatabaseEngine: DatabaseEngine[];
-  DatabaseType: DatabaseType[];
-  // Add future options here as needed
-};
+/**
+ * This interface holds the query function and query key from various factories, like databaseQueries, linodeQueries etc.,
+ */
+export interface QueryFunctionAndKey {
+  /**
+   * The query function that contains actual function that calls API like getDatabaseEngines, getDatabaseTypes etc.,
+   */
+  queryFn: QueryFunction<Awaited<QueryFunctionType>>;
 
-export type QueryFunctionTypes<T extends keyof QueryOptionMap> = QueryOptionMap[T];
+  /**
+   * The actual query key defined in the factory
+   */
+  queryKey: QueryKey;
+}
 
 /**
  * CloudPulseServiceTypeFiltersConfiguration is the actual configuration of the filter component
@@ -79,8 +84,9 @@ export interface CloudPulseServiceTypeFiltersConfiguration {
 
   /**
    * This is an optional field, it is required if the type is dynamic for call the respective API to get the filters
+   * example, databaseQueries.types, databaseQueries.engines etc., makes use of existing query key and optimises cache
    */
-  apiUrl?: string;
+  apiV4QueryKey?: QueryFunctionAndKey;
 
   /**
    * This is an optional field, it is used to disable a certain filter, untill of the dependent filters are selected

@@ -1,6 +1,6 @@
-import { CloudPulseSelectTypes } from '../shared/CloudPulseCustomSelect';
-import { DASHBOARD_ID, RELATIVE_TIME_DURATION, RESOURCES } from './constants';
+import { RELATIVE_TIME_DURATION } from './constants';
 import { FILTER_CONFIG } from './FilterConfig';
+import { CloudPulseSelectTypes, type CloudPulseServiceTypeFilters } from './models';
 
 import type { FilterValueType } from '../Dashboard/CloudPulseDashboardLanding';
 import type { CloudPulseCustomSelectProps } from '../shared/CloudPulseCustomSelect';
@@ -10,7 +10,6 @@ import type {
   CloudPulseResourcesSelectProps,
 } from '../shared/CloudPulseResourcesSelect';
 import type { CloudPulseTimeRangeSelectProps } from '../shared/CloudPulseTimeRangeSelect';
-import type { CloudPulseServiceTypeFilters } from './models';
 import type { Dashboard, Filter, TimeDuration } from '@linode/api-v4';
 
 interface CloudPulseFilterProperties {
@@ -254,42 +253,4 @@ export const checkIfAllMandatoryFiltersAreSelected = (
     const value = filterValue[filterKey];
     return value !== undefined && (!Array.isArray(value) || value.length > 0);
   });
-};
-
-/**
- * This functions clears all the filters from the preferences
- *
- * @param dashboard - The current selected dashboard
- * @returns {[key:string]: number | undefined}
- */
-export const clearSelectedFiltersAndChangeDashboardId = (
-  dashboard: Dashboard
-): { [key: string]: number | undefined } => {
-  const clearKeys: { [key: string]: number | undefined } = {};
-
-  clearKeys[DASHBOARD_ID] = dashboard ? dashboard.id : undefined;
-
-  getUniqueFilterKeys().forEach((filter) => {
-    clearKeys[filter] = undefined;
-  });
-
-  clearKeys[RESOURCES] = undefined;
-
-  return clearKeys;
-};
-
-/**
- * This functions gets all the unique filter keys across filter config
- * @returns {string[]}
- */
-const getUniqueFilterKeys = (): string[] => {
-  const uniqueKeys = new Set<string>();
-
-  FILTER_CONFIG.forEach((config) => {
-    config.filters.forEach((filter) => {
-      uniqueKeys.add(filter.configuration.filterKey);
-    });
-  });
-
-  return Array.from(uniqueKeys);
 };

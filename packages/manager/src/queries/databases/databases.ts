@@ -53,9 +53,9 @@ export const databaseQueries = createQueryKeys('databases', {
   }),
   databases: {
     contextQueries: {
-      all: (filter?: Filter) => ({
-        queryFn: () => getAllDatabases(filter),
-        queryKey: [filter],
+      all: (params: Params = {}, filter: Filter = {}) => ({
+        queryFn: () => getAllDatabases(params, filter),
+        queryKey: [params, filter],
       }),
       paginated: (params: Params, filter: Filter) => ({
         queryFn: () => getDatabases(params, filter),
@@ -92,9 +92,13 @@ export const useDatabasesQuery = (params: Params, filter: Filter) =>
     refetchInterval: 20000,
   });
 
-export const useAllDatabasesQuery = (enabled: boolean = true) =>
+export const useAllDatabasesQuery = (
+  enabled: boolean = true,
+  params: Params = {},
+  filters: Filter = {}
+) =>
   useQuery<DatabaseInstance[], APIError[]>({
-    ...databaseQueries.databases._ctx.all(),
+    ...databaseQueries.databases._ctx.all(params, filters),
     enabled,
   });
 
@@ -128,7 +132,9 @@ export const useCreateDatabaseMutation = () => {
         database
       );
       // If a restricted user creates an entity, we must make sure grants are up to date.
-      queryClient.invalidateQueries(profileQueries.grants.queryKey);
+      queryClient.invalidateQueries({
+        queryKey: profileQueries.grants.queryKey,
+      });
     },
   });
 };
