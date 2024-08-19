@@ -11,6 +11,7 @@ import NullComponent from 'src/components/NullComponent';
 
 import RenderComponent from '../shared/CloudPulseComponentRenderer';
 import {
+  CUSTOM_SELECT,
   REGION,
   RELATIVE_TIME_DURATION,
   RESOURCE_ID,
@@ -187,7 +188,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
             {RenderComponent({
               componentKey:
                 filter.configuration.type !== undefined
-                  ? 'customSelect'
+                  ? CUSTOM_SELECT
                   : filter.configuration.filterKey,
               componentProps: { ...getProps(filter) },
               key: index + filter.configuration.filterKey,
