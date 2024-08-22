@@ -50,12 +50,14 @@ export const CloudPulseTimeRangeSelect = React.memo(
     >(getDefaultValue());
 
     React.useEffect(() => {
-      const item = getDefaultValue();
+      if(!selectedTimeRange) {
+        const item = getDefaultValue();
 
-      if (handleStatsChange) {
-        handleStatsChange(getTimeDurationFromTimeRange(item.value));
-      }
-      setSelectedTimeRange(item);
+        if (handleStatsChange) {
+          handleStatsChange(getTimeDurationFromTimeRange(item.value));
+        }
+        setSelectedTimeRange(item);
+      }      
     }, [handleStatsChange, getDefaultValue]);
 
     const handleChange = (item: Item<Labels, Labels>) => {
