@@ -2268,7 +2268,14 @@ export const handlers = [
 
     return HttpResponse.json(response);
   }),
-  http.get('*/v4/monitor/services/linode/dashboards', () => {
+  http.get('*/v4/monitor/services', () => {
+    const response = {
+      data: [{ service_type: 'linode' }],
+    };
+
+    return HttpResponse.json(response);
+  }),
+  http.get('*/v4/monitor/services/:serviceType/dashboards', () => {
     const response = {
       data: [
         dashboardFactory.build({
