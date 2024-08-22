@@ -210,8 +210,7 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
           icon: <Longview />,
         },
         {
-          display: 'Monitor',
-          hide: !isACLPEnabled,
+          display: 'Monitor',          
           href: '/monitor/cloudpulse',
           icon: <CloudPulse />,
           isBeta: flags.aclp?.beta,
