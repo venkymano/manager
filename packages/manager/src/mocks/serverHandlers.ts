@@ -2275,24 +2275,26 @@ export const handlers = [
 
     return HttpResponse.json(response);
   }),
-  http.get('*/monitor/services/:serviceType/dashboards', () => {
-    const response = {
-      data: [
-        dashboardFactory.build({
-          label:'Linode Dashboard',
-          service_type: 'linode'
-        }),
-        dashboardFactory.build({
-          label: 'Dbaas Dashboard',
-          service_type: 'dbaas'
-        })
-      ],
-    };
-
-    return HttpResponse.json(response);
+  http.get('*/monitor/services/:serviceType/dashboards', ({params}) => {
+    
+    if(params.serviceType === 'linode') {
+        return HttpResponse.json({
+          data: [
+            dashboardFactory.build({
+              label:'Linode Dashboard',
+              service_type: 'linode'
+            })] });
+    } else {
+      return HttpResponse.json({
+        data: [
+          dashboardFactory.build({
+            label:'Dbaas Dashboard',
+            service_type: 'dbaas'
+          })] });
+    }
   }),
 
-  http.get('*/monitor/services', (req, res, ctx) => {
+  http.get('*/monitor/services', () => {
     return HttpResponse.json({
       data: [
         {

@@ -6,7 +6,7 @@ import { Dashboard } from './types';
 export const getDashboards = (serviceType: string) =>
   Request<ResourcePage<Dashboard>>(
     setURL(
-      `https://blr-lhv95n.bangalore.corp.akamai.com:9000/v4beta/monitor/services/linode/dashboards`
+      `https://blr-lhv95n.bangalore.corp.akamai.com:9000/v4beta/monitor/services/${encodeURIComponent(serviceType)}/dashboards`
     ),
     setMethod('GET'),
     setHeaders({
