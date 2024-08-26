@@ -12,6 +12,7 @@ import {
   getCloudPulseMetricRequest,
 } from '../Utils/CloudPulseWidgetUtils';
 import { AGGREGATE_FUNCTION, SIZE, TIME_GRANULARITY } from '../Utils/constants';
+import { constructAdditionalRequestFilters } from '../Utils/FilterBuilder';
 import { convertValueToUnit, formatToolTip } from '../Utils/unitConversion';
 import {
   getUserPreferenceObject,
@@ -25,15 +26,14 @@ import { ZoomIcon } from './components/Zoomer';
 
 import type { FilterValueType } from '../Dashboard/CloudPulseDashboardLanding';
 import type { CloudPulseResources } from '../shared/CloudPulseResourcesSelect';
+import type { Widgets } from '@linode/api-v4';
 import type {
   AvailableMetrics,
   TimeDuration,
   TimeGranularity,
 } from '@linode/api-v4';
-import type { Widgets } from '@linode/api-v4';
 import type { DataSet } from 'src/components/LineGraph/LineGraph';
 import type { Metrics } from 'src/utilities/statMetrics';
-import { constructAdditionalRequestFilters } from '../Utils/FilterBuilder';
 
 export interface CloudPulseWidgetProperties {
   /**
@@ -127,6 +127,7 @@ export const CloudPulseWidget = (props: CloudPulseWidgetProperties) => {
   const [widget, setWidget] = React.useState<Widgets>({ ...props.widget });
 
   const {
+    additionalFilters,
     ariaLabel,
     authToken,
     availableMetrics,
@@ -137,10 +138,11 @@ export const CloudPulseWidget = (props: CloudPulseWidgetProperties) => {
     serviceType,
     timeStamp,
     unit,
-    additionalFilters,
   } = props;
 
   const flags = useFlags();
+
+  const jweTokenExpiryError = 'Token expired';
 
   /**
    *
@@ -274,6 +276,7 @@ export const CloudPulseWidget = (props: CloudPulseWidgetProperties) => {
       serviceType,
       status,
       unit,
+      widgetChartType: widget.chart_type,
       widgetColor: widget.color,
     });
 
@@ -338,7 +341,7 @@ export const CloudPulseWidget = (props: CloudPulseWidgetProperties) => {
 
           <CloudPulseLineGraph
             error={
-              status === 'error'
+              status === 'error' && error?.[0].reason !== jweTokenExpiryError // show the error only if the error is not related to token expiration
                 ? error?.[0]?.reason ?? 'Error while rendering graph'
                 : undefined
             }
@@ -350,7 +353,7 @@ export const CloudPulseWidget = (props: CloudPulseWidgetProperties) => {
             formatData={(data: number) => convertValueToUnit(data, currentUnit)}
             formatTooltip={(value: number) => formatToolTip(value, unit)}
             gridSize={widget.size}
-            loading={isLoading}
+            loading={isLoading || error?.[0].reason === jweTokenExpiryError} // keep loading until we fetch the refresh token
             nativeLegend
             showToday={today}
             timezone={timezone}
