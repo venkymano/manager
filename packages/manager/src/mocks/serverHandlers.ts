@@ -103,6 +103,7 @@ import type {
   CreateObjectStorageKeyPayload,
   FirewallStatus,
   NotificationType,
+  ObjectStorageEndpointTypes,
   SecurityQuestionsPayload,
   TokenRequest,
   UpdateImageRegionsPayload,
@@ -189,7 +190,7 @@ const entityTransfers = [
 
 const databases = [
   http.get('*/databases/instances', () => {
-    const databases = databaseInstanceFactory.buildList(5);
+    const databases = databaseInstanceFactory.buildList(9);
     return HttpResponse.json(makeResourcePage(databases));
   }),
 
@@ -971,9 +972,13 @@ export const handlers = [
     const pageSize = Number(url.searchParams.get('page_size') || 25);
 
     const randomBucketNumber = getRandomWholeNumber(1, 500);
+    const randomEndpointType = `E${Math.floor(
+      Math.random() * 4
+    )}` as ObjectStorageEndpointTypes;
 
     const buckets = objectStorageBucketFactoryGen2.buildList(1, {
       cluster: `${region}-1`,
+      endpoint_type: randomEndpointType,
       hostname: `obj-bucket-${randomBucketNumber}.${region}.linodeobjects.com`,
       label: `obj-bucket-${randomBucketNumber}`,
       region,
@@ -2275,22 +2280,25 @@ export const handlers = [
 
     return HttpResponse.json(response);
   }),
-  http.get('*/monitor/services/:serviceType/dashboards', ({params}) => {
-    
-    if(params.serviceType === 'linode') {
-        return HttpResponse.json({
-          data: [
-            dashboardFactory.build({
-              label:'Linode Dashboard',
-              service_type: 'linode'
-            })] });
+  http.get('*/monitor/services/:serviceType/dashboards', ({ params }) => {
+    if (params.serviceType === 'linode') {
+      return HttpResponse.json({
+        data: [
+          dashboardFactory.build({
+            label: 'Linode Dashboard',
+            service_type: 'linode',
+          }),
+        ],
+      });
     } else {
       return HttpResponse.json({
         data: [
           dashboardFactory.build({
-            label:'Dbaas Dashboard',
-            service_type: 'dbaas'
-          })] });
+            label: 'Dbaas Dashboard',
+            service_type: 'dbaas',
+          }),
+        ],
+      });
     }
   }),
 
