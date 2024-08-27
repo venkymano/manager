@@ -93,7 +93,16 @@ export const CloudPulseDashboardWithFilters = React.memo(
       );
     }, []);
 
-    const renderDashboardContent = React.useCallback(() => {
+    const renderDashboardContent = React.useCallback(() => {         
+
+      if (isError) {
+        return (
+          <ErrorState
+            errorText={`Error while loading Dashboard with Id -${dashboardId}`}
+          />
+        );
+      }
+
       if (!dashboard) {
         return <CircleProgress />;
       }
@@ -102,14 +111,6 @@ export const CloudPulseDashboardWithFilters = React.memo(
         return (
           <ErrorState
             errorText={`No Filters Configured for Service Type - ${dashboard.service_type}`}
-          />
-        );
-      }
-
-      if (isError) {
-        return (
-          <ErrorState
-            errorText={`Error while loading Dashboard with Id -${dashboardId}`}
           />
         );
       }

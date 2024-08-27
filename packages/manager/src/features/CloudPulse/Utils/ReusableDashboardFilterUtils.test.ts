@@ -2,7 +2,7 @@ import { dashboardFactory } from 'src/factories';
 
 import {
   checkMandatoryFiltersSelected,
-  constructDimesionFilters,
+  constructDimensionFilters,
   getDashboardProperties,
 } from './ReusableDashboardFilterUtils';
 
@@ -38,14 +38,15 @@ it('test checkMandatoryFiltersSelected method', () => {
   expect(result).toBe(true);
 });
 
-it('test constructDimesionFilters method', () => {
-  const result = constructDimesionFilters({
+it('test constructDimensionFilters method', () => {
+  mockDashboard.service_type = 'dbaas';
+  const result = constructDimensionFilters({
     dashboardObj: mockDashboard,
-    filterValue: { region: 'us-east' },
+    filterValue: { nodeType: 'primary' },
     resource: 1,
   });
 
   expect(result.length).toEqual(1);
-  expect(result[0].filterKey).toEqual('resource_ids');
-  expect(result[0].filterValue).toEqual([1]);
+  expect(result[0].filterKey).toEqual('nodeType');
+  expect(result[0].filterValue).toEqual('primary');
 });
