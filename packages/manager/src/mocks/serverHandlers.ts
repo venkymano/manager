@@ -2275,7 +2275,16 @@ export const handlers = [
   }),
   http.get('*/v4/monitor/services', () => {
     const response = {
-      data: [{ service_type: 'linode' }],
+      data: [
+        dashboardFactory.build({
+          label: 'Linode Dashboard',
+          service_type: 'linode',
+        }),
+        dashboardFactory.build({
+          label: 'DBaaS Dashboard',
+          service_type: 'dbaas',
+        }),
+      ],
     };
 
     return HttpResponse.json(response);
