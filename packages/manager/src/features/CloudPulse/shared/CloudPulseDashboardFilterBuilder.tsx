@@ -92,7 +92,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
         emitFilterChange(filterKey, filterValue);
         checkAndUpdateDependentFilters(filterKey, filterValue);
       },
-      []
+      [emitFilterChange, checkAndUpdateDependentFilters]
     );
 
     const handleResourceChange = React.useCallback(
@@ -102,21 +102,21 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
           resourceId.map((resource) => resource.id)
         );
       },
-      []
+      [emitFilterChangeByFilterKey]
     );
 
     const handleRegionChange = React.useCallback(
       (region: string | undefined) => {
         emitFilterChangeByFilterKey(REGION, region);
       },
-      []
+      [emitFilterChangeByFilterKey]
     );
 
     const handleCustomSelectChange = React.useCallback(
       (filterKey: string, value: FilterValueType) => {
         emitFilterChangeByFilterKey(filterKey, value);
       },
-      []
+      [emitFilterChangeByFilterKey]
     );
 
     const getProps = React.useCallback(

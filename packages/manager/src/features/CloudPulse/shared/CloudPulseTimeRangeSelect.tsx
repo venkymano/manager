@@ -50,14 +50,12 @@ export const CloudPulseTimeRangeSelect = React.memo(
     >(getDefaultValue());
 
     React.useEffect(() => {
-      if (!selectedTimeRange) {
-        const item = getDefaultValue();
+      const item = getDefaultValue();
 
-        if (handleStatsChange) {
-          handleStatsChange(getTimeDurationFromTimeRange(item.value));
-        }
-        setSelectedTimeRange(item);
+      if (handleStatsChange) {
+        handleStatsChange(getTimeDurationFromTimeRange(item.value));
       }
+      setSelectedTimeRange(item);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // need to execute only once, during mounting of this component
 
