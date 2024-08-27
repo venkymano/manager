@@ -49,7 +49,7 @@ export const getDashboardProperties = (
 
   // fill up required properties
   dashboardProps.dashboardId = dashboardObj.id;
-  dashboardProps.additionalFilters = constructDimesionFilters({
+  dashboardProps.additionalFilters = constructDimensionFilters({
     dashboardObj,
     filterValue,
     resource,
@@ -100,7 +100,8 @@ export const checkIfFilterNeededInMetricsCall = (
         (filterObj) =>
           filterObj &&
           filterObj.configuration.filterKey === filterKey &&
-          Boolean(filterObj.configuration.isFilterable) // this indicates whether we need to send this as a filter or not
+          Boolean(filterObj.configuration.isFilterable) &&
+          filterObj.configuration.neededInServicePage // this indicates whether we need to send this as a filter or not
       ) > -1
     : false;
 };
@@ -110,10 +111,10 @@ export const checkIfFilterNeededInMetricsCall = (
  * @param props The props required for constructing the dashboard properties
  * @returns Array of additional filters to be passed in the metrics api call
  */
-export const constructDimesionFilters = (
+export const constructDimensionFilters = (
   props: ReusableDashboardFilterUtilProps
 ) => {
-  const { dashboardObj, filterValue, resource } = props;
+  const { dashboardObj, filterValue } = props;
   const keys = Object.keys(filterValue);
   const dimensionFilters: CloudPulseMetricsAdditionalFilters[] = [];
   for (let i = 0; i < keys.length; i++) {
@@ -124,12 +125,6 @@ export const constructDimesionFilters = (
       });
     }
   }
-
-  // push passed resource
-  dimensionFilters.push({
-    filterKey: 'resource_ids',
-    filterValue: [resource],
-  });
 
   return dimensionFilters;
 };

@@ -2454,7 +2454,7 @@ export const handlers = [
       created: '2024-04-29T17:09:29',
       id: 1,
       label: 'Linode Service I/O Statistics',
-      service_type: 'linode',
+      service_type: 'dbaas',
       type: 'standard',
       updated: null,
       widgets: [

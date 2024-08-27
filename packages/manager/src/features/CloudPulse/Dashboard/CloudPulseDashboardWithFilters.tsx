@@ -1,4 +1,4 @@
-import { Grid, styled } from '@mui/material';
+import { Divider, Grid, styled } from '@mui/material';
 import React from 'react';
 
 import CloudPulseIcon from 'src/assets/icons/entityIcons/monitor.svg';
@@ -50,12 +50,12 @@ export const CloudPulseDashboardWithFilters = React.memo(
       value: 30,
     });
 
-    const filterReference: { [key: string]: any } = React.useRef({});
-
-    const emitFilterChange = (filterKey: string, value: any) => {
-      filterReference.current[filterKey] = value;
-      setFilterValue({ ...filterReference.current });
-    };
+    const emitFilterChange = React.useCallback(
+      (filterKey: string, value: any) => {
+        setFilterValue((prev) => ({ ...prev, [filterKey]: value }));
+      },
+      []
+    );
 
     const StyledPlaceholder = styled(Placeholder, {
       label: 'StyledPlaceholder',
@@ -63,11 +63,14 @@ export const CloudPulseDashboardWithFilters = React.memo(
       flex: 'auto',
     });
 
-    const handleTimeRangeChange = (timeDuration: TimeDuration) => {
-      setTimeDuration(timeDuration);
-    };
+    const handleTimeRangeChange = React.useCallback(
+      (timeDuration: TimeDuration) => {
+        setTimeDuration(timeDuration);
+      },
+      []
+    );
 
-    const checkIfFilterBuilderNeeded = () => {
+    const checkIfFilterBuilderNeeded = React.useCallback(() => {
       if (!dashboard) {
         return false;
       }
@@ -75,9 +78,9 @@ export const CloudPulseDashboardWithFilters = React.memo(
       return FILTER_CONFIG.get(dashboard?.service_type)?.filters.some(
         (filterObj) => filterObj.configuration.neededInServicePage
       );
-    };
+    }, [dashboard]);
 
-    const renderPlaceHolder = (subtitle: string) => {
+    const renderPlaceHolder = React.useCallback((subtitle: string) => {
       return (
         <Paper>
           <StyledPlaceholder
@@ -88,50 +91,73 @@ export const CloudPulseDashboardWithFilters = React.memo(
           />
         </Paper>
       );
-    };
+    }, []);
 
-    const RenderDashboardWithFilter = () => {
+    const renderDashboardContent = React.useCallback(() => {
       if (!dashboard) {
         return <CircleProgress />;
-      } else if (!FILTER_CONFIG.get(dashboard.service_type)) {
+      }
+
+      if (!FILTER_CONFIG.get(dashboard.service_type)) {
         return (
           <ErrorState
             errorText={`No Filters Configured for Service Type - ${dashboard.service_type}`}
-          ></ErrorState>
+          />
+        );
+      }
+
+      if (isError) {
+        return (
+          <ErrorState
+            errorText={`Error while loading Dashboard with Id -${dashboardId}`}
+          />
         );
       }
 
       return (
         <>
-          <Paper style={{ border: 'solid 1px #e3e5e8' }}>
-            <Grid container>
-              <Grid
-                item
-                lg={12}
-                sx={{ marginLeft: '70%', width: '90%' }}
-                xs={12}
-              >
-                <CloudPulseTimeRangeSelect
-                  disabled={!dashboard}
-                  handleStatsChange={handleTimeRangeChange}
-                  savePreferences={true}
-                />
-              </Grid>
-              {checkIfFilterBuilderNeeded() && (
-                <CloudPulseDashboardFilterBuilder
-                  dashboard={dashboard}
-                  emitFilterChange={emitFilterChange}
-                  isServiceAnalyticsIntegration={true}
-                />
-              )}
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Paper>
+                <Grid container gap={1}>
+                  <Grid
+                    container
+                    item
+                    justifyContent="flex-end"
+                    mt={2}
+                    px={2}
+                    rowGap={2}
+                    xs={12}
+                  >
+                    <Grid display="flex" gap={1} item md={4} sm={5} xs={12}>
+                      <CloudPulseTimeRangeSelect
+                        disabled={!dashboard}
+                        handleStatsChange={handleTimeRangeChange}
+                        savePreferences={true}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                  {checkIfFilterBuilderNeeded() && (
+                    <CloudPulseDashboardFilterBuilder
+                      dashboard={dashboard}
+                      emitFilterChange={emitFilterChange}
+                      isServiceAnalyticsIntegration={true}
+                      key="serviceIntegration"
+                    />
+                  )}
+                </Grid>
+              </Paper>
             </Grid>
-          </Paper>
+          </Grid>
           {checkMandatoryFiltersSelected({
             dashboardObj: dashboard,
             filterValue,
             resource,
             timeDuration,
-          }) && (
+          }) ? (
             <CloudPulseDashboard
               {...getDashboardProperties({
                 dashboardObj: dashboard,
@@ -140,26 +166,24 @@ export const CloudPulseDashboardWithFilters = React.memo(
                 timeDuration,
               })}
             />
+          ) : (
+            renderPlaceHolder('Mandatory Filters not Selected')
           )}
-          {!checkMandatoryFiltersSelected({
-            dashboardObj: dashboard,
-            filterValue,
-            resource,
-            timeDuration,
-          }) && renderPlaceHolder('Mandatory Filters not Selected')}
         </>
       );
-    };
-
-    if (isError) {
-      return (
-        <ErrorState
-          errorText={`Error while loading Dashboard with Id -${dashboardId}`}
-        ></ErrorState>
-      );
-    }
-
-    return <RenderDashboardWithFilter />;
+    }, [
+      dashboard,
+      isError,
+      handleTimeRangeChange,
+      checkIfFilterBuilderNeeded,
+      emitFilterChange,
+      filterValue,
+      resource,
+      timeDuration,
+      renderPlaceHolder,
+      dashboardId,
+    ]);
+    return renderDashboardContent();
   },
   compareProps
 );

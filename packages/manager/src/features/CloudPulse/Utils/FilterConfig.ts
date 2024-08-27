@@ -119,6 +119,31 @@ export const DBAAS_CONFIG: Readonly<CloudPulseServiceTypeFilterMap> = {
       },
       name: TIME_DURATION,
     },
+    {
+      configuration: {
+        filterKey: 'nodeType',
+        filterType: 'string',
+        isFilterable: true, // isFilterable -- this determines whethere you need to pass it metrics api
+        isMetricsFilter: false, // if it is false, it will go as a part of filter params, else global filter
+        isMultiSelect: false,
+        name: 'Node Type',
+        neededInServicePage: true,
+        options: [
+          {
+            id: 'primary',
+            label: 'Primary',
+          },
+          {
+            id: 'secondary',
+            label: 'Secondary',
+          },
+        ],
+        placeholder: 'Select Node Type',
+        priority: 2,
+        type: CloudPulseSelectTypes.static,
+      },
+      name: 'Node Type',
+    },
   ],
   serviceType: 'dbaas',
 };
