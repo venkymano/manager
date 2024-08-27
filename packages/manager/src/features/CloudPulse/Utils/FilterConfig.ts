@@ -113,7 +113,7 @@ export const DBAAS_CONFIG: Readonly<CloudPulseServiceTypeFilterMap> = {
         isMetricsFilter: true,
         isMultiSelect: false,
         name: TIME_DURATION,
-        neededInServicePage: true,
+        neededInServicePage: false,
         placeholder: 'Select Duration',
         priority: 4,
       },
