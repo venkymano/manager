@@ -63,16 +63,18 @@ const AlertsLanding = React.memo(() => {
         >
           <TabLinkList tabs={tabs} />
           {location.pathname === `${path}/definitions` ? (
-            <Button
-              onClick={(_) => {
-                history.push(`${path}/definitions/create`);
-              }}
-              buttonType="primary"
-              sx={{ marginRight: 2 }}
-              variant="contained"
-            >
-              Create
-            </Button>
+            <Box>
+              <Button
+                onClick={(_) => {
+                  history.push(`${path}/definitions/create`);
+                }}
+                buttonType="primary"
+                sx={{ marginRight: 2 }}
+                variant="contained"
+              >
+                Create
+              </Button>
+            </Box>
           ) : null}
         </Box>
         <Switch>

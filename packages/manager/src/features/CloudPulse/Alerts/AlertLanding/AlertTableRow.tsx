@@ -1,9 +1,12 @@
-
 import * as React from 'react';
+
+import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow';
 import { Typography } from 'src/components/Typography';
-import { ActionHandlers, AlertActionMenu } from './AlertActionMenu';
-import { TableCell } from 'src/components/TableCell';
+
+import { AlertActionMenu } from './AlertActionMenu';
+
+import type { ActionHandlers } from './AlertActionMenu';
 
 interface Props {
   alert: any;
@@ -12,10 +15,9 @@ interface Props {
 
 export const AlertTableRow = React.memo((props: Props) => {
   const { alert, handlers } = props;
-  //console.log(alert)
   return (
     <TableRow data-qa-alert-cell={alert.id} key={`alert-row-${alert.id}`}>
-      <TableCell colSpan={2}>{alert.alertName}</TableCell>
+      <TableCell colSpan={2}>{alert.name}</TableCell>
       <TableCell>{alert.serviceType}</TableCell>
       <TableCell>{alert.severity}</TableCell>
       <TableCell>
@@ -26,10 +28,7 @@ export const AlertTableRow = React.memo((props: Props) => {
       <TableCell>{alert.lastModified}</TableCell>
       <TableCell>{alert.createdBy}</TableCell>
       <TableCell actionCell>
-        <AlertActionMenu
-          handlers={handlers}
-          alert={alert}
-        />
+        <AlertActionMenu alert={alert} handlers={handlers} />
       </TableCell>
     </TableRow>
   );
