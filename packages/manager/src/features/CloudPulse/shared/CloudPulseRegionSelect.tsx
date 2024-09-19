@@ -37,7 +37,14 @@ export const CloudPulseRegionSelect = React.memo(
         setSelectedRegion(region);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [regions, selectedDashboard]);
+    }, [regions]);
+
+    // Once the data is loaded, set the state variable with value stored in preferences
+    React.useEffect(() => {
+      handleRegionChange(undefined);
+      setSelectedRegion(undefined);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedDashboard]);
 
     return (
       <RegionSelect
