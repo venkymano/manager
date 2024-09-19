@@ -17,7 +17,7 @@ import type { AclpWidget } from '@linode/api-v4';
 export const useAclpPreference = () => {
   const { data: preferences, isLoading } = usePreferences();
 
-  const { mutateAsync: updateFunction } = useMutatePreferences();
+  const { mutateAsync: updateFunction } = useMutatePreferences(false, true);
 
   const preferenceRef = useRef(preferences?.aclpPreference ?? {});
 
@@ -41,7 +41,11 @@ export const useAclpPreference = () => {
       };
     }
     preferenceRef.current = currentPreferences;
-    updateFunction({ aclpPreference: currentPreferences });
+    updateFunction({
+      aclpPreference: {
+        ...data,
+      },
+    });
   };
 
   /**
