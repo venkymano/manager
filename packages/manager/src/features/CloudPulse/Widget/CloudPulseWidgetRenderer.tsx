@@ -127,7 +127,7 @@ export const RenderWidgets = React.memo(
       !Boolean(resourceList?.length)
     ) {
       return renderPlaceHolder(
-        'Select Dashboard, Region and Resource to visualize metrics'
+        'Select a dashboard and filters to visualize metrics.'
       );
     }
 
