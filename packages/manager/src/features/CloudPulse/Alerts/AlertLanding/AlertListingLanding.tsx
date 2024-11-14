@@ -45,13 +45,22 @@ const alerts = [
     id: 'someID',
     lastModified: 'jan 16, 2024, 4:10 PM',
     name: 'CPU Utilization - 20%',
-    notification: {
-      templateName: 'Email-08/2024',
-      type: 'Email',
-      values: {
-        to: ['satkumar@akamai.com'],
+    notification: [
+      {
+        templateName: 'Email-08/2024',
+        type: 'Email',
+        values: {
+          to: ['satkumar@akamai.com'],
+        },
       },
-    },
+      {
+        templateName: 'Email-09/2024',
+        type: 'Email',
+        values: {
+          to: ['satkumar@akamai.com'],
+        },
+      },
+    ],
     region: 'Chennai',
     service_type: 'Linode',
     severity: '1',
@@ -99,13 +108,22 @@ const alerts = [
     id: 'someID1',
     lastModified: 'jan 16, 2024, 4:10 PM',
     name: 'CPU Utilization - 30%',
-    notification: {
-      templateName: 'Email-08/2024',
-      type: 'Email',
-      values: {
-        to: ['satkumar@akamai.com'],
+    notification: [
+      {
+        templateName: 'Email-08/2024',
+        type: 'Email',
+        values: {
+          to: ['satkumar@akamai.com'],
+        },
       },
-    },
+      {
+        templateName: 'Email-09/2024',
+        type: 'Email',
+        values: {
+          to: ['satkumar@akamai.com'],
+        },
+      },
+    ],
     region: 'Chennai',
     service_type: 'Linode',
     severity: '1',
