@@ -1,3 +1,4 @@
+import { Notice } from '@linode/ui';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 
@@ -6,7 +7,6 @@ import { CircleProgress } from 'src/components/CircleProgress';
 import { ConfirmationDialog } from 'src/components/ConfirmationDialog/ConfirmationDialog';
 import { List } from 'src/components/List';
 import { ListItem } from 'src/components/ListItem';
-import { Notice } from 'src/components/Notice/Notice';
 import { RemovableSelectionsList } from 'src/components/RemovableSelectionsList/RemovableSelectionsList';
 import { TypeToConfirmDialog } from 'src/components/TypeToConfirmDialog/TypeToConfirmDialog';
 import { Typography } from 'src/components/Typography';
@@ -43,7 +43,7 @@ export const PlacementGroupsDeleteModal = (props: Props) => {
   const { enqueueSnackbar } = useSnackbar();
   const {
     error: deletePlacementError,
-    isLoading: deletePlacementLoading,
+    isPending: deletePlacementLoading,
     mutateAsync: deletePlacementGroup,
     reset: resetDeletePlacementGroup,
   } = useDeletePlacementGroup(selectedPlacementGroup?.id ?? -1);

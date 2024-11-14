@@ -1,7 +1,7 @@
+import { Notice } from '@linode/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
 
-import { Notice } from 'src/components/Notice/Notice';
 import { TypeToConfirmDialog } from 'src/components/TypeToConfirmDialog/TypeToConfirmDialog';
 import { Typography } from 'src/components/Typography';
 import { useEventsPollingActions } from 'src/queries/events/events';
@@ -28,7 +28,7 @@ export const DeleteLinodeDialog = (props: Props) => {
     linodeId !== undefined && open
   );
 
-  const { error, isLoading, mutateAsync, reset } = useDeleteLinodeMutation(
+  const { error, isPending, mutateAsync, reset } = useDeleteLinodeMutation(
     linodeId ?? -1
   );
 
@@ -77,8 +77,8 @@ export const DeleteLinodeDialog = (props: Props) => {
         type: 'Linode',
       }}
       errors={error}
-      label={'Linode Label'}
-      loading={isLoading}
+      label="Linode Label"
+      loading={isPending}
       onClick={onDelete}
       onClose={onClose}
       open={open}

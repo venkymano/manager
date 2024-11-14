@@ -1,5 +1,7 @@
+import { IconButton, InputAdornment, Notice, Paper } from '@linode/ui';
 import CloseIcon from '@mui/icons-material/Close';
 import { useQueryClient } from '@tanstack/react-query';
+import { createLazyRoute } from '@tanstack/react-router';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -13,12 +15,8 @@ import { DocumentTitleSegment } from 'src/components/DocumentTitle';
 import { Drawer } from 'src/components/Drawer';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Hidden } from 'src/components/Hidden';
-import { IconButton } from 'src/components/IconButton';
-import { InputAdornment } from 'src/components/InputAdornment';
 import { LandingHeader } from 'src/components/LandingHeader';
-import { Notice } from 'src/components/Notice/Notice';
 import { PaginationFooter } from 'src/components/PaginationFooter/PaginationFooter';
-import { Paper } from 'src/components/Paper';
 import { Table } from 'src/components/Table';
 import { TableBody } from 'src/components/TableBody';
 import { TableCell } from 'src/components/TableCell';
@@ -47,7 +45,7 @@ import { getErrorStringOrDefault } from 'src/utilities/errorUtils';
 
 import { getEventsForImages } from '../utils';
 import { EditImageDrawer } from './EditImageDrawer';
-import { ManageImageRegionsForm } from './ImageRegions/ManageImageRegionsForm';
+import { ManageImageReplicasForm } from './ImageRegions/ManageImageRegionsForm';
 import { ImageRow } from './ImageRow';
 import { ImagesLandingEmptyState } from './ImagesLandingEmptyState';
 import { RebuildImageDrawer } from './RebuildImageDrawer';
@@ -221,8 +219,8 @@ export const ImagesLanding = () => {
   const [selectedImageId, setSelectedImageId] = React.useState<string>();
 
   const [
-    isManageRegionsDrawerOpen,
-    setIsManageRegionsDrawerOpen,
+    isManageReplicasDrawerOpen,
+    setIsManageReplicasDrawerOpen,
   ] = React.useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] = React.useState(false);
   const [isRebuildDrawerOpen, setIsRebuildDrawerOpen] = React.useState(false);
@@ -349,7 +347,7 @@ export const ImagesLanding = () => {
     onManageRegions: multiRegionsEnabled
       ? (image) => {
           setSelectedImageId(image.id);
-          setIsManageRegionsDrawerOpen(true);
+          setIsManageReplicasDrawerOpen(true);
         }
       : undefined,
     onRestore: (image) => {
@@ -373,8 +371,8 @@ export const ImagesLanding = () => {
   }
 
   if (
-    manualImages.results === 0 &&
-    automaticImages.results === 0 &&
+    manualImages?.results === 0 &&
+    automaticImages?.results === 0 &&
     !imageLabelFromParam
   ) {
     return <ImagesLandingEmptyState />;
@@ -394,7 +392,7 @@ export const ImagesLanding = () => {
           }),
         }}
         disabledCreateButton={isImagesReadOnly}
-        docsLink="https://www.linode.com/docs/platform/disk-images/linode-images/"
+        docsLink="https://techdocs.akamai.com/cloud-computing/docs/images"
         entity="Image"
         onButtonClick={() => history.push('/images/create')}
         title="Images"
@@ -430,7 +428,8 @@ export const ImagesLanding = () => {
           <Typography variant="h3">Custom Images</Typography>
           <Typography className={classes.imageTableSubheader}>
             These are images you manually uploaded or captured from an existing
-            Linode disk.
+            compute instance disk. You can deploy an image to a compute instance
+            in any region.
           </Typography>
         </div>
         <Table>
@@ -448,14 +447,14 @@ export const ImagesLanding = () => {
                 <TableCell>Status</TableCell>
               </Hidden>
               {multiRegionsEnabled && (
-                <>
-                  <Hidden smDown>
-                    <TableCell>Region(s)</TableCell>
-                  </Hidden>
-                  <Hidden smDown>
-                    <TableCell>Compatibility</TableCell>
-                  </Hidden>
-                </>
+                <Hidden smDown>
+                  <TableCell>Replicated in</TableCell>
+                </Hidden>
+              )}
+              {multiRegionsEnabled && !flags.imageServiceGen2Ga && (
+                <Hidden smDown>
+                  <TableCell>Compatibility</TableCell>
+                </Hidden>
               )}
               <TableSortCell
                 active={manualImagesOrderBy === 'size'}
@@ -463,11 +462,11 @@ export const ImagesLanding = () => {
                 handleClick={handleManualImagesOrderChange}
                 label="size"
               >
-                Size
+                {multiRegionsEnabled ? 'Original Image' : 'Size'}
               </TableSortCell>
               {multiRegionsEnabled && (
                 <Hidden mdDown>
-                  <TableCell>Total Size</TableCell>
+                  <TableCell>All Replicas</TableCell>
                 </Hidden>
               )}
               <Hidden mdDown>
@@ -489,13 +488,13 @@ export const ImagesLanding = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {manualImages.results === 0 && (
+            {manualImages?.results === 0 && (
               <TableRowEmpty
                 colSpan={9}
                 message={`No Custom Images to display.`}
               />
             )}
-            {manualImages.data.map((manualImage) => (
+            {manualImages?.data.map((manualImage) => (
               <ImageRow
                 event={manualImagesEvents[manualImage.id]}
                 handlers={handlers}
@@ -562,13 +561,13 @@ export const ImagesLanding = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {automaticImages.results === 0 && (
+            {automaticImages?.results === 0 && (
               <TableRowEmpty
                 colSpan={6}
                 message={`No Recovery Images to display.`}
               />
             )}
-            {automaticImages.data.map((automaticImage) => (
+            {automaticImages?.data.map((automaticImage) => (
               <ImageRow
                 event={automaticImagesEvents[automaticImage.id]}
                 handlers={handlers}
@@ -598,13 +597,13 @@ export const ImagesLanding = () => {
         open={isRebuildDrawerOpen}
       />
       <Drawer
-        onClose={() => setIsManageRegionsDrawerOpen(false)}
-        open={isManageRegionsDrawerOpen}
-        title={`Manage Regions for ${selectedImage?.label}`}
+        onClose={() => setIsManageReplicasDrawerOpen(false)}
+        open={isManageReplicasDrawerOpen}
+        title={`Manage Replicas for ${selectedImage?.label}`}
       >
-        <ManageImageRegionsForm
+        <ManageImageReplicasForm
           image={selectedImage}
-          onClose={() => setIsManageRegionsDrawerOpen(false)}
+          onClose={() => setIsManageReplicasDrawerOpen(false)}
         />
       </Drawer>
       <ConfirmationDialog
@@ -638,5 +637,9 @@ export const ImagesLanding = () => {
     </React.Fragment>
   );
 };
+
+export const imagesLandingLazyRoute = createLazyRoute('/images')({
+  component: ImagesLanding,
+});
 
 export default ImagesLanding;

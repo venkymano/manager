@@ -1,3 +1,9 @@
+export type AlertSeverityType = 0 | 1 | 2 | 3 | null;
+type MetricAggregationType = 'avg' | 'sum' | 'min' | 'max' | 'count';
+type MetricOperatorType = 'eq' | 'gt' | 'lt' | 'gte' | 'lte';
+type DimensionFilterOperatorType = 'eq' | 'neq' | 'startswith' | 'endswith';
+type AlertDefinitionType = 'default' | 'custom';
+type AlertStatusType = 'enabled' | 'disabled';
 export interface Dashboard {
   id: number;
   label: string;
@@ -11,6 +17,7 @@ export interface Dashboard {
 export interface TimeGranularity {
   unit: string;
   value: number;
+  label?: string;
 }
 
 export interface TimeDuration {
@@ -44,13 +51,19 @@ export interface Filters {
   value: string;
 }
 
+export type FilterValue =
+  | number
+  | string
+  | string[]
+  | number[]
+  | WidgetFilterValue
+  | undefined;
+
+type WidgetFilterValue = { [key: string]: AclpWidget };
+
 export interface AclpConfig {
-  dashboardId: number;
-  interval: string;
-  region: string;
-  resources: string[];
-  timeDuration: string;
-  widgets: { [label: string]: AclpWidget };
+  [key: string]: FilterValue;
+  widgets?: WidgetFilterValue;
 }
 
 export interface AclpWidget {
@@ -95,7 +108,7 @@ export interface CloudPulseMetricsRequest {
   group_by: string;
   relative_time_duration: TimeDuration;
   time_granularity: TimeGranularity | undefined;
-  resource_id: number[];
+  resource_ids: number[];
 }
 
 export interface CloudPulseMetricsResponse {
@@ -117,79 +130,72 @@ export interface CloudPulseMetricsList {
   values: [number, string][];
 }
 
+export interface ServiceTypes {
+  service_type: string;
+  label: string;
+}
+
+export interface ServiceTypesList {
+  data: ServiceTypes[];
+}
+
 export interface CreateAlertDefinitionPayload {
-  name: string | null;
-  region: string | null;
-  description?: string | null;
-  service_type: string | null;
-  engineOption: string | null;
-  resource_ids: string[];
-  severity: string;
-  criteria: MetricCriteria[];
+  label: string;
+  description?: string;
+  resource_ids?: string[];
+  severity: AlertSeverityType;
+  rule_criteria: {
+    rules: MetricCriteria[];
+  };
   triggerCondition: TriggerCondition;
-  sink_ids: string[];
+  channel_ids: number[];
+}
+export interface CreateAlertDefinitionForm
+  extends CreateAlertDefinitionPayload {
+  region: string;
+  service_type: string;
+  engine_type: string;
 }
 export interface MetricCriteria {
   metric: string;
-  aggregation_type: string;
-  operator: string;
+  aggregation_type: MetricAggregationType | '';
+  operator: MetricOperatorType | '';
   value: number;
-  dimension_filters: {
-    dimension_label: string;
-    operator: string;
-    value: string;
-  }[];
+  dimension_filters: DimensionFilter[];
+}
+
+export interface DimensionFilter {
+  dimension_label: string;
+  operator: DimensionFilterOperatorType | '';
+  value: string;
 }
 
 export interface TriggerCondition {
-  criteria_condition: string;
-  polling_interval_seconds: string;
-  evaluation_period_seconds: string;
+  polling_interval_seconds: number;
+  evaluation_period_seconds: number;
   trigger_occurrences: number;
 }
 export interface Alert {
   id: number;
-  name: string;
+  label: string;
   description: string;
-  status: string;
-  severity: string;
+  status: AlertStatusType;
+  type: AlertDefinitionType;
+  severity: AlertSeverityType;
   service_type: string;
   resource_ids: string[];
-  criteria: MetricCriteria[];
+  rule_criteria: {
+    rules: MetricCriteria[];
+  };
   triggerCondition: TriggerCondition;
-  notification: {
-    notification_id: string;
-    template_name: string;
+  channels: {
+    id: string;
+    label: string;
+    url: string;
+    type: 'channel';
   }[];
   created_by: string;
   updated_by: string;
   created: string;
   updated: string;
-}
-
-
-export interface ServiceTypes {
-  data: Services[];
-}
-export interface Services {
-  service_type: string;
-}
-export interface MetricDefinitions {
-  data: AvailableMetrics[];
-}
-
-export interface AvailableMetrics {
-  label: string;
-  metric: string;
-  metric_type: string;
-  unit: string;
-  scrape_interval: string;
-  available_aggregate_functions: string[];
-  dimensions: Dimension[];
-}
-
-export interface Dimension {
-  label: string;
-  dim_label: string;
-  values: string[];
 }

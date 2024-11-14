@@ -1,16 +1,16 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { uploadAttachment } from '@linode/api-v4/lib/support';
+import { Box, Notice } from '@linode/ui';
 import { update } from 'ramda';
 import * as React from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useLocation } from 'react-router-dom';
 import { debounce } from 'throttle-debounce';
-import { makeStyles } from 'tss-react/mui';
 
 import { Accordion } from 'src/components/Accordion';
 import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 import { Dialog } from 'src/components/Dialog/Dialog';
-import { Notice } from 'src/components/Notice/Notice';
 import { TextField } from 'src/components/TextField';
 import { Typography } from 'src/components/Typography';
 import { useCreateSupportTicketMutation } from 'src/queries/support';
@@ -40,29 +40,10 @@ import type { FileAttachment } from '../index';
 import type { AttachmentError } from '../SupportTicketDetail/SupportTicketDetail';
 import type { AccountLimitCustomFields } from './SupportTicketAccountLimitFields';
 import type { SMTPCustomFields } from './SupportTicketSMTPFields';
+import type { CreateKubeClusterPayload } from '@linode/api-v4';
 import type { TicketSeverity } from '@linode/api-v4/lib/support';
-import type { Theme } from '@mui/material/styles';
+import type { CreateLinodeRequest } from '@linode/api-v4/src/linodes/types';
 import type { EntityForTicketDetails } from 'src/components/SupportLink/SupportLink';
-
-const useStyles = makeStyles()((theme: Theme) => ({
-  expPanelSummary: {
-    backgroundColor: theme.name === 'dark' ? theme.bg.main : theme.bg.white,
-    borderTop: `1px solid ${theme.bg.main}`,
-    paddingTop: theme.spacing(1),
-  },
-  innerReply: {
-    '& div[role="tablist"]': {
-      marginBottom: theme.spacing(),
-      marginTop: theme.spacing(),
-    },
-    padding: 0,
-  },
-  rootReply: {
-    marginBottom: theme.spacing(2),
-    marginTop: theme.spacing(2),
-    padding: 0,
-  },
-}));
 
 interface Accumulator {
   errors: AttachmentError[];
@@ -75,6 +56,7 @@ interface AttachmentWithTarget {
 }
 
 export type EntityType =
+  | 'bucket'
   | 'database_id'
   | 'domain_id'
   | 'firewall_id'
@@ -91,6 +73,10 @@ export type TicketType = 'accountLimit' | 'general' | 'smtp';
 export type AllSupportTicketFormFields = SupportTicketFormFields &
   SMTPCustomFields &
   AccountLimitCustomFields;
+
+export type FormPayloadValues =
+  | Partial<CreateKubeClusterPayload>
+  | Partial<CreateLinodeRequest>;
 
 export interface TicketTypeData {
   dialogTitle: string;
@@ -146,33 +132,48 @@ export const SupportTicketDialog = (props: SupportTicketDialogProps) => {
     prefilledTitle,
   } = props;
 
+  const location = useLocation<any>();
+  const stateParams = location.state;
+
+  // Collect prefilled data from props or Link parameters.
+  const _prefilledDescription: string =
+    prefilledDescription ?? stateParams?.description ?? undefined;
+  const _prefilledEntity: EntityForTicketDetails =
+    prefilledEntity ?? stateParams?.entity ?? undefined;
+  const _prefilledTitle: string =
+    prefilledTitle ?? stateParams?.title ?? undefined;
+  const prefilledFormPayloadValues: FormPayloadValues =
+    stateParams?.formPayloadValues ?? undefined;
+  const _prefilledTicketType: TicketType =
+    prefilledTicketType ?? stateParams?.ticketType ?? undefined;
+
+  // Use the prefilled title if one is given, otherwise, use any default prefill titles by ticket type, if extant.
+  const newPrefilledTitle = _prefilledTitle
+    ? _prefilledTitle
+    : _prefilledTicketType && TICKET_TYPE_MAP[_prefilledTicketType]
+    ? TICKET_TYPE_MAP[_prefilledTicketType].ticketTitle
+    : undefined;
+
   const formContainerRef = React.useRef<HTMLFormElement>(null);
 
   const hasSeverityCapability = useTicketSeverityCapability();
 
   const valuesFromStorage = storage.supportTicket.get();
 
-  // Use a prefilled title if one is given, otherwise, use any default prefill titles by ticket type, if extant.
-  const _prefilledTitle = prefilledTitle
-    ? prefilledTitle
-    : prefilledTicketType && TICKET_TYPE_MAP[prefilledTicketType]
-    ? TICKET_TYPE_MAP[prefilledTicketType].ticketTitle
-    : undefined;
-
   // Ticket information
   const form = useForm<SupportTicketFormFields>({
     defaultValues: {
       description: getInitialValue(
-        prefilledDescription,
+        _prefilledDescription,
         valuesFromStorage.description
       ),
-      entityId: prefilledEntity?.id ? String(prefilledEntity.id) : '',
+      entityId: _prefilledEntity?.id ? String(_prefilledEntity.id) : '',
       entityInputValue: '',
-      entityType: prefilledEntity?.type ?? 'general',
-      summary: getInitialValue(_prefilledTitle, valuesFromStorage.summary),
-      ticketType: prefilledTicketType ?? 'general',
+      entityType: _prefilledEntity?.type ?? 'general',
+      summary: getInitialValue(newPrefilledTitle, valuesFromStorage.summary),
+      ticketType: _prefilledTicketType ?? 'general',
     },
-    resolver: yupResolver(SCHEMA_MAP[prefilledTicketType ?? 'general']),
+    resolver: yupResolver(SCHEMA_MAP[_prefilledTicketType ?? 'general']),
   });
 
   const {
@@ -189,8 +190,6 @@ export const SupportTicketDialog = (props: SupportTicketDialogProps) => {
   const [files, setFiles] = React.useState<FileAttachment[]>([]);
 
   const [submitting, setSubmitting] = React.useState<boolean>(false);
-
-  const { classes } = useStyles();
 
   React.useEffect(() => {
     if (!open) {
@@ -345,12 +344,28 @@ export const SupportTicketDialog = (props: SupportTicketDialogProps) => {
     }
     setSubmitting(true);
 
-    createSupportTicket({
-      [_entityType]: Number(_entityId),
+    const baseRequestPayload = {
       description: _description,
       severity: selectedSeverity,
       summary,
-    })
+    };
+
+    let requestPayload;
+    if (entityType === 'bucket') {
+      const bucket_label = values.entityInputValue;
+      requestPayload = {
+        bucket: bucket_label,
+        region: _entityId,
+        ...baseRequestPayload,
+      };
+    } else {
+      requestPayload = {
+        [_entityType]: Number(_entityId),
+        ...baseRequestPayload,
+      };
+    }
+
+    createSupportTicket(requestPayload)
       .then((response) => {
         return response;
       })
@@ -458,32 +473,38 @@ export const SupportTicketDialog = (props: SupportTicketDialogProps) => {
             </>
           )}
           {ticketType === 'smtp' && <SupportTicketSMTPFields />}
-          {ticketType === 'accountLimit' && <SupportTicketAccountLimitFields />}
+          {ticketType === 'accountLimit' && (
+            <SupportTicketAccountLimitFields
+              prefilledFormPayloadValues={prefilledFormPayloadValues}
+            />
+          )}
           {(!ticketType || ticketType === 'general') && (
             <>
               {props.hideProductSelection ? null : (
                 <SupportTicketProductSelectionFields />
               )}
-              <Controller
-                render={({ field, fieldState }) => (
-                  <TabbedReply
-                    placeholder={
-                      "Tell us more about the trouble you're having and any steps you've already taken to resolve it."
-                    }
-                    error={fieldState.error?.message}
-                    handleChange={field.onChange}
-                    innerClass={classes.innerReply}
-                    required
-                    rootClass={classes.rootReply}
-                    value={description}
-                  />
-                )}
-                control={form.control}
-                name="description"
-              />
+              <Box mt={1}>
+                <Controller
+                  render={({ field, fieldState }) => (
+                    <TabbedReply
+                      placeholder={
+                        'Tell us more about the trouble you’re having and any steps you’ve already taken to resolve it.'
+                      }
+                      error={fieldState.error?.message}
+                      handleChange={field.onChange}
+                      required
+                      value={description}
+                    />
+                  )}
+                  control={form.control}
+                  name="description"
+                />
+              </Box>
               <Accordion
-                detailProps={{ className: classes.expPanelSummary }}
+                detailProps={{ sx: { p: 0.25 } }}
                 heading="Formatting Tips"
+                summaryProps={{ sx: { paddingX: 0.25 } }}
+                sx={(theme) => ({ mt: `${theme.spacing(0.5)} !important` })} // forcefully disable margin when accordion is expanded
               >
                 <MarkdownReference />
               </Accordion>

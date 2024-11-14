@@ -1,23 +1,25 @@
 import { fireEvent, screen } from '@testing-library/react';
 import React from 'react';
 
+import { dashboardFactory, serviceTypesFactory } from 'src/factories';
+import * as utils from 'src/features/CloudPulse/Utils/utils';
 import { renderWithTheme } from 'src/utilities/testHelpers';
 
-import { DASHBOARD_ID } from '../Utils/constants';
-import * as preferences from '../Utils/UserPreference';
 import { CloudPulseDashboardSelect } from './CloudPulseDashboardSelect';
 
 import type { CloudPulseDashboardSelectProps } from './CloudPulseDashboardSelect';
-import type { AclpConfig } from '@linode/api-v4';
 
-const dashboardLabel = 'Dashboard 1';
+const dashboardLabel = 'Factory Dashboard-1';
 const props: CloudPulseDashboardSelectProps = {
   handleDashboardChange: vi.fn(),
 };
 
 const queryMocks = vi.hoisted(() => ({
   useCloudPulseDashboardsQuery: vi.fn().mockReturnValue({}),
+  useCloudPulseServiceTypes: vi.fn().mockReturnValue({}),
 }));
+const mockDashboard = dashboardFactory.build();
+const mockServiceTypesList = serviceTypesFactory.build();
 
 vi.mock('src/queries/cloudpulse/dashboards', async () => {
   const actual = await vi.importActual('src/queries/cloudpulse/dashboards');
@@ -27,21 +29,31 @@ vi.mock('src/queries/cloudpulse/dashboards', async () => {
   };
 });
 
+vi.mock('src/queries/cloudpulse/services', async () => {
+  const actual = await vi.importActual('src/queries/cloudpulse/services');
+  return {
+    ...actual,
+    useCloudPulseServiceTypes: queryMocks.useCloudPulseServiceTypes,
+  };
+});
+
 queryMocks.useCloudPulseDashboardsQuery.mockReturnValue({
   data: {
-    data: [
-      {
-        created: '2024-04-29T17:09:29',
-        id: 1,
-        label: dashboardLabel,
-        service_type: 'linode',
-        type: 'standard',
-        updated: null,
-        widgets: {},
-      },
-    ],
+    data: [mockDashboard],
   },
   error: false,
+  isLoading: false,
+});
+
+queryMocks.useCloudPulseServiceTypes.mockReturnValue({
+  data: {
+    data: [mockServiceTypesList],
+  },
+});
+
+vi.spyOn(utils, 'getAllDashboards').mockReturnValue({
+  data: [mockDashboard],
+  error: '',
   isLoading: false,
 });
 
@@ -75,14 +87,50 @@ describe('CloudPulse Dashboard select', () => {
       );
     }),
     it('Should select the default value from preferences', () => {
-      const mockFunction = vi.spyOn(preferences, 'getUserPreferenceObject');
-      mockFunction.mockReturnValue({ [DASHBOARD_ID]: 1 } as AclpConfig);
-
-      renderWithTheme(<CloudPulseDashboardSelect {...props} />);
+      renderWithTheme(
+        <CloudPulseDashboardSelect
+          {...props}
+          defaultValue={1}
+          savePreferences
+        />
+      );
 
       expect(screen.getByRole('combobox')).toHaveAttribute(
         'value',
         dashboardLabel
       );
     });
+
+  it('Should show error message when only dashboard call fails', () => {
+    vi.spyOn(utils, 'getAllDashboards').mockReturnValue({
+      data: [],
+      error: 'some error',
+      isLoading: false,
+    });
+
+    renderWithTheme(<CloudPulseDashboardSelect {...props} savePreferences />);
+
+    expect(
+      screen.getByText('Failed to fetch the dashboards.')
+    ).toBeInTheDocument();
+  });
+  it('Should show error message when services call fails', () => {
+    queryMocks.useCloudPulseServiceTypes.mockReturnValue({
+      data: undefined,
+      error: 'an error happened',
+      isLoading: false,
+    });
+
+    vi.spyOn(utils, 'getAllDashboards').mockReturnValue({
+      data: [],
+      error: 'some error',
+      isLoading: false,
+    });
+
+    renderWithTheme(<CloudPulseDashboardSelect {...props} savePreferences />);
+
+    expect(
+      screen.getByText('Failed to fetch the services.')
+    ).toBeInTheDocument();
+  });
 });

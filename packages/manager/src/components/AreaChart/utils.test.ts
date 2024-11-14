@@ -14,7 +14,7 @@ const timestamp = 1704204000000;
 describe('getAccessibleTimestamp', () => {
   it('should return the time in a format like 10/14/2023, 9:30 AM', () => {
     expect(getAccessibleTimestamp(timestamp, 'America/New_York')).toBe(
-      '1/2/2024, 9:00\u202fAM'
+      '1/2/2024, 9:00 AM'
     );
   });
 });
@@ -22,7 +22,7 @@ describe('getAccessibleTimestamp', () => {
 describe('tooltipLabelFormatter', () => {
   it('should return the time in a format like October 14, 2023, 9:30 AM', () => {
     expect(tooltipLabelFormatter(timestamp, 'America/New_York')).toBe(
-      'Jan 2, 2024, 9:00\u202fAM'
+      'Jan 2, 2024, 9:00 AM'
     );
   });
 });
@@ -39,7 +39,8 @@ describe('humanizeLargeData', () => {
   it('should return the value as an abbreviated string if the value is >= 1000', () => {
     expect(humanizeLargeData(999)).toBe('999');
     expect(humanizeLargeData(1125)).toBe('1.1K');
-    expect(humanizeLargeData(231434)).toBe('231.4K');
+    expect(humanizeLargeData(55555)).toBe('55.6K');
+    expect(humanizeLargeData(231434)).toBe('231K');
     expect(humanizeLargeData(1010000)).toBe('1M');
     expect(humanizeLargeData(12345678900)).toBe('12.3B');
     expect(humanizeLargeData(1543212345678)).toBe('1.5T');

@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Notice } from '@linode/ui';
 import { CreateBucketSchema } from '@linode/validation';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
@@ -6,7 +7,6 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
 import { Drawer } from 'src/components/Drawer';
-import { Notice } from 'src/components/Notice/Notice';
 import { TextField } from 'src/components/TextField';
 import { EUAgreementCheckbox } from 'src/features/Account/Agreements/EUAgreementCheckbox';
 import {
@@ -63,7 +63,7 @@ export const CreateBucketDrawer = (props: Props) => {
   const isInvalidPrice =
     !objTypes || !transferTypes || isErrorTypes || isErrorTransferTypes;
 
-  const { isLoading, mutateAsync: createBucket } = useCreateBucketMutation();
+  const { isPending, mutateAsync: createBucket } = useCreateBucketMutation();
   const { data: agreements } = useAccountAgreements();
   const { mutateAsync: updateAccountAgreements } = useMutateAccountAgreements();
   const { data: accountSettings } = useAccountSettings();
@@ -200,7 +200,7 @@ export const CreateBucketDrawer = (props: Props) => {
             'data-testid': 'create-bucket-button',
             disabled: (showGDPRCheckbox && !hasSignedAgreement) || isErrorTypes,
             label: 'Create Bucket',
-            loading: isLoading || Boolean(clusterRegion?.id && isLoadingTypes),
+            loading: isPending || Boolean(clusterRegion?.id && isLoadingTypes),
             tooltipText:
               !isLoadingTypes && isInvalidPrice
                 ? PRICES_RELOAD_ERROR_NOTICE_TEXT

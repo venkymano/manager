@@ -1,5 +1,4 @@
-import { APIError } from '@linode/api-v4/lib/types';
-import { Theme } from '@mui/material/styles';
+import { Notice } from '@linode/ui';
 import { useFormik } from 'formik';
 import * as React from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -7,16 +6,21 @@ import { makeStyles } from 'tss-react/mui';
 import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
 import { Drawer } from 'src/components/Drawer';
 import { MultipleIPInput } from 'src/components/MultipleIPInput/MultipleIPInput';
-import { Notice } from 'src/components/Notice/Notice';
 import { Typography } from 'src/components/Typography';
 import { enforceIPMasks } from 'src/features/Firewalls/FirewallDetail/Rules/FirewallRuleDrawer.utils';
+import { useDatabaseMutation } from 'src/queries/databases/databases';
 import { handleAPIErrors } from 'src/utilities/formikErrorUtils';
 import {
-  ExtendedIP,
   extendedIPToString,
   ipFieldPlaceholder,
+  stringToExtendedIP,
   validateIPs,
 } from 'src/utilities/ipUtils';
+
+import type { Database, DatabaseInstance } from '@linode/api-v4';
+import type { APIError } from '@linode/api-v4/lib/types';
+import type { Theme } from '@mui/material/styles';
+import type { ExtendedIP } from 'src/utilities/ipUtils';
 
 const useStyles = makeStyles()((theme: Theme) => ({
   instructions: {
@@ -28,10 +32,9 @@ const useStyles = makeStyles()((theme: Theme) => ({
 }));
 
 interface Props {
-  allowList: ExtendedIP[];
+  database: Database | DatabaseInstance;
   onClose: () => void;
   open: boolean;
-  updateDatabase: any;
 }
 
 interface Values {
@@ -41,7 +44,7 @@ interface Values {
 type CombinedProps = Props;
 
 const AddAccessControlDrawer = (props: CombinedProps) => {
-  const { allowList, onClose, open, updateDatabase } = props;
+  const { database, onClose, open } = props;
 
   const { classes } = useStyles();
 
@@ -57,6 +60,11 @@ const AddAccessControlDrawer = (props: CombinedProps) => {
 
     setValues({ _allowList: _ipsWithMasks });
   };
+
+  const { mutateAsync: updateDatabase } = useDatabaseMutation(
+    database.engine,
+    database.id
+  );
 
   const handleUpdateAccessControlsClick = (
     { _allowList }: Values,
@@ -132,7 +140,7 @@ const AddAccessControlDrawer = (props: CombinedProps) => {
   } = useFormik({
     enableReinitialize: true,
     initialValues: {
-      _allowList: allowList,
+      _allowList: database?.allow_list?.map(stringToExtendedIP),
     },
     onSubmit: handleUpdateAccessControlsClick,
     validate: (values: Values) => onValidate(values),
@@ -182,7 +190,7 @@ const AddAccessControlDrawer = (props: CombinedProps) => {
             className={classes.ipSelect}
             forDatabaseAccessControls
             inputProps={{ autoFocus: true }}
-            ips={values._allowList}
+            ips={values._allowList!}
             onBlur={handleIPBlur}
             onChange={handleIPChange}
             placeholder={ipFieldPlaceholder}

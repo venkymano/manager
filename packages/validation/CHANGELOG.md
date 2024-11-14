@@ -1,3 +1,47 @@
+## [2024-11-12] - v0.56.0
+
+
+### Tech Stories:
+
+- Remove `@types/node` dependency ([#11157](https://github.com/linode/manager/pull/11157))
+
+## [2024-10-28] - v0.55.0
+
+
+### Added:
+
+- Validation schema for LKE ACL payload ([#10968](https://github.com/linode/manager/pull/10968))
+- `PRIVATE_IPv4_REGEX` for determining if an IPv4 address is private ([#11069](https://github.com/linode/manager/pull/11069))
+
+### Changed:
+
+- Update `nodeBalancerConfigNodeSchema` to allow any private IPv4 rather than just \`192\.168\` IPs ([#11069](https://github.com/linode/manager/pull/11069))
+
+## [2024-10-14] - v0.54.0
+
+
+### Changed:
+
+- Update validation schema to account for clearing value in ImageSelect ([#11007](https://github.com/linode/manager/pull/11007))
+
+## [2024-09-30] - v0.53.0
+
+
+### Changed:
+
+- Make `replication_type` and `replication_commit_type` optional in `databases.schema.ts` ([#10980](https://github.com/linode/manager/pull/10980))
+
+## [2024-09-03] - v0.52.0
+
+
+### Fixed:
+
+- Lack of `label` error validation for letter casing and symbols when creating Object Storage bucket ([#10842](https://github.com/linode/manager/pull/10842), [#10847](https://github.com/linode/manager/pull/10847))
+
+### Changed:
+
+- Increase block storage max volume size to 16TB ([#10865](https://github.com/linode/manager/pull/10865))
+
 ## [2024-08-05] - v0.51.0
 
 
@@ -26,7 +70,7 @@
 ### Changed:
 
 - Breaking: change Placement Group `is_strict` to `placement_group_policy` and `affinity_type` to `placement_group_type` ([#10651](https://github.com/linode/manager/pull/10651))
-  
+
 ## [2024-07-08] - v0.49.0
 
 ### Added:

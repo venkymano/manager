@@ -108,7 +108,7 @@ export interface LineGraphProps {
   /**
    * Custom styles for the table.
    */
-  sxTableStyles?: SxProps;
+  sxTableStyles?: SxProps<Theme>;
   /**
    * The suggested maximum y-axis value passed to **Chart,js**.
    */
@@ -202,6 +202,11 @@ export const LineGraph = (props: LineGraphProps) => {
       },
       legend: {
         display: _nativeLegend,
+        onClick: (_e, legendItem) => {
+          if (legendItem && legendItem.datasetIndex !== undefined) {
+            handleLegendClick(legendItem.datasetIndex); // when we click on native legend, also call the handle legend click function
+          }
+        },
         position: _nativeLegend ? 'bottom' : undefined,
       },
       maintainAspectRatio: false,
@@ -454,6 +459,8 @@ export const LineGraph = (props: LineGraphProps) => {
                               rowHeaders ? rowHeaders[idx] : undefined
                             }
                             data-qa-body-cell
+                            data-qa-graph-column-title={finalRowHeaders[i]}
+                            data-qa-graph-row-title={title}
                             key={i}
                           >
                             <Typography
@@ -515,7 +522,7 @@ export const _formatTooltip = curry(
      */
     const dataset = t?.datasetIndex ? data[t?.datasetIndex] : data[0];
     const label = dataset.label;
-    const val = t?.index ? dataset.data[t?.index][1] || 0 : 0;
+    const val = t?.index !== undefined ? dataset.data[t?.index][1] || 0 : 0; // bug, t?.index if 0, it is considered as false, so added undefined check directly
     const value = formatter ? formatter(val) : roundTo(val);
     return `${label}: ${value}${unit ? unit : ''}`;
   }

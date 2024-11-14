@@ -1,103 +1,117 @@
+import { Box } from '@linode/ui';
 import React from 'react';
 
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
-import { Box } from 'src/components/Box';
 import { Typography } from 'src/components/Typography';
 import { useCloudPulseDashboardsQuery } from 'src/queries/cloudpulse/dashboards';
+import { useCloudPulseServiceTypes } from 'src/queries/cloudpulse/services';
 
-import { DASHBOARD_ID, REGION, RESOURCES } from '../Utils/constants';
-import {
-  getUserPreferenceObject,
-  updateGlobalFilterPreference,
-} from '../Utils/UserPreference';
+import { formattedServiceTypes, getAllDashboards } from '../Utils/utils';
 
-import type { Dashboard } from '@linode/api-v4';
+import type { Dashboard, FilterValue } from '@linode/api-v4';
 
 export interface CloudPulseDashboardSelectProps {
+  defaultValue?: Partial<FilterValue>;
   handleDashboardChange: (
     dashboard: Dashboard | undefined,
-    isDefault?: boolean
+    savePref?: boolean
   ) => void;
+  savePreferences?: boolean;
 }
 
 export const CloudPulseDashboardSelect = React.memo(
   (props: CloudPulseDashboardSelectProps) => {
+    const { defaultValue, handleDashboardChange, savePreferences } = props;
+
+    const {
+      data: serviceTypesList,
+      error: serviceTypesError,
+      isLoading: serviceTypesLoading,
+    } = useCloudPulseServiceTypes(true);
+
+    const serviceTypes: string[] = formattedServiceTypes(serviceTypesList);
+    const serviceTypeMap: Map<string, string> = new Map(
+      serviceTypesList?.data.map((item) => [item.service_type, item.label])
+    );
+
     const {
       data: dashboardsList,
-      error,
-      isLoading,
-    } = useCloudPulseDashboardsQuery(true); // Fetch the list of dashboards
-
+      error: dashboardsError,
+      isLoading: dashboardsLoading,
+    } = getAllDashboards(
+      useCloudPulseDashboardsQuery(serviceTypes),
+      serviceTypes
+    );
     const [
       selectedDashboard,
       setSelectedDashboard,
     ] = React.useState<Dashboard>();
 
-    const errorText: string = error ? 'Error loading dashboards' : '';
+    const getErrorText = () => {
+      if (serviceTypesError) {
+        return 'Failed to fetch the services.';
+      }
+
+      if (dashboardsError.length > 0) {
+        return 'Failed to fetch the dashboards.';
+      }
+
+      return '';
+    };
+
+    const errorText: string = getErrorText();
 
     const placeHolder = 'Select a Dashboard';
 
     // sorts dashboards by service type. Required due to unexpected autocomplete grouping behaviour
-    const getSortedDashboardsList = (options: Dashboard[]) => {
-      return options.sort(
+    const getSortedDashboardsList = (options: Dashboard[]): Dashboard[] => {
+      return [...options].sort(
         (a, b) => -b.service_type.localeCompare(a.service_type)
       );
     };
 
     // Once the data is loaded, set the state variable with value stored in preferences
     React.useEffect(() => {
-      if (dashboardsList) {
-        const dashboardId = getUserPreferenceObject()?.dashboardId;
-
-        if (dashboardId) {
-          const dashboard = dashboardsList.data.find(
-            (obj) => obj.id === dashboardId
-          );
-          setSelectedDashboard(dashboard);
-          props.handleDashboardChange(dashboard, true);
-        } else {
-          props.handleDashboardChange(undefined, true);
-        }
+      // only call this code when the component is rendered initially
+      if (
+        savePreferences &&
+        dashboardsList.length > 0 &&
+        selectedDashboard === undefined
+      ) {
+        const dashboard = defaultValue
+          ? dashboardsList.find((obj: Dashboard) => obj.id === defaultValue)
+          : undefined;
+        setSelectedDashboard(dashboard);
+        handleDashboardChange(dashboard);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dashboardsList]);
-
     return (
       <Autocomplete
-        onChange={(_: any, dashboard: Dashboard) => {
-          updateGlobalFilterPreference({
-            [DASHBOARD_ID]: dashboard?.id,
-            [REGION]: undefined,
-            [RESOURCES]: undefined,
-          });
+        onChange={(e, dashboard: Dashboard) => {
           setSelectedDashboard(dashboard);
-          props.handleDashboardChange(dashboard);
+          handleDashboardChange(dashboard, savePreferences);
         }}
         renderGroup={(params) => (
           <Box key={params.key}>
-            <Typography
-              sx={{ marginLeft: '3.5%', textTransform: 'capitalize' }}
-              variant="h3"
-            >
-              {params.group}
+            <Typography sx={{ marginLeft: '3.5%' }} variant="h3">
+              {serviceTypeMap.get(params.group) || params.group}
             </Typography>
             {params.children}
           </Box>
         )}
-        textFieldProps={{
-          hideLabel: true,
-        }}
         autoHighlight
         clearOnBlur
         data-testid="cloudpulse-dashboard-select"
         disabled={!dashboardsList}
-        errorText={dashboardsList ? '' : errorText}
+        errorText={Boolean(dashboardsList?.length) ? '' : errorText}
         fullWidth
         groupBy={(option: Dashboard) => option.service_type}
         isOptionEqualToValue={(option, value) => option.id === value.id}
-        label="Select a Dashboard"
-        loading={isLoading}
-        options={getSortedDashboardsList(dashboardsList?.data ?? [])}
+        label="Dashboard"
+        loading={dashboardsLoading || serviceTypesLoading}
+        noMarginTop
+        options={getSortedDashboardsList(dashboardsList ?? [])}
         placeholder={placeHolder}
         value={selectedDashboard ?? null} // Undefined is not allowed for uncontrolled component
       />

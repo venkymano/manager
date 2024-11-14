@@ -1,3 +1,4 @@
+import { Notice } from '@linode/ui';
 import Grid from '@mui/material/Unstable_Grid2';
 import * as React from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -6,7 +7,6 @@ import { CircleProgress } from 'src/components/CircleProgress';
 import { DocumentTitleSegment } from 'src/components/DocumentTitle';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Link } from 'src/components/Link';
-import { Notice } from 'src/components/Notice/Notice';
 import OrderBy from 'src/components/OrderBy';
 import { TransferDisplay } from 'src/components/TransferDisplay/TransferDisplay';
 import { TypeToConfirmDialog } from 'src/components/TypeToConfirmDialog/TypeToConfirmDialog';
@@ -60,22 +60,19 @@ export const BucketLanding = () => {
   const { classes } = useStyles();
 
   const removeBucketConfirmationDialog = useOpenClose();
-  const [bucketToRemove, setBucketToRemove] = React.useState<
-    ObjectStorageBucket | undefined
-  >(undefined);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<APIError[] | undefined>(undefined);
   const [
     bucketDetailDrawerOpen,
     setBucketDetailDrawerOpen,
   ] = React.useState<boolean>(false);
-  const [bucketForDetails, setBucketForDetails] = React.useState<
+  const [selectedBucket, setSelectedBucket] = React.useState<
     ObjectStorageBucket | undefined
   >(undefined);
 
   const handleClickDetails = (bucket: ObjectStorageBucket) => {
     setBucketDetailDrawerOpen(true);
-    setBucketForDetails(bucket);
+    setSelectedBucket(bucket);
   };
 
   const closeBucketDetailDrawer = () => {
@@ -83,21 +80,21 @@ export const BucketLanding = () => {
   };
 
   const handleClickRemove = (bucket: ObjectStorageBucket) => {
-    setBucketToRemove(bucket);
+    setSelectedBucket(bucket);
     setError(undefined);
     removeBucketConfirmationDialog.open();
   };
 
   const removeBucket = () => {
     // This shouldn't happen, but just in case (and to get TS to quit complaining...)
-    if (!bucketToRemove) {
+    if (!selectedBucket) {
       return;
     }
 
     setError(undefined);
     setIsLoading(true);
 
-    const { cluster, label } = bucketToRemove;
+    const { cluster, label } = selectedBucket;
 
     deleteBucket({ cluster, label })
       .then(() => {
@@ -156,7 +153,7 @@ export const BucketLanding = () => {
   }
 
   const totalUsage = sumBucketUsage(objectStorageBucketsResponse.buckets);
-  const bucketLabel = bucketToRemove ? bucketToRemove.label : '';
+  const bucketLabel = selectedBucket ? selectedBucket.label : '';
 
   return (
     <React.Fragment>
@@ -219,11 +216,11 @@ export const BucketLanding = () => {
         </Notice>
         <Typography className={classes.copy}>
           A bucket must be empty before deleting it. Please{' '}
-          <Link to="https://www.linode.com/docs/platform/object-storage/lifecycle-policies/">
+          <Link to="https://techdocs.akamai.com/cloud-computing/docs/lifecycle-policies">
             delete all objects
           </Link>
           , or use{' '}
-          <Link to="https://www.linode.com/docs/platform/object-storage/how-to-use-object-storage/#object-storage-tools">
+          <Link to="https://techdocs.akamai.com/cloud-computing/docs/getting-started-with-object-storage#object-storage-tools">
             another tool
           </Link>{' '}
           to force deletion.
@@ -236,14 +233,9 @@ export const BucketLanding = () => {
         )}
       </TypeToConfirmDialog>
       <BucketDetailsDrawer
-        bucketLabel={bucketForDetails?.label}
-        cluster={bucketForDetails?.cluster}
-        created={bucketForDetails?.created}
-        hostname={bucketForDetails?.hostname}
-        objectsNumber={bucketForDetails?.objects}
         onClose={closeBucketDetailDrawer}
         open={bucketDetailDrawerOpen}
-        size={bucketForDetails?.size}
+        selectedBucket={selectedBucket}
       />
     </React.Fragment>
   );

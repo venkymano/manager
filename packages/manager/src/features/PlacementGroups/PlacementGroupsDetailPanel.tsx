@@ -1,13 +1,10 @@
+import { Box, Notice } from '@linode/ui';
 import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
 
-import { Box } from 'src/components/Box';
 import { Button } from 'src/components/Button/Button';
 import { ListItem } from 'src/components/ListItem';
-import { Notice } from 'src/components/Notice/Notice';
 import { PlacementGroupsSelect } from 'src/components/PlacementGroupsSelect/PlacementGroupsSelect';
-import { getNewRegionLabel } from 'src/components/RegionSelect/RegionSelect.utils';
-import { useIsGeckoEnabled } from 'src/components/RegionSelect/RegionSelect.utils';
 import { TextTooltip } from 'src/components/TextTooltip';
 import { Typography } from 'src/components/Typography';
 import { NO_PLACEMENT_GROUPS_IN_SELECTED_REGION_MESSAGE } from 'src/features/PlacementGroups/constants';
@@ -73,17 +70,9 @@ export const PlacementGroupsDetailPanel = (props: Props) => {
   );
   const isPlacementGroupSelectDisabled =
     !selectedRegionId || !hasRegionPlacementGroupCapability;
-  const { isGeckoGAEnabled } = useIsGeckoEnabled();
 
   const placementGroupSelectLabel = selectedRegion
-    ? `Placement Groups in ${
-        isGeckoGAEnabled
-          ? getNewRegionLabel({
-              includeSlug: true,
-              region: selectedRegion,
-            })
-          : `${selectedRegion.label} (${selectedRegion.id})`
-      }`
+    ? `Placement Groups in ${`${selectedRegion.label} (${selectedRegion.id})`}`
     : 'Placement Group';
 
   return (

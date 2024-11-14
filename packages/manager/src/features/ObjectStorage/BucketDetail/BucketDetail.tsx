@@ -1,4 +1,5 @@
 import { getObjectList, getObjectURL } from '@linode/api-v4/lib/object-storage';
+import { Box } from '@linode/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import produce from 'immer';
 import { useSnackbar } from 'notistack';
@@ -8,7 +9,6 @@ import { Waypoint } from 'react-waypoint';
 import { debounce } from 'throttle-debounce';
 
 import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
-import { Box } from 'src/components/Box';
 import { ConfirmationDialog } from 'src/components/ConfirmationDialog/ConfirmationDialog';
 import { Hidden } from 'src/components/Hidden';
 import { Table } from 'src/components/Table';
@@ -21,14 +21,12 @@ import { OBJECT_STORAGE_DELIMITER } from 'src/constants';
 import { useFlags } from 'src/hooks/useFlags';
 import { useAccount } from 'src/queries/account/account';
 import {
+  getObjectBucketObjectsQueryKey,
   objectStorageQueries,
   useObjectBucketObjectsInfiniteQuery,
   useObjectStorageBuckets,
 } from 'src/queries/object-storage/queries';
-import {
-  fetchBucketAndUpdateCache,
-  prefixToQueryKey,
-} from 'src/queries/object-storage/utilities';
+import { fetchBucketAndUpdateCache } from 'src/queries/object-storage/utilities';
 import { isFeatureEnabledV2 } from 'src/utilities/accountCapabilities';
 import { sendDownloadObjectEvent } from 'src/utilities/analytics/customEventAnalytics';
 import { getQueryParamFromQueryString } from 'src/utilities/queryParams';
@@ -56,16 +54,22 @@ import ObjectTableContent from './ObjectTableContent';
 
 import type {
   ObjectStorageClusterID,
+  ObjectStorageEndpointTypes,
   ObjectStorageObject,
   ObjectStorageObjectList,
 } from '@linode/api-v4';
+import type { InfiniteData } from '@tanstack/react-query';
 
 interface MatchParams {
   bucketName: string;
   clusterId: ObjectStorageClusterID;
 }
+interface Props {
+  endpointType: ObjectStorageEndpointTypes;
+}
 
-export const BucketDetail = () => {
+export const BucketDetail = (props: Props) => {
+  const { endpointType } = props;
   /**
    * @note If `Object Storage Access Key Regions` is enabled, clusterId will actually contain
    * the bucket's region id
@@ -232,11 +236,7 @@ export const BucketDetail = () => {
       pageParams: string[];
       pages: ObjectStorageObjectList[];
     }>(
-      [
-        ...objectStorageQueries.bucket(clusterId, bucketName)._ctx.objects
-          .queryKey,
-        ...prefixToQueryKey(prefix),
-      ],
+      getObjectBucketObjectsQueryKey(clusterId, bucketName, prefix),
       (data) => ({
         pageParams: data?.pageParams || [],
         pages,
@@ -274,7 +274,11 @@ export const BucketDetail = () => {
   };
 
   const addOneFile = (objectName: string, sizeInBytes: number) => {
-    if (!data) {
+    const currentData = queryClient.getQueryData<
+      InfiniteData<ObjectStorageObjectList>
+    >(getObjectBucketObjectsQueryKey(clusterId, bucketName, prefix));
+
+    if (!currentData) {
       return;
     }
 
@@ -286,13 +290,13 @@ export const BucketDetail = () => {
       size: sizeInBytes,
     };
 
-    for (let i = 0; i < data.pages.length; i++) {
-      const foundObjectIndex = data.pages[i].data.findIndex(
+    for (let i = 0; i < currentData.pages.length; i++) {
+      const foundObjectIndex = currentData.pages[i].data.findIndex(
         (_object) => _object.name === object.name
       );
       if (foundObjectIndex !== -1) {
-        const copy = [...data.pages];
-        const pageCopy = [...data.pages[i].data];
+        const copy = [...currentData.pages];
+        const pageCopy = [...currentData.pages[i].data];
 
         pageCopy[foundObjectIndex] = object;
 
@@ -304,7 +308,7 @@ export const BucketDetail = () => {
       }
     }
 
-    const copy = [...data.pages];
+    const copy = [...currentData.pages];
     const dataCopy = [...copy[copy.length - 1].data];
 
     dataCopy.push(object);
@@ -317,7 +321,11 @@ export const BucketDetail = () => {
   };
 
   const addOneFolder = (objectName: string) => {
-    if (!data) {
+    const currentData = queryClient.getQueryData<
+      InfiniteData<ObjectStorageObjectList>
+    >(getObjectBucketObjectsQueryKey(clusterId, bucketName, prefix));
+
+    if (!currentData) {
       return;
     }
 
@@ -329,7 +337,7 @@ export const BucketDetail = () => {
       size: null,
     };
 
-    for (const page of data.pages) {
+    for (const page of currentData.pages) {
       if (page.data.find((object) => object.name === folder.name)) {
         // If a folder already exists in the store, invalidate that store for that specific
         // prefix. Due to how invalidateQueries works, all subdirectories also get invalidated.
@@ -344,7 +352,7 @@ export const BucketDetail = () => {
       }
     }
 
-    const copy = [...data.pages];
+    const copy = [...currentData.pages];
     const dataCopy = [...copy[copy.length - 1].data];
 
     dataCopy.push(folder);
@@ -473,6 +481,7 @@ export const BucketDetail = () => {
         bucketName={bucketName}
         clusterId={clusterId}
         displayName={selectedObject?.name}
+        endpointType={endpointType}
         lastModified={selectedObject?.last_modified}
         name={selectedObject?.name}
         onClose={closeObjectDetailsDrawer}

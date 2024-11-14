@@ -15,6 +15,7 @@ export interface DismissedNotification {
 }
 
 export interface ManagerPreferences extends UserPreferences {
+  avatarColor?: string;
   backups_cta_dismissed?: boolean;
   desktop_sidebar_open?: boolean;
   dismissed_notifications?: Record<string, DismissedNotification>;
@@ -26,6 +27,7 @@ export interface ManagerPreferences extends UserPreferences {
   linodes_view_style?: 'grid' | 'list';
   longviewTimeRange?: string;
   main_content_banner_dismissal?: Record<string, boolean>;
+  maskSensitiveData?: boolean;
   nodebalancers_group_by_tag?: boolean;
   pageSizes?: Record<string, number>;
   secure_vm_notices?: 'always' | 'header' | 'never';

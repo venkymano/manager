@@ -1,6 +1,6 @@
+import { Box } from '@linode/ui';
 import * as React from 'react';
 
-import { Box } from 'src/components/Box';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { DisplayPrice } from 'src/components/DisplayPrice';
 import { MAX_VOLUME_SIZE } from 'src/constants';
@@ -44,7 +44,7 @@ export const PricePanel = ({ currentSize, regionId, value }: Props) => {
   }
 
   return (
-    <Box marginTop={4}>
+    <Box marginTop={2}>
       <DisplayPrice interval="mo" price={price ? Number(price) : '--.--'} />
     </Box>
   );

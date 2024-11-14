@@ -1,8 +1,8 @@
+import { FormHelperText } from '@linode/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
-import { FormHelperText } from 'src/components/FormHelperText';
 import { TextField } from 'src/components/TextField';
 import { useAllDatabasesQuery } from 'src/queries/databases/databases';
 import { useAllDomainsQuery } from 'src/queries/domains';
@@ -10,6 +10,7 @@ import { useAllFirewallsQuery } from 'src/queries/firewalls';
 import { useAllKubernetesClustersQuery } from 'src/queries/kubernetes';
 import { useAllLinodesQuery } from 'src/queries/linodes/linodes';
 import { useAllNodeBalancersQuery } from 'src/queries/nodebalancers';
+import { useObjectStorageBuckets } from 'src/queries/object-storage/queries';
 import { useAllVolumesQuery } from 'src/queries/volumes/volumes';
 import { useAllVPCsQuery } from 'src/queries/vpcs/vpcs';
 
@@ -18,6 +19,7 @@ import {
   ENTITY_ID_TO_NAME_MAP,
   ENTITY_MAP,
 } from './constants';
+import { getEntityNameFromEntityType } from './ticketUtils';
 
 import type { AccountLimitCustomFields } from './SupportTicketAccountLimitFields';
 import type {
@@ -81,6 +83,12 @@ export const SupportTicketProductSelectionFields = (props: Props) => {
   } = useAllLinodesQuery({}, {}, entityType === 'linode_id');
 
   const {
+    data: buckets,
+    error: bucketsError,
+    isLoading: bucketsLoading,
+  } = useObjectStorageBuckets(entityType === 'bucket');
+
+  const {
     data: volumes,
     error: volumesError,
     isLoading: volumesLoading,
@@ -92,8 +100,9 @@ export const SupportTicketProductSelectionFields = (props: Props) => {
     isLoading: vpcsLoading,
   } = useAllVPCsQuery(entityType === 'vpc_id');
 
-  const getEntityOptions = (): { label: string; value: number }[] => {
+  const getEntityOptions = (): { label: string; value: number | string }[] => {
     const reactQueryEntityDataMap = {
+      bucket: buckets,
       database_id: databases,
       domain_id: domains,
       firewall_id: firewalls,
@@ -122,6 +131,17 @@ export const SupportTicketProductSelectionFields = (props: Props) => {
       );
     }
 
+    if (entityType === 'bucket') {
+      return (
+        reactQueryEntityDataMap['bucket']?.buckets?.map(
+          ({ label, region }) => ({
+            label,
+            value: region ?? '',
+          })
+        ) || []
+      );
+    }
+
     return (
       reactQueryEntityDataMap[entityType]?.map(
         ({ id, label }: { id: number; label: string }) => ({
@@ -133,6 +153,7 @@ export const SupportTicketProductSelectionFields = (props: Props) => {
   };
 
   const loadingMap: Record<EntityType, boolean> = {
+    bucket: bucketsLoading,
     database_id: databasesLoading,
     domain_id: domainsLoading,
     firewall_id: firewallsLoading,
@@ -146,6 +167,7 @@ export const SupportTicketProductSelectionFields = (props: Props) => {
   };
 
   const errorMap: Record<EntityType, APIError[] | null> = {
+    bucket: bucketsError,
     database_id: databasesError,
     domain_id: domainsError,
     firewall_id: firewallsError,
@@ -183,10 +205,7 @@ export const SupportTicketProductSelectionFields = (props: Props) => {
     return eachTopic.value === entityType;
   });
 
-  const _entityType =
-    entityType !== 'general' && entityType !== 'none'
-      ? `${ENTITY_ID_TO_NAME_MAP[entityType]}s`
-      : 'entities';
+  const _entityType = getEntityNameFromEntityType(entityType, true);
 
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
@@ -195,10 +214,13 @@ export const SupportTicketProductSelectionFields = (props: Props) => {
         <Controller
           render={({ field, fieldState }) => (
             <TextField
+              label={ACCOUNT_LIMIT_FIELD_NAME_TO_LABEL_MAP.numberOfEntities.replace(
+                'entities',
+                _entityType
+              )}
               data-qa-ticket-number-of-entities
               errorText={fieldState.error?.message}
               helperText={`Current number of ${_entityType}: ${entityOptions.length}`}
-              label={ACCOUNT_LIMIT_FIELD_NAME_TO_LABEL_MAP.numberOfEntities}
               name="numberOfEntities"
               onChange={field.onChange}
               placeholder={`Enter total number of ${_entityType}`}

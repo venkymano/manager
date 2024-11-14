@@ -69,11 +69,13 @@ export const ENTITY_MAP: Record<string, EntityType> = {
   Kubernetes: 'lkecluster_id',
   Linodes: 'linode_id',
   NodeBalancers: 'nodebalancer_id',
+  'Object Storage': 'bucket',
   VPCs: 'vpc_id',
   Volumes: 'volume_id',
 };
 
 export const ENTITY_ID_TO_NAME_MAP: Record<EntityType, string> = {
+  bucket: 'Bucket',
   database_id: 'Database Cluster',
   domain_id: 'Domain',
   firewall_id: 'Firewall',
@@ -88,8 +90,9 @@ export const ENTITY_ID_TO_NAME_MAP: Record<EntityType, string> = {
 
 // General custom fields common to multiple custom ticket types.
 export const CUSTOM_FIELD_NAME_TO_LABEL_MAP: Record<string, string> = {
-  companyName: 'Business or company name',
   customerName: 'First and last name',
+  // eslint-disable-next-line perfectionist/sort-objects
+  companyName: 'Business or company name',
   publicInfo:
     "Links to public information - e.g. your business or application's website, Twitter profile, GitHub, etc.",
   useCase: 'A clear and detailed description of your use case',
@@ -104,8 +107,9 @@ export const SMTP_FIELD_NAME_TO_LABEL_MAP: Record<string, string> = {
 
 export const ACCOUNT_LIMIT_FIELD_NAME_TO_LABEL_MAP: Record<string, string> = {
   ...CUSTOM_FIELD_NAME_TO_LABEL_MAP,
-  linodePlan: 'Which Linode plan do you need access to?',
   numberOfEntities: 'Total number of entities you need?',
+  // eslint-disable-next-line perfectionist/sort-objects
+  linodePlan: 'Which Linode plan do you need access to?',
   useCase:
     'A detailed description of your use case and why you need access to more/larger entities',
 };

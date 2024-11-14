@@ -1,10 +1,10 @@
+import { Notice } from '@linode/ui';
 import { updateVPCSchema } from '@linode/validation/lib/vpcs.schema';
 import { useFormik } from 'formik';
 import * as React from 'react';
 
 import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
 import { Drawer } from 'src/components/Drawer';
-import { Notice } from 'src/components/Notice/Notice';
 import { RegionSelect } from 'src/components/RegionSelect/RegionSelect';
 import { TextField } from 'src/components/TextField';
 import { useGrants, useProfile } from 'src/queries/profile/profile';
@@ -38,7 +38,7 @@ export const VPCEditDrawer = (props: Props) => {
 
   const {
     error,
-    isLoading,
+    isPending,
     mutateAsync: updateVPC,
     reset,
   } = useUpdateVPCMutation(vpc?.id ?? -1);
@@ -132,7 +132,7 @@ export const VPCEditDrawer = (props: Props) => {
             'data-testid': 'save-button',
             disabled: !form.dirty || readOnly,
             label: 'Save',
-            loading: isLoading,
+            loading: isPending,
             type: 'submit',
           }}
           secondaryButtonProps={{ label: 'Cancel', onClick: onClose }}

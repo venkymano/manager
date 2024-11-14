@@ -4,11 +4,7 @@ import * as React from 'react';
 import { linodeFactory } from 'src/factories';
 import { renderWithTheme } from 'src/utilities/testHelpers';
 
-import { RESOURCES } from '../Utils/constants';
-import * as preferences from '../Utils/UserPreference';
 import { CloudPulseResourcesSelect } from './CloudPulseResourcesSelect';
-
-import type { AclpConfig } from '@linode/api-v4';
 
 const queryMocks = vi.hoisted(() => ({
   useResourcesQuery: vi.fn().mockReturnValue({}),
@@ -37,11 +33,13 @@ describe('CloudPulseResourcesSelect component tests', () => {
     const { getByPlaceholderText, getByTestId } = renderWithTheme(
       <CloudPulseResourcesSelect
         handleResourcesSelection={mockResourceHandler}
+        label="Resources"
         region={undefined}
         resourceType={undefined}
       />
     );
     expect(getByTestId('resource-select')).toBeInTheDocument();
+    expect(screen.getByLabelText('Resources')).toBeInTheDocument();
     expect(getByPlaceholderText('Select Resources')).toBeInTheDocument();
   }),
     it('should render resources happy path', () => {
@@ -54,11 +52,13 @@ describe('CloudPulseResourcesSelect component tests', () => {
       renderWithTheme(
         <CloudPulseResourcesSelect
           handleResourcesSelection={mockResourceHandler}
+          label="Resources"
           region={'us-east'}
           resourceType={'us-east'}
         />
       );
       fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+      expect(screen.getByLabelText('Resources')).toBeInTheDocument();
       expect(
         screen.getByRole('option', {
           name: 'linode-3',
@@ -81,12 +81,14 @@ describe('CloudPulseResourcesSelect component tests', () => {
     renderWithTheme(
       <CloudPulseResourcesSelect
         handleResourcesSelection={mockResourceHandler}
+        label="Resources"
         region={'us-east'}
         resourceType={'linode'}
       />
     );
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     fireEvent.click(screen.getByRole('option', { name: SELECT_ALL }));
+    expect(screen.getByLabelText('Resources')).toBeInTheDocument();
     expect(
       screen.getByRole('option', {
         name: 'linode-5',
@@ -109,6 +111,7 @@ describe('CloudPulseResourcesSelect component tests', () => {
     renderWithTheme(
       <CloudPulseResourcesSelect
         handleResourcesSelection={mockResourceHandler}
+        label="Resources"
         region={'us-east'}
         resourceType={'linode'}
       />
@@ -116,6 +119,7 @@ describe('CloudPulseResourcesSelect component tests', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     fireEvent.click(screen.getByRole('option', { name: SELECT_ALL }));
     fireEvent.click(screen.getByRole('option', { name: 'Deselect All' }));
+    expect(screen.getByLabelText('Resources')).toBeInTheDocument();
     expect(
       screen.getByRole('option', {
         name: 'linode-7',
@@ -138,6 +142,7 @@ describe('CloudPulseResourcesSelect component tests', () => {
     renderWithTheme(
       <CloudPulseResourcesSelect
         handleResourcesSelection={mockResourceHandler}
+        label="Resources"
         region={'us-east'}
         resourceType={'linode'}
       />
@@ -145,6 +150,7 @@ describe('CloudPulseResourcesSelect component tests', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     fireEvent.click(screen.getByRole('option', { name: 'linode-9' }));
     fireEvent.click(screen.getByRole('option', { name: 'linode-10' }));
+    expect(screen.getByLabelText('Resources')).toBeInTheDocument();
 
     expect(
       screen.getByRole('option', {
@@ -174,15 +180,15 @@ describe('CloudPulseResourcesSelect component tests', () => {
       isLoading: false,
       status: 'success',
     });
-    vi.spyOn(preferences, 'getUserPreferenceObject').mockReturnValue({
-      [RESOURCES]: ['12'],
-    } as AclpConfig);
 
     renderWithTheme(
       <CloudPulseResourcesSelect
+        defaultValue={['12']}
         handleResourcesSelection={mockResourceHandler}
+        label="Resources"
         region={'us-east'}
         resourceType={'linode'}
+        savePreferences
       />
     );
 
@@ -199,5 +205,51 @@ describe('CloudPulseResourcesSelect component tests', () => {
         name: 'linode-13',
       })
     ).toHaveAttribute(ARIA_SELECTED, 'false');
+  });
+
+  it('Should show appropriate error message on resources call failure', async () => {
+    queryMocks.useResourcesQuery.mockReturnValue({
+      data: undefined,
+      isError: true,
+      isLoading: false,
+      status: 'error',
+    });
+    renderWithTheme(
+      <CloudPulseResourcesSelect
+        defaultValue={['12']}
+        handleResourcesSelection={mockResourceHandler}
+        label="Resource"
+        region={'us-east'}
+        resourceType={'linode'}
+        savePreferences
+      />
+    );
+    expect(screen.getByText('Failed to fetch Resource.')).toBeInTheDocument();
+
+    // if the label is ABC, error message should be Failed to fetch ABC
+    renderWithTheme(
+      <CloudPulseResourcesSelect
+        defaultValue={['12']}
+        handleResourcesSelection={mockResourceHandler}
+        label="ABC"
+        region={'us-east'}
+        resourceType={'linode'}
+        savePreferences
+      />
+    );
+    expect(screen.getByText('Failed to fetch ABC.')).toBeInTheDocument();
+
+    // if the label is empty , error message should be Failed to fetch Resources
+    renderWithTheme(
+      <CloudPulseResourcesSelect
+        defaultValue={['12']}
+        handleResourcesSelection={mockResourceHandler}
+        label=""
+        region={'us-east'}
+        resourceType={'linode'}
+        savePreferences
+      />
+    );
+    expect(screen.getByText('Failed to fetch Resources.')).toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { queryFactory } from './queries';
 
@@ -7,7 +7,7 @@ import type {
   JWEToken,
   JWETokenPayLoad,
   MetricDefinitions,
-  ServiceTypes,
+  ServiceTypesList,
 } from '@linode/api-v4';
 
 export const useGetCloudPulseMetricDefinitionsByServiceType = (
@@ -33,7 +33,14 @@ export const useCloudPulseJWEtokenQuery = (
   return useQuery<JWEToken, APIError[]>({
     ...queryFactory.token(serviceType, request),
     enabled: runQuery,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useCloudPulseServiceTypes = (enabled: boolean) => {
+  return useQuery<ServiceTypesList, APIError[]>({
+    ...queryFactory.lists._ctx.serviceTypes,
+    enabled,
   });
 };

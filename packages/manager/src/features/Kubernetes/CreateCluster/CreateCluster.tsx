@@ -1,25 +1,25 @@
+import { Box, Notice, Paper, Stack } from '@linode/ui';
 import { Divider } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
+import { createLazyRoute } from '@tanstack/react-router';
 import { pick, remove, update } from 'ramda';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
-import { Box } from 'src/components/Box';
 import { DocsLink } from 'src/components/DocsLink/DocsLink';
 import { DocumentTitleSegment } from 'src/components/DocumentTitle';
 import { ErrorMessage } from 'src/components/ErrorMessage';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { LandingHeader } from 'src/components/LandingHeader';
-import { Notice } from 'src/components/Notice/Notice';
-import { Paper } from 'src/components/Paper';
 import { RegionSelect } from 'src/components/RegionSelect/RegionSelect';
 import { RegionHelperText } from 'src/components/SelectRegionPanel/RegionHelperText';
-import { Stack } from 'src/components/Stack';
 import { TextField } from 'src/components/TextField';
 import {
+  getKubeControlPlaneACL,
   getKubeHighAvailability,
   getLatestVersion,
+  useAPLAvailability,
 } from 'src/features/Kubernetes/kubeUtils';
 import { useAccount } from 'src/queries/account/account';
 import {
@@ -27,6 +27,7 @@ import {
   useMutateAccountAgreements,
 } from 'src/queries/account/agreements';
 import {
+  useCreateKubernetesClusterBetaMutation,
   useCreateKubernetesClusterMutation,
   useKubernetesTypesQuery,
   useKubernetesVersionQuery,
@@ -36,16 +37,19 @@ import { useAllTypes } from 'src/queries/types';
 import { getAPIErrorOrDefault, getErrorMap } from 'src/utilities/errorUtils';
 import { extendType } from 'src/utilities/extendType';
 import { filterCurrentTypes } from 'src/utilities/filterCurrentLinodeTypes';
+import { stringToExtendedIP } from 'src/utilities/ipUtils';
 import { plansNoticesUtils } from 'src/utilities/planNotices';
 import { DOCS_LINK_LABEL_DC_PRICING } from 'src/utilities/pricing/constants';
 import { UNKNOWN_PRICE } from 'src/utilities/pricing/constants';
 import { getDCSpecificPriceByType } from 'src/utilities/pricing/dynamicPricing';
-import { scrollErrorIntoView } from 'src/utilities/scrollErrorIntoView';
+import { scrollErrorIntoViewV2 } from 'src/utilities/scrollErrorIntoViewV2';
 
 import KubeCheckoutBar from '../KubeCheckoutBar';
+import { ApplicationPlatform } from './ApplicationPlatform';
+import { ControlPlaneACLPane } from './ControlPlaneACLPane';
 import {
   StyledDocsLinkContainer,
-  StyledRegionSelectStack,
+  StyledFieldWithDocsStack,
   useStyles,
 } from './CreateCluster.styles';
 import { HAControlPlane } from './HAControlPlane';
@@ -57,6 +61,7 @@ import type {
   KubeNodePoolResponse,
 } from '@linode/api-v4/lib/kubernetes';
 import type { APIError } from '@linode/api-v4/lib/types';
+import type { ExtendedIP } from 'src/utilities/ipUtils';
 
 export const CreateCluster = () => {
   const { classes } = useStyles();
@@ -69,14 +74,25 @@ export const CreateCluster = () => {
   const [errors, setErrors] = React.useState<APIError[] | undefined>();
   const [submitting, setSubmitting] = React.useState<boolean>(false);
   const [hasAgreed, setAgreed] = React.useState<boolean>(false);
+  const formContainerRef = React.useRef<HTMLDivElement>(null);
   const { mutateAsync: updateAccountAgreements } = useMutateAccountAgreements();
   const [highAvailability, setHighAvailability] = React.useState<boolean>();
+  const [controlPlaneACL, setControlPlaneACL] = React.useState<boolean>(false);
+  const [apl_enabled, setApl_enabled] = React.useState<boolean>(false);
 
   const { data, error: regionsError } = useRegionsQuery();
   const regionsData = data ?? [];
   const history = useHistory();
   const { data: account } = useAccount();
+  const { showAPL } = useAPLAvailability();
   const { showHighAvailability } = getKubeHighAvailability(account);
+  const { showControlPlaneACL } = getKubeControlPlaneACL(account);
+  const [ipV4Addr, setIPv4Addr] = React.useState<ExtendedIP[]>([
+    stringToExtendedIP(''),
+  ]);
+  const [ipV6Addr, setIPv6Addr] = React.useState<ExtendedIP[]>([
+    stringToExtendedIP(''),
+  ]);
 
   const {
     data: kubernetesHighAvailabilityTypesData,
@@ -102,6 +118,10 @@ export const CreateCluster = () => {
   } = useCreateKubernetesClusterMutation();
 
   const {
+    mutateAsync: createKubernetesClusterBeta,
+  } = useCreateKubernetesClusterBetaMutation();
+
+  const {
     data: versionData,
     isError: versionLoadError,
   } = useKubernetesVersionQuery();
@@ -118,24 +138,69 @@ export const CreateCluster = () => {
   }, [versionData]);
 
   const createCluster = () => {
+    if (ipV4Addr.some((ip) => ip.error) || ipV6Addr.some((ip) => ip.error)) {
+      scrollErrorIntoViewV2(formContainerRef);
+      return;
+    }
+
     const { push } = history;
     setErrors(undefined);
     setSubmitting(true);
 
-    // Only type and count to the API.
     const node_pools = nodePools.map(
       pick(['type', 'count'])
     ) as CreateNodePoolData[];
 
-    const payload: CreateKubeClusterPayload = {
-      control_plane: { high_availability: highAvailability ?? false },
+    const _ipv4 = ipV4Addr
+      .map((ip) => {
+        return ip.address;
+      })
+      .filter((ip) => ip !== '');
+
+    const _ipv6 = ipV6Addr
+      .map((ip) => {
+        return ip.address;
+      })
+      .filter((ip) => ip !== '');
+
+    const addressIPv4Payload = {
+      ...(_ipv4.length > 0 && { ipv4: _ipv4 }),
+    };
+
+    const addressIPv6Payload = {
+      ...(_ipv6.length > 0 && { ipv6: _ipv6 }),
+    };
+
+    let payload: CreateKubeClusterPayload = {
+      control_plane: {
+        acl: {
+          enabled: controlPlaneACL,
+          'revision-id': '',
+          ...(controlPlaneACL && // only send the IPs if we are enabling IPACL
+            (_ipv4.length > 0 || _ipv6.length > 0) && {
+              addresses: {
+                ...addressIPv4Payload,
+                ...addressIPv6Payload,
+              },
+            }),
+        },
+        high_availability: highAvailability ?? false,
+      },
       k8s_version: version,
       label,
       node_pools,
       region: selectedRegionId,
     };
 
-    createKubernetesCluster(payload)
+    if (showAPL) {
+      payload = { ...payload, apl_enabled };
+    }
+
+    const createClusterFn = showAPL
+      ? createKubernetesClusterBeta
+      : createKubernetesCluster;
+
+    createClusterFn(payload)
       .then((cluster) => {
         push(`/kubernetes/clusters/${cluster.id}`);
         if (hasAgreed) {
@@ -148,7 +213,7 @@ export const CreateCluster = () => {
       .catch((err) => {
         setErrors(getAPIErrorOrDefault(err, 'Error creating your cluster'));
         setSubmitting(false);
-        scrollErrorIntoView();
+        scrollErrorIntoViewV2(formContainerRef);
       });
   };
 
@@ -181,7 +246,14 @@ export const CreateCluster = () => {
   });
 
   const errorMap = getErrorMap(
-    ['region', 'node_pools', 'label', 'k8s_version', 'versionLoad'],
+    [
+      'region',
+      'node_pools',
+      'label',
+      'k8s_version',
+      'versionLoad',
+      'control_plane',
+    ],
     errors
   );
 
@@ -202,17 +274,21 @@ export const CreateCluster = () => {
   }
 
   return (
-    <Grid className={classes.root} container>
+    <Grid className={classes.root} container ref={formContainerRef}>
       <DocumentTitleSegment segment="Create a Kubernetes Cluster" />
       <LandingHeader
         docsLabel="Docs"
-        docsLink="https://www.linode.com/docs/kubernetes/deploy-and-manage-a-cluster-with-linode-kubernetes-engine-a-tutorial/"
+        docsLink="https://techdocs.akamai.com/cloud-computing/docs/getting-started-with-lke-linode-kubernetes-engine"
         title="Create Cluster"
       />
       <Grid className={`mlMain py0`}>
         {generalError && (
           <Notice variant="error">
-            <ErrorMessage entityType="lkecluster_id" message={generalError} />
+            <ErrorMessage
+              entity={{ type: 'lkecluster_id' }}
+              formPayloadValues={{ node_pools: nodePools }}
+              message={generalError}
+            />
           </Notice>
         )}
         <Paper data-qa-label-header>
@@ -226,7 +302,7 @@ export const CreateCluster = () => {
             value={label || ''}
           />
           <Divider sx={{ marginTop: 4 }} />
-          <StyledRegionSelectStack>
+          <StyledFieldWithDocsStack>
             <Stack>
               <RegionSelect
                 textFieldProps={{
@@ -247,7 +323,7 @@ export const CreateCluster = () => {
                 label={DOCS_LINK_LABEL_DC_PRICING}
               />
             </StyledDocsLinkContainer>
-          </StyledRegionSelectStack>
+          </StyledFieldWithDocsStack>
           <Divider sx={{ marginTop: 4 }} />
           <Autocomplete
             onChange={(_, selected) => {
@@ -260,8 +336,21 @@ export const CreateCluster = () => {
             placeholder={' '}
             value={versions.find((v) => v.value === version) ?? null}
           />
-          <Divider sx={{ marginTop: 4 }} />
-          {showHighAvailability ? (
+          {showAPL && (
+            <>
+              <Divider sx={{ marginTop: 4 }} />
+              <StyledFieldWithDocsStack>
+                <Stack>
+                  <ApplicationPlatform
+                    setAPL={setApl_enabled}
+                    setHighAvailability={setHighAvailability}
+                  />
+                </Stack>
+              </StyledFieldWithDocsStack>
+            </>
+          )}
+          <Divider sx={{ marginTop: showAPL ? 1 : 4 }} />
+          {showHighAvailability && (
             <Box data-testid="ha-control-plane">
               <HAControlPlane
                 highAvailabilityPrice={
@@ -269,13 +358,32 @@ export const CreateCluster = () => {
                     ? UNKNOWN_PRICE
                     : highAvailabilityPrice
                 }
+                isAPLEnabled={apl_enabled}
                 isErrorKubernetesTypes={isErrorKubernetesTypes}
                 isLoadingKubernetesTypes={isLoadingKubernetesTypes}
                 selectedRegionId={selectedRegionId}
                 setHighAvailability={setHighAvailability}
               />
             </Box>
-          ) : null}
+          )}
+          {showControlPlaneACL && (
+            <>
+              <Divider />
+              <ControlPlaneACLPane
+                handleIPv4Change={(newIpV4Addr: ExtendedIP[]) => {
+                  setIPv4Addr(newIpV4Addr);
+                }}
+                handleIPv6Change={(newIpV6Addr: ExtendedIP[]) => {
+                  setIPv6Addr(newIpV6Addr);
+                }}
+                enableControlPlaneACL={controlPlaneACL}
+                errorText={errorMap.control_plane}
+                ipV4Addr={ipV4Addr}
+                ipV6Addr={ipV6Addr}
+                setControlPlaneACL={setControlPlaneACL}
+              />
+            </>
+          )}
           <Divider sx={{ marginBottom: 4 }} />
           <NodePoolPanel
             typesError={
@@ -289,6 +397,7 @@ export const CreateCluster = () => {
             addNodePool={(pool: KubeNodePoolResponse) => addPool(pool)}
             apiError={errorMap.node_pools}
             hasSelectedRegion={hasSelectedRegion}
+            isAPLEnabled={apl_enabled}
             isPlanPanelDisabled={isPlanPanelDisabled}
             isSelectedRegionEligibleForPlan={isSelectedRegionEligibleForPlan}
             regionsData={regionsData}
@@ -336,3 +445,7 @@ export const CreateCluster = () => {
     </Grid>
   );
 };
+
+export const createClusterLazyRoute = createLazyRoute('/kubernetes/create')({
+  component: CreateCluster,
+});

@@ -5,10 +5,6 @@ import {
   vpcFactory,
 } from 'src/factories';
 import {
-  mockAppendFeatureFlags,
-  mockGetFeatureFlagClientstream,
-} from 'support/intercepts/feature-flags';
-import {
   mockCreateLinode,
   mockGetLinodeDetails,
 } from 'support/intercepts/linodes';
@@ -21,7 +17,6 @@ import {
 } from 'support/intercepts/vpc';
 import { ui } from 'support/ui';
 import { linodeCreatePage, vpcCreateDrawer } from 'support/ui/pages';
-import { makeFeatureFlagData } from 'support/util/feature-flags';
 import {
   randomIp,
   randomLabel,
@@ -32,14 +27,6 @@ import {
 import { chooseRegion } from 'support/util/regions';
 
 describe('Create Linode with VPCs', () => {
-  // TODO Remove feature flag mocks when `linodeCreateRefactor` flag is retired.
-  beforeEach(() => {
-    mockAppendFeatureFlags({
-      linodeCreateRefactor: makeFeatureFlagData(true),
-    });
-    mockGetFeatureFlagClientstream();
-  });
-
   /*
    * - Confirms UI flow to create a Linode with an existing VPC assigned using mock API data.
    * - Confirms that VPC assignment is reflected in create summary section.
@@ -66,7 +53,6 @@ describe('Create Linode with VPCs', () => {
       id: randomNumber(),
       label: randomLabel(),
       region: linodeRegion.id,
-      //
     });
 
     mockGetVPCs([mockVPC]).as('getVPCs');
@@ -83,20 +69,18 @@ describe('Create Linode with VPCs', () => {
     linodeCreatePage.setRootPassword(randomString(32));
 
     // Confirm that mocked VPC is shown in the Autocomplete, and then select it.
-    cy.findByText('Assign VPC').click().type(`${mockVPC.label}`);
+    cy.findByText('Assign VPC').click().type(mockVPC.label);
 
     ui.autocompletePopper
       .findByTitle(mockVPC.label)
       .should('be.visible')
       .click();
 
-    // Confirm that Subnet selection appears and select mock subnet.
-    cy.findByLabelText('Subnet').should('be.visible').type(mockSubnet.label);
-
-    ui.autocompletePopper
-      .findByTitle(`${mockSubnet.label} (${mockSubnet.ipv4})`)
-      .should('be.visible')
-      .click();
+    // Confirm that VPC's subnet gets selected
+    cy.findByLabelText('Subnet').should(
+      'have.value',
+      `${mockSubnet.label} (${mockSubnet.ipv4})`
+    );
 
     // Confirm VPC assignment indicator is shown in Linode summary.
     cy.get('[data-qa-linode-create-summary]')
@@ -192,20 +176,34 @@ describe('Create Linode with VPCs', () => {
 
         // Create VPC with successful API response mocked.
         mockCreateVPC(mockVPC).as('createVpc');
+        mockGetVPCs([mockVPC]);
         vpcCreateDrawer.submit();
       });
 
-    // Attempt to create Linode before selecting a VPC subnet, and confirm
-    // that validation error appears.
+    // Verify the VPC field gets populated
+    cy.findByLabelText('Assign VPC').should('have.value', mockVPC.label);
+
+    // Verify the subnet gets populated
+    cy.findByLabelText('Subnet').should(
+      'have.value',
+      `${mockSubnet.label} (${mockSubnet.ipv4})`
+    );
+
+    // Clear the subnet value
+    cy.get('[data-qa-autocomplete="Subnet"]').within(() => {
+      cy.findByLabelText('Clear').click();
+    });
+
+    // Try to submit the form without a subnet selected
     ui.button
       .findByTitle('Create Linode')
       .should('be.visible')
       .should('be.enabled')
       .click();
 
+    // Verify a validation error shows
     cy.findByText('Subnet is required.').should('be.visible');
 
-    // Confirm that Subnet selection appears and select mock subnet.
     cy.findByLabelText('Subnet').should('be.visible').type(mockSubnet.label);
 
     ui.autocompletePopper

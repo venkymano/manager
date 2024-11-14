@@ -1,3 +1,11 @@
+/**
+ * @deprecated
+ *
+ * This mocking mode is being phased out.
+ * It remains available in out DEV tools for convenience and backward compatibility, it is however discouraged to add new handlers to it.
+ *
+ * New handlers should be added to the CRUD baseline preset instead (ex: src/mocks/presets/crud/handlers/linodes.ts) which support a much more dynamic data mocking.
+ */
 import { DateTime } from 'luxon';
 import { HttpResponse, http } from 'msw';
 
@@ -16,6 +24,7 @@ import {
   contactFactory,
   credentialFactory,
   creditPaymentResponseFactory,
+  dashboardFactory,
   databaseBackupFactory,
   databaseEngineFactory,
   databaseFactory,
@@ -76,6 +85,7 @@ import {
   promoFactory,
   regionAvailabilityFactory,
   securityQuestionsFactory,
+  serviceTypesFactory,
   stackScriptFactory,
   staticObjects,
   subnetFactory,
@@ -91,18 +101,22 @@ import { accountLoginFactory } from 'src/factories/accountLogin';
 import { accountUserFactory } from 'src/factories/accountUsers';
 import { grantFactory, grantsFactory } from 'src/factories/grants';
 import { LinodeKernelFactory } from 'src/factories/linodeKernel';
-import { pickRandom } from 'src/utilities/random';
 import { getStorage } from 'src/utilities/storage';
 
 const getRandomWholeNumber = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1) + min);
 
+import { pickRandom } from 'src/utilities/random';
+
 import type {
   AccountMaintenance,
   CreateObjectStorageKeyPayload,
+  Dashboard,
   FirewallStatus,
   NotificationType,
+  ObjectStorageEndpointTypes,
   SecurityQuestionsPayload,
+  ServiceTypesList,
   TokenRequest,
   UpdateImageRegionsPayload,
   User,
@@ -188,7 +202,7 @@ const entityTransfers = [
 
 const databases = [
   http.get('*/databases/instances', () => {
-    const databases = databaseInstanceFactory.buildList(5);
+    const databases = databaseInstanceFactory.buildList(9);
     return HttpResponse.json(makeResourcePage(databases));
   }),
 
@@ -196,20 +210,23 @@ const databases = [
     const standardTypes = [
       databaseTypeFactory.build({
         class: 'nanode',
-        id: 'g6-standard-0',
+        id: 'g6-nanode-1',
         label: `Nanode 1 GB`,
         memory: 1024,
+      }),
+      databaseTypeFactory.build({
+        class: 'nanode',
+        id: 'g6-standard-1',
+        label: `Linode 2 GB`,
+        memory: 2048,
       }),
       ...databaseTypeFactory.buildList(7, { class: 'standard' }),
     ];
     const dedicatedTypes = databaseTypeFactory.buildList(7, {
       class: 'dedicated',
     });
-    const premiumTypes = databaseTypeFactory.buildList(7, {
-      class: 'premium',
-    });
     return HttpResponse.json(
-      makeResourcePage([...standardTypes, ...dedicatedTypes, ...premiumTypes])
+      makeResourcePage([...standardTypes, ...dedicatedTypes])
     );
   }),
 
@@ -218,37 +235,37 @@ const databases = [
     const engine2 = databaseEngineFactory.buildList(3, {
       engine: 'postgresql',
     });
-    const engine3 = databaseEngineFactory.buildList(3, {
-      engine: 'mongodb',
-    });
 
-    const combinedList = [...engine1, ...engine2, ...engine3];
+    const combinedList = [...engine1, ...engine2];
 
     return HttpResponse.json(makeResourcePage(combinedList));
   }),
 
   http.get('*/databases/:engine/instances/:id', ({ params }) => {
-    const database = databaseFactory.build({
-      compression_type: params.engine === 'mongodb' ? 'none' : undefined,
+    const isDefault = Number(params.id) % 2 !== 0;
+    const db: Record<string, boolean | number | string | undefined> = {
       engine: params.engine as 'mysql',
       id: Number(params.id),
       label: `database-${params.id}`,
-      replication_commit_type:
-        params.engine === 'postgresql' ? 'local' : undefined,
-      replication_type:
+      platform: isDefault ? 'rdbms-default' : 'rdbms-legacy',
+    };
+    if (!isDefault) {
+      db.replication_commit_type =
+        params.engine === 'postgresql' ? 'local' : undefined;
+      db.replication_type =
         params.engine === 'mysql'
           ? pickRandom(possibleMySQLReplicationTypes)
           : params.engine === 'postgresql'
           ? pickRandom(possiblePostgresReplicationTypes)
-          : (undefined as any),
-      ssl_connection: true,
-      storage_engine: params.engine === 'mongodb' ? 'wiredtiger' : undefined,
-    });
+          : (undefined as any);
+      db.ssl_connection = true;
+    }
+    const database = databaseFactory.build(db);
     return HttpResponse.json(database);
   }),
 
   http.get('*/databases/:engine/instances/:databaseId/backups', () => {
-    const backups = databaseBackupFactory.buildList(7);
+    const backups = databaseBackupFactory.buildList(10);
     return HttpResponse.json(makeResourcePage(backups));
   }),
 
@@ -302,6 +319,14 @@ const databases = [
   ),
 
   http.delete('*/databases/mysql/instances/:databaseId', () => {
+    return HttpResponse.json({});
+  }),
+
+  http.post('*/databases/:engine/instances/:databaseId/suspend', () => {
+    return HttpResponse.json({});
+  }),
+
+  http.post('*/databases/:engine/instances/:databaseId/resume', () => {
     return HttpResponse.json({});
   }),
 ];
@@ -364,7 +389,17 @@ const nanodeType = linodeTypeFactory.build({ id: 'g6-nanode-1' });
 const standardTypes = linodeTypeFactory.buildList(7);
 const dedicatedTypes = dedicatedTypeFactory.buildList(7);
 const proDedicatedType = proDedicatedTypeFactory.build();
-
+const gpuTypesAda = linodeTypeFactory.buildList(7, {
+  class: 'gpu',
+  gpus: 5,
+  label: 'Ada Lovelace',
+  transfer: 0,
+});
+const gpuTypesRX = linodeTypeFactory.buildList(7, {
+  class: 'gpu',
+  gpus: 1,
+  transfer: 5000,
+});
 const proxyAccountUser = accountUserFactory.build({
   email: 'partner@proxy.com',
   last_login: null,
@@ -558,6 +593,8 @@ export const handlers = [
         nanodeType,
         ...standardTypes,
         ...dedicatedTypes,
+        ...gpuTypesAda,
+        ...gpuTypesRX,
         proDedicatedType,
       ])
     );
@@ -571,6 +608,9 @@ export const handlers = [
         return HttpResponse.json(type);
       })
   ),
+  http.get(`*/linode/types/*`, () => {
+    return HttpResponse.json(linodeTypeFactory.build());
+  }),
   http.get('*/linode/instances', async ({ request }) => {
     linodeFactory.resetSequenceNumber();
     const metadataLinodeWithCompatibleImage = linodeFactory.build({
@@ -586,6 +626,7 @@ export const handlers = [
       image: 'distributed-region-test-image',
       label: 'Gecko Distributed Region Test',
       region: 'us-den-10',
+      site_type: 'distributed',
     });
     const onlineLinodes = linodeFactory.buildList(40, {
       backups: { enabled: false },
@@ -970,9 +1011,13 @@ export const handlers = [
     const pageSize = Number(url.searchParams.get('page_size') || 25);
 
     const randomBucketNumber = getRandomWholeNumber(1, 500);
+    const randomEndpointType = `E${Math.floor(
+      Math.random() * 4
+    )}` as ObjectStorageEndpointTypes;
 
     const buckets = objectStorageBucketFactoryGen2.buildList(1, {
       cluster: `${region}-1`,
+      endpoint_type: randomEndpointType,
       hostname: `obj-bucket-${randomBucketNumber}.${region}.linodeobjects.com`,
       label: `obj-bucket-${randomBucketNumber}`,
       region,
@@ -1553,21 +1598,37 @@ export const handlers = [
       ])
     );
   }),
-
+  http.post('*/seen', () => {
+    return HttpResponse.json({});
+  }),
   http.get(
     '*/events',
     () => {
       const events = eventFactory.buildList(1, {
         action: 'lke_node_create',
-        entity: { id: 999, label: 'linode-1', type: 'linode' },
+        entity: {
+          id: 1,
+          label: 'linode-1',
+          type: 'linode',
+          url: 'https://google.com',
+        },
         message:
           'Rebooting this thing and showing an extremely long event message for no discernible reason other than the fairly obvious reason that we want to do some testing of whether or not these messages wrap.',
         percent_complete: 15,
+        secondary_entity: {
+          id: 1,
+          label: 'my config',
+          type: 'linode',
+          url: 'https://google.com',
+        },
+        status: 'notification',
       });
+
       const dbEvents = eventFactory.buildList(1, {
         action: 'database_low_disk_space',
         entity: { id: 999, label: 'database-1', type: 'database' },
         message: 'Low disk space.',
+        status: 'notification',
       });
       const oldEvents = eventFactory.buildList(20, {
         action: 'account_update',
@@ -1610,15 +1671,15 @@ export const handlers = [
         makeResourcePage([
           ...events,
           ...dbEvents,
-          ...oldEvents,
           ...placementGroupAssignedEvent,
           ...placementGroupCreateEvent,
           eventWithSpecialCharacters,
+          ...oldEvents,
         ])
       );
     },
     {
-      once: true,
+      once: false,
     }
   ),
 
@@ -1993,7 +2054,7 @@ export const handlers = [
   http.delete('*/profile/tokens/:id', () => {
     return HttpResponse.json({});
   }),
-  http.get('*/account/betas', () => {
+  http.get('*/v4*/account/betas', () => {
     return HttpResponse.json(
       makeResourcePage([
         ...accountBetaFactory.buildList(5),
@@ -2005,7 +2066,7 @@ export const handlers = [
       ])
     );
   }),
-  http.get('*/account/betas/:id', ({ params }) => {
+  http.get('*/v4*/account/betas/:id', ({ params }) => {
     if (params.id !== 'undefined') {
       return HttpResponse.json(
         accountBetaFactory.build({ id: params.id as string })
@@ -2013,17 +2074,15 @@ export const handlers = [
     }
     return HttpResponse.json({}, { status: 404 });
   }),
-  http.post('*/account/betas', () => {
-    return HttpResponse.json({});
+  http.get('*/v4*/betas', () => {
+    return HttpResponse.json(makeResourcePage(betaFactory.buildList(5)));
   }),
-  http.get('*/betas/:id', ({ params }) => {
+  http.get('*/v4*/betas/:id', ({ params }) => {
+    const id = params.id.toString();
     if (params.id !== 'undefined') {
-      return HttpResponse.json(betaFactory.build({ id: params.id as string }));
+      return HttpResponse.json(betaFactory.build({ id }));
     }
     return HttpResponse.json({}, { status: 404 });
-  }),
-  http.get('*/betas', () => {
-    return HttpResponse.json(makeResourcePage(betaFactory.buildList(5)));
   }),
   http.get('*regions/availability', () => {
     return HttpResponse.json(
@@ -2267,77 +2326,7 @@ export const handlers = [
 
     return HttpResponse.json(response);
   }),
-  http.get('*/v4/monitor/services/linode/dashboards', () => {
-    const response = {
-      data: [
-        {
-          created: '2024-04-29T17:09:29',
-          id: 1,
-          label: 'Linode Service I/O Statistics',
-          service_type: 'linode',
-          type: 'standard',
-          updated: null,
-          widgets: [
-            {
-              aggregate_function: 'avg',
-              chart_type: 'area',
-              color: 'blue',
-              label: 'CPU utilization',
-              metric: 'system_cpu_utilization_percent',
-              size: 12,
-              unit: '%',
-              y_label: 'system_cpu_utilization_ratio',
-            },
-            {
-              aggregate_function: 'avg',
-              chart_type: 'area',
-              color: 'red',
-              label: 'Memory Usage',
-              metric: 'system_memory_usage_by_resource',
-              size: 12,
-              unit: 'Bytes',
-              y_label: 'system_memory_usage_bytes',
-            },
-            {
-              aggregate_function: 'avg',
-              chart_type: 'area',
-              color: 'green',
-              label: 'Network Traffic',
-              metric: 'system_network_io_by_resource',
-              size: 6,
-              unit: 'Bytes',
-              y_label: 'system_network_io_bytes_total',
-            },
-            {
-              aggregate_function: 'avg',
-              chart_type: 'area',
-              color: 'yellow',
-              label: 'Disk I/O',
-              metric: 'system_disk_OPS_total',
-              size: 6,
-              unit: 'OPS',
-              y_label: 'system_disk_operations_total',
-            },
-          ],
-        },
-      ],
-    };
-
-    return HttpResponse.json(response);
-  }),
-  http.get('*/v4/monitor/services', () => {
-    const response = {
-      data: [
-        {
-          label: 'Linodes',
-          value: 'linode',
-        },
-        { label: 'DbaaS', value: 'dbaas' },
-      ],
-    };
-    return HttpResponse.json(response);
-  }),
-  http.post('*/monitor/alerts', async ({ request }) => {
+  http.post('*/monitor/alert-definitions', async ({ request }) => {
     const reqBody = await request.json();
     const response = {
       data: [
@@ -2359,7 +2348,45 @@ export const handlers = [
     };
     return HttpResponse.json(response);
   }),
-  http.get('*/v4/monitor/services/:serviceType/metric-definitions', () => {
+  http.get('*/monitor/services', () => {
+    const response: ServiceTypesList = {
+      data: [
+        serviceTypesFactory.build({
+          label: 'Linode',
+          service_type: 'linode',
+        }),
+        serviceTypesFactory.build({
+          label: 'Databases',
+          service_type: 'dbaas',
+        }),
+      ],
+    };
+
+    return HttpResponse.json(response);
+  }),
+  http.get('*/monitor/services/:serviceType/dashboards', ({ params }) => {
+    const response = {
+      data: [] as Dashboard[],
+    };
+    if (params.serviceType === 'linode') {
+      response.data.push(
+        dashboardFactory.build({
+          label: 'Linode Dashboard',
+          service_type: 'linode',
+        })
+      );
+    } else if (params.serviceType === 'dbaas') {
+      response.data.push(
+        dashboardFactory.build({
+          label: 'DBaaS Dashboard',
+          service_type: 'dbaas',
+        })
+      );
+    }
+
+    return HttpResponse.json(response);
+  }),
+  http.get('*/monitor/services/:serviceType/metric-definitions', () => {
     const response = {
       data: [
         {
@@ -2478,26 +2505,29 @@ export const handlers = [
 
     return HttpResponse.json(response);
   }),
-  http.post('*/v4/monitor/services/:serviceType/token', () => {
+  http.post('*/monitor/services/:serviceType/token', () => {
     const response = {
       token: 'eyJhbGciOiAiZGlyIiwgImVuYyI6ICJBMTI4Q0JDLUhTMjU2IiwgImtpZCI6ID',
     };
     return HttpResponse.json(response);
   }),
 
-  http.get('*/v4/monitor/dashboards/:id', () => {
+  http.get('*/monitor/dashboards/:id', ({ params }) => {
     const response = {
       created: '2024-04-29T17:09:29',
-      id: 1,
-      label: 'Linode Service I/O Statistics',
-      service_type: 'linode',
+      id: params.id,
+      label:
+        params.id === '1'
+          ? 'Linode Service I/O Statistics'
+          : 'DBaaS Service I/O Statistics',
+      service_type: params.id === '1' ? 'linode' : 'dbaas', // just update the service type and label and use same widget configs
       type: 'standard',
       updated: null,
       widgets: [
         {
           aggregate_function: 'avg',
           chart_type: 'area',
-          color: 'blue',
+          color: 'default',
           label: 'CPU utilization',
           metric: 'system_cpu_utilization_percent',
           size: 12,
@@ -2507,7 +2537,7 @@ export const handlers = [
         {
           aggregate_function: 'avg',
           chart_type: 'area',
-          color: 'red',
+          color: 'default',
           label: 'Memory Usage',
           metric: 'system_memory_usage_by_resource',
           size: 12,
@@ -2517,7 +2547,7 @@ export const handlers = [
         {
           aggregate_function: 'avg',
           chart_type: 'area',
-          color: 'green',
+          color: 'default',
           label: 'Network Traffic',
           metric: 'system_network_io_by_resource',
           size: 6,
@@ -2527,7 +2557,7 @@ export const handlers = [
         {
           aggregate_function: 'avg',
           chart_type: 'area',
-          color: 'yellow',
+          color: 'default',
           label: 'Disk I/O',
           metric: 'system_disk_OPS_total',
           size: 6,
@@ -2543,7 +2573,9 @@ export const handlers = [
       data: {
         result: [
           {
-            metric: {},
+            metric: {
+              test: 'Test1',
+            },
             values: [
               [1721854379, '0.2744841110560275'],
               [1721857979, '0.2980357104166823'],
@@ -2558,6 +2590,46 @@ export const handlers = [
               [1721890379, '0.26863082415681144'],
               [1721893979, '0.26126998689934394'],
               [1721897579, '0.26164641539434685'],
+            ],
+          },
+          {
+            metric: {
+              test2: 'Test2',
+            },
+            values: [
+              [1721854379, '0.3744841110560275'],
+              [1721857979, '0.4980357104166823'],
+              [1721861579, '0.3290476561287732'],
+              [1721865179, '0.42148793964961897'],
+              [1721868779, '0.2269247326830727'],
+              [1721872379, '0.3393055885526987'],
+              [1721875979, '0.5237102833940027'],
+              [1721879579, '0.3153372503472701'],
+              [1721883179, '0.26811506053820466'],
+              [1721886779, '0.35839295774934357'],
+              [1721890379, '0.36863082415681144'],
+              [1721893979, '0.46126998689934394'],
+              [1721897579, '0.56164641539434685'],
+            ],
+          },
+          {
+            metric: {
+              test3: 'Test3',
+            },
+            values: [
+              [1721854379, '0.3744841110560275'],
+              [1721857979, '0.4980357104166823'],
+              [1721861579, '0.3290476561287732'],
+              [1721865179, '0.4148793964961897'],
+              [1721868779, '0.4269247326830727'],
+              [1721872379, '0.3393055885526987'],
+              [1721875979, '0.6237102833940027'],
+              [1721879579, '0.3153372503472701'],
+              [1721883179, '0.26811506053820466'],
+              [1721886779, '0.45839295774934357'],
+              [1721890379, '0.36863082415681144'],
+              [1721893979, '0.56126998689934394'],
+              [1721897579, '0.66164641539434685'],
             ],
           },
         ],

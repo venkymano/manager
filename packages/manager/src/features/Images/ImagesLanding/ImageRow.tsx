@@ -1,15 +1,20 @@
-import * as React from 'react';
+import { Stack, Tooltip } from '@linode/ui';
+import React from 'react';
 
+import CloudInitIcon from 'src/assets/icons/cloud-init.svg';
 import { Hidden } from 'src/components/Hidden';
+import { LinkButton } from 'src/components/LinkButton';
 import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow';
 import { Typography } from 'src/components/Typography';
+import { useFlags } from 'src/hooks/useFlags';
 import { useProfile } from 'src/queries/profile/profile';
 import { capitalizeAllWords } from 'src/utilities/capitalize';
 import { formatDate } from 'src/utilities/formatDate';
+import { pluralize } from 'src/utilities/pluralize';
+import { convertStorageUnit } from 'src/utilities/unitConversions';
 
 import { ImagesActionMenu } from './ImagesActionMenu';
-import { RegionsList } from './RegionsList';
 
 import type { Handlers } from './ImagesActionMenu';
 import type { Event, Image, ImageCapabilities } from '@linode/api-v4';
@@ -42,6 +47,7 @@ export const ImageRow = (props: Props) => {
   } = image;
 
   const { data: profile } = useProfile();
+  const flags = useFlags();
 
   const isFailed = status === 'pending_upload' && event?.status === 'failed';
 
@@ -73,7 +79,14 @@ export const ImageRow = (props: Props) => {
     eventStatus: string | undefined
   ) => {
     if (status === 'available' || eventStatus === 'finished') {
-      return `${size} MB`;
+      const sizeInGB = convertStorageUnit('MB', size, 'GB');
+
+      const formattedSizeInGB = Intl.NumberFormat('en-US', {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+      }).format(sizeInGB);
+
+      return `${formattedSizeInGB} GB`;
     } else if (isFailed) {
       return 'N/A';
     } else {
@@ -83,26 +96,42 @@ export const ImageRow = (props: Props) => {
 
   return (
     <TableRow data-qa-image-cell={id} key={id}>
-      <TableCell data-qa-image-label>{label}</TableCell>
+      <TableCell data-qa-image-label noWrap>
+        {capabilities.includes('cloud-init') &&
+        flags.imageServiceGen2 &&
+        flags.imageServiceGen2Ga ? (
+          <Stack alignItems="center" direction="row" gap={1.5}>
+            <Tooltip title="This image supports our Metadata service via cloud-init.">
+              <div style={{ display: 'flex' }}>
+                <CloudInitIcon />
+              </div>
+            </Tooltip>
+            {label}
+          </Stack>
+        ) : (
+          label
+        )}
+      </TableCell>
       <Hidden smDown>
-        {status ? <TableCell>{getStatusForImage(status)}</TableCell> : null}
+        <TableCell>{getStatusForImage(status)}</TableCell>
       </Hidden>
       {multiRegionsEnabled && (
-        <>
-          <Hidden smDown>
-            <TableCell>
-              {regions && regions.length > 0 && (
-                <RegionsList
-                  onManageRegions={() => handlers.onManageRegions?.(image)}
-                  regions={regions}
-                />
-              )}
-            </TableCell>
-          </Hidden>
-          <Hidden smDown>
-            <TableCell>{compatibilitiesList}</TableCell>
-          </Hidden>
-        </>
+        <Hidden smDown>
+          <TableCell>
+            {regions.length > 0 ? (
+              <LinkButton onClick={() => handlers.onManageRegions?.(image)}>
+                {pluralize('Region', 'Regions', regions.length)}
+              </LinkButton>
+            ) : (
+              'N/A'
+            )}
+          </TableCell>
+        </Hidden>
+      )}
+      {multiRegionsEnabled && !flags.imageServiceGen2Ga && (
+        <Hidden smDown>
+          <TableCell>{compatibilitiesList}</TableCell>
+        </Hidden>
       )}
       <TableCell data-qa-image-size>
         {getSizeForImage(size, status, event?.status)}
@@ -122,13 +151,13 @@ export const ImageRow = (props: Props) => {
         </TableCell>
       </Hidden>
       <Hidden smDown>
-        {expiry ? (
+        {expiry && (
           <TableCell data-qa-image-date>
             {formatDate(expiry, {
               timezone: profile?.timezone,
             })}
           </TableCell>
-        ) : null}
+        )}
       </Hidden>
       {multiRegionsEnabled && (
         <Hidden mdDown>

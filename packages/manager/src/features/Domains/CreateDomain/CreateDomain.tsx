@@ -1,14 +1,8 @@
-import { Linode } from '@linode/api-v4';
-import {
-  CreateDomainPayload,
-  Domain,
-  DomainType,
-} from '@linode/api-v4/lib/domains';
-import { NodeBalancer } from '@linode/api-v4/lib/nodebalancers';
-import { APIError } from '@linode/api-v4/lib/types';
+import { FormHelperText, Notice, Paper, RadioGroup } from '@linode/ui';
 import { createDomainSchema } from '@linode/validation/lib/domains.schema';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
+import { createLazyRoute } from '@tanstack/react-router';
 import { useFormik } from 'formik';
 import { path } from 'ramda';
 import * as React from 'react';
@@ -18,13 +12,9 @@ import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 import { DocumentTitleSegment } from 'src/components/DocumentTitle';
 import { FormControlLabel } from 'src/components/FormControlLabel';
-import { FormHelperText } from 'src/components/FormHelperText';
 import { LandingHeader } from 'src/components/LandingHeader';
 import { MultipleIPInput } from 'src/components/MultipleIPInput/MultipleIPInput';
-import { Notice } from 'src/components/Notice/Notice';
-import { Paper } from 'src/components/Paper';
 import { Radio } from 'src/components/Radio/Radio';
-import { RadioGroup } from 'src/components/RadioGroup';
 import { TextField } from 'src/components/TextField';
 import { reportException } from 'src/exceptionReporting';
 import { LinodeSelect } from 'src/features/Linodes/LinodeSelect/LinodeSelect';
@@ -38,14 +28,20 @@ import {
   handleGeneralErrors,
 } from 'src/utilities/formikErrorUtils';
 import { handleFormikBlur } from 'src/utilities/formikTrimUtil';
-import {
-  ExtendedIP,
-  extendedIPToString,
-  stringToExtendedIP,
-} from 'src/utilities/ipUtils';
+import { extendedIPToString, stringToExtendedIP } from 'src/utilities/ipUtils';
 import { scrollErrorIntoView } from 'src/utilities/scrollErrorIntoView';
 
 import { generateDefaultDomainRecords } from '../domainUtils';
+
+import type { Linode } from '@linode/api-v4';
+import type {
+  CreateDomainPayload,
+  Domain,
+  DomainType,
+} from '@linode/api-v4/lib/domains';
+import type { NodeBalancer } from '@linode/api-v4/lib/nodebalancers';
+import type { APIError } from '@linode/api-v4/lib/types';
+import type { ExtendedIP } from 'src/utilities/ipUtils';
 
 interface DefaultRecordsSetting {
   label: string;
@@ -286,7 +282,7 @@ export const CreateDomain = () => {
       <DocumentTitleSegment segment="Create Domain" />
       <LandingHeader
         docsLabel="Docs"
-        docsLink="https://www.linode.com/docs/guides/dns-manager/"
+        docsLink="https://techdocs.akamai.com/cloud-computing/docs/dns-manager"
         title="Create"
       />
       <StyledGrid>
@@ -447,6 +443,10 @@ export const CreateDomain = () => {
     </Grid>
   );
 };
+
+export const createDomainLazyRoute = createLazyRoute('/domains/create')({
+  component: CreateDomain,
+});
 
 const StyledGrid = styled(Grid, { label: 'StyledGrid' })({
   width: '100%',

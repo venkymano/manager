@@ -1,20 +1,17 @@
+import { Box, IconButton } from '@linode/ui';
 import MenuIcon from '@mui/icons-material/Menu';
 import * as React from 'react';
 
 import { AppBar } from 'src/components/AppBar';
-import { Box } from 'src/components/Box';
 import { Hidden } from 'src/components/Hidden';
-import { IconButton } from 'src/components/IconButton';
 import { Toolbar } from 'src/components/Toolbar';
 import { Typography } from 'src/components/Typography';
 import { useAuthentication } from 'src/hooks/useAuthentication';
-import { useFlags } from 'src/hooks/useFlags';
 
 import { AddNewMenu } from './AddNewMenu/AddNewMenu';
 import { Community } from './Community';
 import { Help } from './Help';
 import { NotificationMenu } from './NotificationMenu/NotificationMenu';
-import { NotificationMenuV2 } from './NotificationMenu/NotificationMenuV2';
 import SearchBar from './SearchBar/SearchBar';
 import { TopMenuTooltip } from './TopMenuTooltip';
 import { UserMenu } from './UserMenu';
@@ -32,8 +29,6 @@ export interface TopMenuProps {
  */
 export const TopMenu = React.memo((props: TopMenuProps) => {
   const { desktopMenuToggle, isSideMenuOpen, openSideMenu, username } = props;
-  // TODO eventMessagesV2: delete when flag is removed
-  const flags = useFlags();
 
   const { loggedInAsCustomer } = useAuthentication();
 
@@ -45,12 +40,15 @@ export const TopMenu = React.memo((props: TopMenuProps) => {
     <React.Fragment>
       {loggedInAsCustomer && (
         <Box bgcolor="pink" padding="1em" textAlign="center">
-          <Typography color="black" fontSize="1.2em">
+          <Typography
+            color={(theme) => theme.tokens.color.Neutrals.Black}
+            fontSize="1.2em"
+          >
             You are logged in as customer: <strong>{username}</strong>
           </Typography>
         </Box>
       )}
-      <AppBar>
+      <AppBar data-qa-appbar>
         <Toolbar
           sx={(theme) => ({
             '&.MuiToolbar-root': {
@@ -65,6 +63,7 @@ export const TopMenu = React.memo((props: TopMenuProps) => {
             <TopMenuTooltip title={navHoverText}>
               <IconButton
                 aria-label="open menu"
+                color="inherit"
                 data-testid="open-nav-menu"
                 onClick={desktopMenuToggle}
                 size="large"
@@ -89,11 +88,9 @@ export const TopMenu = React.memo((props: TopMenuProps) => {
           <SearchBar />
           <Help />
           <Community />
-          {flags.eventMessagesV2 ? (
-            <NotificationMenuV2 />
-          ) : (
-            <NotificationMenu />
-          )}
+
+          <NotificationMenu />
+
           <UserMenu />
         </Toolbar>
       </AppBar>

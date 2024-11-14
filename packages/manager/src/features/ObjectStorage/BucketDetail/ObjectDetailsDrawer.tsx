@@ -1,12 +1,8 @@
-import {
-  getObjectACL,
-  updateObjectACL,
-} from '@linode/api-v4/lib/object-storage';
+import { Divider } from '@linode/ui';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
 
 import { CopyTooltip } from 'src/components/CopyTooltip/CopyTooltip';
-import { Divider } from 'src/components/Divider';
 import { Drawer } from 'src/components/Drawer';
 import { Link } from 'src/components/Link';
 import { Typography } from 'src/components/Typography';
@@ -17,12 +13,13 @@ import { readableBytes } from 'src/utilities/unitConversions';
 
 import { AccessSelect } from './AccessSelect';
 
-import type { ACLType } from '@linode/api-v4/lib/object-storage';
+import type { ObjectStorageEndpointTypes } from '@linode/api-v4/lib/object-storage';
 
 export interface ObjectDetailsDrawerProps {
   bucketName: string;
   clusterId: string;
   displayName?: string;
+  endpointType?: ObjectStorageEndpointTypes;
   lastModified?: null | string;
   name?: string;
   onClose: () => void;
@@ -38,6 +35,7 @@ export const ObjectDetailsDrawer = React.memo(
       bucketName,
       clusterId,
       displayName,
+      endpointType,
       lastModified,
       name,
       onClose,
@@ -54,6 +52,9 @@ export const ObjectDetailsDrawer = React.memo(
         });
       }
     } catch {}
+
+    const isAccessSelectEnabled =
+      open && name && endpointType !== 'E2' && endpointType !== 'E3';
 
     return (
       <Drawer
@@ -81,20 +82,13 @@ export const ObjectDetailsDrawer = React.memo(
           </StyledLinkContainer>
         ) : null}
 
-        {open && name ? (
+        {isAccessSelectEnabled ? (
           <>
             <Divider spacingBottom={16} spacingTop={16} />
             <AccessSelect
-              getAccess={() =>
-                getObjectACL({
-                  bucket: bucketName,
-                  clusterId,
-                  params: { name },
-                })
-              }
-              updateAccess={(acl: ACLType) =>
-                updateObjectACL(clusterId, bucketName, name, acl)
-              }
+              bucketName={bucketName}
+              clusterOrRegion={clusterId}
+              endpointType={endpointType}
               name={name}
               variant="object"
             />

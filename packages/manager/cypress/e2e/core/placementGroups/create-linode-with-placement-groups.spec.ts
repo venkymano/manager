@@ -1,8 +1,3 @@
-import {
-  mockAppendFeatureFlags,
-  mockGetFeatureFlagClientstream,
-} from 'support/intercepts/feature-flags';
-import { makeFeatureFlagData } from 'support/util/feature-flags';
 import { mockGetAccount } from 'support/intercepts/account';
 import {
   accountFactory,
@@ -22,42 +17,35 @@ import {
 } from 'support/intercepts/placement-groups';
 import { randomNumber, randomString } from 'support/util/random';
 import { CANNOT_CHANGE_PLACEMENT_GROUP_POLICY_MESSAGE } from 'src/features/PlacementGroups/constants';
-
-import type { Region } from '@linode/api-v4';
-import type { Flags } from 'src/featureFlags';
 import { linodeCreatePage } from 'support/ui/pages';
+import { extendRegion } from 'support/util/regions';
 
 const mockAccount = accountFactory.build();
-const mockRegions: Region[] = [
+
+const mockNewarkRegion = extendRegion(
   regionFactory.build({
     capabilities: ['Linodes', 'Placement Group'],
     id: 'us-east',
     label: 'Newark, NJ',
     country: 'us',
-  }),
+  })
+);
+
+const mockDallasRegion = extendRegion(
   regionFactory.build({
     capabilities: ['Linodes'],
     id: 'us-central',
     label: 'Dallas, TX',
     country: 'us',
-  }),
-];
+  })
+);
+
+const mockRegions = [mockNewarkRegion, mockDallasRegion];
 
 describe('Linode create flow with Placement Group', () => {
   beforeEach(() => {
     mockGetAccount(mockAccount);
     mockGetRegions(mockRegions).as('getRegions');
-    // TODO Remove feature flag mocks when `placementGroups` flag is retired.
-    mockAppendFeatureFlags({
-      placementGroups: makeFeatureFlagData<Flags['placementGroups']>({
-        beta: true,
-        enabled: true,
-      }),
-      linodeCreateRefactor: makeFeatureFlagData<Flags['linodeCreateRefactor']>(
-        false
-      ),
-    });
-    mockGetFeatureFlagClientstream();
   });
 
   /*
@@ -75,15 +63,15 @@ describe('Linode create flow with Placement Group', () => {
     // Region without capability
     // Choose region
     ui.regionSelect.find().click();
-    ui.regionSelect.findItemByRegionLabel(mockRegions[1].label).click();
+    ui.regionSelect.findItemByRegionLabel(mockDallasRegion.label).click();
 
     // Choose plan
     cy.findByText('Shared CPU').click();
     cy.get('[id="g6-nanode-1"]').click();
 
-    cy.findByText('Placement Groups in Dallas, TX (us-central)').should(
-      'be.visible'
-    );
+    cy.findByText(
+      `Placement Groups in ${mockDallasRegion.label} (${mockDallasRegion.id})`
+    ).should('be.visible');
     cy.get('[data-testid="placement-groups-no-capability-notice"]').should(
       'be.visible'
     );
@@ -96,7 +84,7 @@ describe('Linode create flow with Placement Group', () => {
     // Region with capability
     // Choose region
     ui.regionSelect.find().click();
-    ui.regionSelect.findItemByRegionLabel(mockRegions[0].label).click();
+    ui.regionSelect.findItemByRegionLabel(mockNewarkRegion.label).click();
 
     // Choose plan
     cy.findByText('Shared CPU').click();
@@ -104,9 +92,9 @@ describe('Linode create flow with Placement Group', () => {
 
     // Choose Placement Group
     // No Placement Group available
-    cy.findByText('Placement Groups in Newark, NJ (us-east)').should(
-      'be.visible'
-    );
+    cy.findByText(
+      `Placement Groups in ${mockNewarkRegion.label} (${mockNewarkRegion.id})`
+    ).should('be.visible');
     // Open the select
     cy.get('[data-testid="placement-groups-select"] input').click();
     cy.findByText('There are no placement groups in this region.').click();
@@ -139,7 +127,9 @@ describe('Linode create flow with Placement Group', () => {
         // - A selection region
         // - An Placement Group Policy message
         // - a disabled "Create Placement Group" button.
-        cy.findByText('Newark, NJ (us-east)').should('be.visible');
+        cy.findByText(
+          `${mockNewarkRegion.label} (${mockNewarkRegion.id})`
+        ).should('be.visible');
         cy.findByText(CANNOT_CHANGE_PLACEMENT_GROUP_POLICY_MESSAGE).should(
           'be.visible'
         );
@@ -190,16 +180,16 @@ describe('Linode create flow with Placement Group', () => {
     });
 
     // Confirm the Placement group assignment is accounted for in the summary.
-    cy.get('[data-qa-summary="true"]').within(() => {
-      cy.findByText('Assigned to Placement Group').should('be.visible');
-    });
+    cy.findByText('Assigned to Placement Group')
+      .scrollIntoView()
+      .should('be.visible');
 
     // Type in a label, password and submit the form.
     mockCreateLinode(mockLinode).as('createLinode');
     cy.get('#linode-label').clear().type('linode-with-placement-group');
     cy.get('#root-password').type(randomString(32));
 
-    cy.get('[data-qa-deploy-linode]').click();
+    cy.findByText('Create Linode').should('be.enabled').click();
 
     // Wait for outgoing API request and confirm that payload contains expected data.
     cy.wait('@createLinode').then((xhr) => {
@@ -250,7 +240,9 @@ describe('Linode create flow with Placement Group', () => {
     linodeCreatePage.setLabel(mockLinode.label);
 
     // Confirm that mocked Placement Group is shown in the Autocomplete, and then select it.
-    cy.findByText('Placement Groups in Newark, NJ (us-east)')
+    cy.findByText(
+      `Placement Groups in ${mockNewarkRegion.label} (${mockNewarkRegion.id})`
+    )
       .click()
       .type(`${mockPlacementGroup.label}`);
     ui.autocompletePopper
@@ -259,9 +251,9 @@ describe('Linode create flow with Placement Group', () => {
       .click();
 
     // Confirm the Placement group assignment is accounted for in the summary.
-    cy.get('[data-qa-summary="true"]').within(() => {
-      cy.findByText('Assigned to Placement Group').should('be.visible');
-    });
+    cy.findByText('Assigned to Placement Group')
+      .scrollIntoView()
+      .should('be.visible');
 
     // Create Linode and confirm contents of outgoing API request payload.
     ui.button

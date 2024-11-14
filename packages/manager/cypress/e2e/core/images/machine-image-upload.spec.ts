@@ -81,9 +81,7 @@ const eventIntercept = (
  * @param message - Expected failure message.
  */
 const assertFailed = (label: string, id: string, message: string) => {
-  ui.toast.assertMessage(
-    `There was a problem uploading image ${label}: ${message}`
-  );
+  ui.toast.assertMessage(`Image ${label} could not be uploaded: ${message}`);
 
   cy.get(`[data-qa-image-cell="${id}"]`).within(() => {
     fbtVisible(label);
@@ -114,7 +112,7 @@ const assertProcessing = (label: string, id: string) => {
  * @param label - Label to apply to uploaded image.
  */
 const uploadImage = (label: string) => {
-  const region = chooseRegion();
+  const region = chooseRegion({ capabilities: ['Object Storage'] });
   const upload = 'machine-images/test-image.gz';
   cy.visitWithLogin('/images/create/upload');
   getClick('[id="label"][data-testid="textfield-input"]').type(label);

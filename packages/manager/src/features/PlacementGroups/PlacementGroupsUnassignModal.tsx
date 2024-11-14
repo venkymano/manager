@@ -1,3 +1,4 @@
+import { Notice } from '@linode/ui';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
@@ -6,7 +7,6 @@ import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
 import { CircleProgress } from 'src/components/CircleProgress';
 import { ConfirmationDialog } from 'src/components/ConfirmationDialog/ConfirmationDialog';
 import { NotFound } from 'src/components/NotFound';
-import { Notice } from 'src/components/Notice/Notice';
 import { Typography } from 'src/components/Typography';
 import { useIsResourceRestricted } from 'src/hooks/useIsResourceRestricted';
 import { useLinodeQuery } from 'src/queries/linodes/linodes';
@@ -39,12 +39,12 @@ export const PlacementGroupsUnassignModal = (props: Props) => {
 
   const {
     error,
-    isLoading,
+    isPending,
     mutateAsync: unassignLinodes,
-  } = useUnassignLinodesFromPlacementGroup(+placementGroupId ?? -1);
+  } = useUnassignLinodesFromPlacementGroup(+placementGroupId);
 
   const { data: linodeFromQuery, isFetching } = useLinodeQuery(
-    +linodeId ?? -1,
+    +linodeId,
     open && selectedLinode === undefined
   );
 
@@ -78,9 +78,9 @@ export const PlacementGroupsUnassignModal = (props: Props) => {
   const actions = (
     <ActionsPanel
       primaryButtonProps={{
-        disabled: isLoading || isLinodeReadOnly,
+        disabled: isPending || isLinodeReadOnly,
         label: 'Unassign',
-        loading: isLoading,
+        loading: isPending,
         onClick: onUnassign,
       }}
       secondaryButtonProps={{

@@ -1,3 +1,5 @@
+import { Notice } from '@linode/ui';
+import { createLazyRoute } from '@tanstack/react-router';
 import * as React from 'react';
 import {
   matchPath,
@@ -9,7 +11,6 @@ import {
 import { CircleProgress } from 'src/components/CircleProgress';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { LandingHeader } from 'src/components/LandingHeader';
-import { Notice } from 'src/components/Notice/Notice';
 import { SafeTabPanel } from 'src/components/Tabs/SafeTabPanel';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
 import { TabPanels } from 'src/components/Tabs/TabPanels';
@@ -24,7 +25,7 @@ import { useGrants } from 'src/queries/profile/profile';
 import { getErrorMap } from 'src/utilities/errorUtils';
 
 import NodeBalancerConfigurations from './NodeBalancerConfigurations';
-import NodeBalancerSettings from './NodeBalancerSettings';
+import { NodeBalancerSettings } from './NodeBalancerSettings';
 import { NodeBalancerSummary } from './NodeBalancerSummary/NodeBalancerSummary';
 
 export const NodeBalancerDetail = () => {
@@ -114,7 +115,7 @@ export const NodeBalancerDetail = () => {
           pathname: `/nodebalancers/${nodeBalancerLabel}`,
         }}
         docsLabel="Docs"
-        docsLink="https://www.linode.com/docs/guides/getting-started-with-nodebalancers/"
+        docsLink="https://techdocs.akamai.com/cloud-computing/docs/getting-started-with-nodebalancers"
         title={nodeBalancerLabel}
       />
       {errorMap.none && <Notice text={errorMap.none} variant="error" />}
@@ -155,3 +156,11 @@ export const NodeBalancerDetail = () => {
     </React.Fragment>
   );
 };
+
+export const nodeBalancerDetailLazyRoute = createLazyRoute(
+  '/nodebalancers/$nodeBalancerId'
+)({
+  component: NodeBalancerDetail,
+});
+
+export default NodeBalancerDetail;

@@ -1,10 +1,8 @@
-import { AccountLogin } from '@linode/api-v4/lib/account/types';
-import { Theme } from '@mui/material/styles';
+import { Notice } from '@linode/ui';
 import * as React from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { Hidden } from 'src/components/Hidden';
-import { Notice } from 'src/components/Notice/Notice';
 import { PaginationFooter } from 'src/components/PaginationFooter/PaginationFooter';
 import { Table } from 'src/components/Table';
 import { TableBody } from 'src/components/TableBody';
@@ -23,6 +21,9 @@ import { useProfile } from 'src/queries/profile/profile';
 
 import AccountLoginsTableRow from './AccountLoginsTableRow';
 import { getRestrictedResourceText } from './utils';
+
+import type { AccountLogin } from '@linode/api-v4/lib/account/types';
+import type { Theme } from '@mui/material/styles';
 
 const preferenceKey = 'account-logins';
 
@@ -66,10 +67,7 @@ const AccountLogins = () => {
   );
   const { data: profile } = useProfile();
   const isChildUser = profile?.user_type === 'child';
-
-  const isRestrictedChildUser = Boolean(isChildUser);
-  const isAccountAccessRestricted =
-    isRestrictedChildUser || profile?.restricted;
+  const isAccountAccessRestricted = profile?.restricted;
 
   const renderTableContent = () => {
     if (isLoading) {

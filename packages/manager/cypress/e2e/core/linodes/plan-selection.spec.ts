@@ -12,13 +12,7 @@ import {
   mockGetRegionAvailability,
 } from 'support/intercepts/regions';
 import { mockGetLinodeTypes } from 'support/intercepts/linodes';
-import {
-  mockAppendFeatureFlags,
-  mockGetFeatureFlagClientstream,
-} from 'support/intercepts/feature-flags';
-import { makeFeatureFlagData } from 'support/util/feature-flags';
-
-import type { Flags } from 'src/featureFlags';
+import { mockAppendFeatureFlags } from 'support/intercepts/feature-flags';
 
 const mockRegions = [
   regionFactory.build({
@@ -131,7 +125,7 @@ const notices = {
 
 authenticate();
 describe('displays linode plans panel based on availability', () => {
-  before(() => {
+  beforeEach(() => {
     mockGetRegions(mockRegions).as('getRegions');
     mockGetLinodeTypes(mockLinodeTypes).as('getLinodeTypes');
     mockGetRegionAvailability(mockRegions[0].id, mockRegionAvailability).as(
@@ -227,7 +221,7 @@ describe('displays linode plans panel based on availability', () => {
 });
 
 describe('displays kubernetes plans panel based on availability', () => {
-  before(() => {
+  beforeEach(() => {
     mockGetRegions(mockRegions).as('getRegions');
     mockGetLinodeTypes(mockLinodeTypes).as('getLinodeTypes');
     mockGetRegionAvailability(mockRegions[0].id, mockRegionAvailability).as(
@@ -277,7 +271,7 @@ describe('displays kubernetes plans panel based on availability', () => {
         cy.get('[data-qa-plan-row="dedicated-3"]').within(() => {
           cy.get('[data-testid="decrement-button"]').should('be.disabled');
           cy.get('[data-testid="increment-button"]').should('be.disabled');
-          cy.get('[data-testid="Button"]')
+          cy.get('[data-testid="button"]')
             .should(
               'have.attr',
               'aria-label',
@@ -357,23 +351,24 @@ describe('displays kubernetes plans panel based on availability', () => {
 });
 
 describe('displays specific linode plans for GPU', () => {
-  before(() => {
+  beforeEach(() => {
     mockGetRegions(mockRegions).as('getRegions');
     mockGetLinodeTypes(mockLinodeTypes).as('getLinodeTypes');
     mockGetRegionAvailability(mockRegions[0].id, mockRegionAvailability).as(
       'getRegionAvailability'
     );
     mockAppendFeatureFlags({
-      placementGroups: makeFeatureFlagData<Flags['gpuv2']>({
+      gpuv2: {
+        transferBanner: true,
         planDivider: true,
-      }),
-    });
-    mockGetFeatureFlagClientstream();
+        egressBanner: true,
+      },
+    }).as('getFeatureFlags');
   });
 
   it('Should render divided tables when GPU divider enabled', () => {
     cy.visitWithLogin('/linodes/create');
-
+    cy.wait(['@getRegions', '@getLinodeTypes', '@getFeatureFlags']);
     ui.regionSelect.find().click();
     ui.regionSelect.findItemByRegionLabel(mockRegions[0].label).click();
 
@@ -381,7 +376,7 @@ describe('displays specific linode plans for GPU', () => {
     // Should display two separate tables
     cy.findByText('GPU').click();
     cy.get(linodePlansPanel).within(() => {
-      cy.findAllByRole('alert').should('have.length', 1);
+      cy.findAllByRole('alert').should('have.length', 3);
       cy.get(notices.unavailable).should('be.visible');
 
       cy.findByRole('table', {

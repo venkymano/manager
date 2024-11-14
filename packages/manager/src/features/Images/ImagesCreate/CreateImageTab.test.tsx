@@ -158,7 +158,42 @@ describe('CreateImageTab', () => {
 
     // Verify distributed compute region notice renders
     await findByText(
-      'This Linode is in a distributed compute region. Images captured from this Linode will be stored in the closest core site.'
+      "This Linode is in a distributed compute region. These regions can't store images.",
+      { exact: false }
+    );
+  });
+
+  it('should render a notice if the user selects a Linode in a region that does not support image storage and Image Service Gen 2 GA is enabled', async () => {
+    const region = regionFactory.build({ capabilities: [] });
+    const linode = linodeFactory.build({ region: region.id });
+
+    server.use(
+      http.get('*/v4/linode/instances', () => {
+        return HttpResponse.json(makeResourcePage([linode]));
+      }),
+      http.get('*/v4/linode/instances/:id', () => {
+        return HttpResponse.json(linode);
+      }),
+      http.get('*/v4/regions', () => {
+        return HttpResponse.json(makeResourcePage([region]));
+      })
+    );
+
+    const { findByText, getByLabelText } = renderWithTheme(<CreateImageTab />, {
+      flags: { imageServiceGen2: true, imageServiceGen2Ga: true },
+    });
+
+    const linodeSelect = getByLabelText('Linode');
+
+    await userEvent.click(linodeSelect);
+
+    const linodeOption = await findByText(linode.label);
+
+    await userEvent.click(linodeOption);
+
+    await findByText(
+      'This Linode’s region doesn’t support local image storage.',
+      { exact: false }
     );
   });
 

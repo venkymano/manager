@@ -1,16 +1,15 @@
+import { Box, Divider, Notice } from '@linode/ui';
 import { useTheme } from '@mui/material/styles';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 
-import { Box } from 'src/components/Box';
 import { Button } from 'src/components/Button/Button';
 import { Checkbox } from 'src/components/Checkbox';
 import { CircleProgress } from 'src/components/CircleProgress/CircleProgress';
 import { Dialog } from 'src/components/Dialog/Dialog';
-import { Divider } from 'src/components/Divider';
+import { ErrorMessage } from 'src/components/ErrorMessage';
 import { Link } from 'src/components/Link';
-import { Notice } from 'src/components/Notice/Notice';
 import { TooltipIcon } from 'src/components/TooltipIcon';
 import { TypeToConfirm } from 'src/components/TypeToConfirm/TypeToConfirm';
 import { Typography } from 'src/components/Typography';
@@ -32,7 +31,6 @@ import { scrollErrorIntoViewV2 } from 'src/utilities/scrollErrorIntoViewV2';
 import { HostMaintenanceError } from '../HostMaintenanceError';
 import { LinodePermissionsError } from '../LinodePermissionsError';
 import {
-  getError,
   isSmallerThanCurrentPlan,
   shouldEnableAutoResizeDiskOption,
 } from './LinodeResize.utils';
@@ -73,12 +71,12 @@ export const LinodeResize = (props: Props) => {
   const { data: preferences } = usePreferences(open);
   const { enqueueSnackbar } = useSnackbar();
   const [confirmationText, setConfirmationText] = React.useState('');
-  const [hasResizeError, setHasResizeError] = React.useState<boolean>(false);
+  const [resizeError, setResizeError] = React.useState<string>('');
   const formRef = React.useRef<HTMLFormElement>(null);
 
   const {
-    error: resizeError,
-    isLoading,
+    error,
+    isPending,
     mutateAsync: resizeLinode,
   } = useLinodeResizeMutation(linodeId ?? -1);
 
@@ -147,15 +145,15 @@ export const LinodeResize = (props: Props) => {
     if (!open) {
       formik.resetForm();
       setConfirmationText('');
-      setHasResizeError(false);
+      setResizeError('');
     }
   }, [open]);
 
   React.useEffect(() => {
-    if (resizeError) {
-      setHasResizeError(true);
+    if (error) {
+      setResizeError(error?.[0]?.reason);
     }
-  }, [resizeError]);
+  }, [error]);
 
   const tableDisabled = hostMaintenance || isLinodesGrantReadOnly;
 
@@ -179,8 +177,6 @@ export const LinodeResize = (props: Props) => {
   const currentTypes =
     types?.filter((thisType) => !Boolean(thisType.successor)) ?? [];
 
-  const error = getError(resizeError);
-
   return (
     <Dialog
       fullHeight
@@ -202,13 +198,23 @@ export const LinodeResize = (props: Props) => {
               variant="error"
             />
           )}
-          {hasResizeError && <Notice variant="error">{error}</Notice>}
+          {resizeError && (
+            <Notice variant="error">
+              <ErrorMessage
+                entity={{
+                  id: linodeId,
+                  type: 'linode_id',
+                }}
+                message={resizeError}
+              />
+            </Notice>
+          )}
           <Typography data-qa-description>
             If you&rsquo;re expecting a temporary burst of traffic to your
             website, or if you&rsquo;re not using your Linode as much as you
             thought, you can temporarily or permanently resize your Linode to a
             different plan.{' '}
-            <Link to="https://www.linode.com/docs/platform/disk-images/resizing-a-linode/">
+            <Link to="https://techdocs.akamai.com/cloud-computing/docs/resize-a-compute-instance">
               Learn more.
             </Link>
           </Typography>
@@ -326,7 +332,7 @@ export const LinodeResize = (props: Props) => {
               }
               buttonType="primary"
               data-qa-resize
-              loading={isLoading}
+              loading={isPending}
               type="submit"
             >
               Resize Linode

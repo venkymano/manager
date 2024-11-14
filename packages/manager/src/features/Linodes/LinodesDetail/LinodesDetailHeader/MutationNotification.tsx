@@ -1,8 +1,8 @@
+import { Notice } from '@linode/ui';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 
-import { Notice } from 'src/components/Notice/Notice';
 import { Typography } from 'src/components/Typography';
 import { MBpsIntraDC } from 'src/constants';
 import { useEventsPollingActions } from 'src/queries/events/events';
@@ -45,7 +45,7 @@ export const MutationNotification = (props: Props) => {
 
   const {
     error,
-    isLoading,
+    isPending,
     mutateAsync: startMutation,
   } = useStartLinodeMutationMutation(linodeId);
 
@@ -132,7 +132,7 @@ export const MutationNotification = (props: Props) => {
         handleClose={() => setIsMutationDrawerOpen(false)}
         initMutation={initMutation}
         linodeId={linodeId}
-        loading={isLoading}
+        loading={isPending}
         open={isMutationDrawerOpen}
       />
     </>

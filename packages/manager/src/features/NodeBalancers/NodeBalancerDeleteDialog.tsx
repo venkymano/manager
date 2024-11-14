@@ -1,7 +1,7 @@
+import { Notice } from '@linode/ui';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { Notice } from 'src/components/Notice/Notice';
 import { TypeToConfirmDialog } from 'src/components/TypeToConfirmDialog/TypeToConfirmDialog';
 import { Typography } from 'src/components/Typography';
 import { useNodebalancerDeleteMutation } from 'src/queries/nodebalancers';
@@ -19,7 +19,7 @@ export const NodeBalancerDeleteDialog = ({
   onClose,
   open,
 }: Props) => {
-  const { error, isLoading, mutateAsync } = useNodebalancerDeleteMutation(id);
+  const { error, isPending, mutateAsync } = useNodebalancerDeleteMutation(id);
   const { push } = useHistory();
 
   const onDelete = async () => {
@@ -38,7 +38,7 @@ export const NodeBalancerDeleteDialog = ({
       }}
       errors={error ?? undefined}
       label={'NodeBalancer Label'}
-      loading={isLoading}
+      loading={isPending}
       onClick={onDelete}
       onClose={onClose}
       open={open}

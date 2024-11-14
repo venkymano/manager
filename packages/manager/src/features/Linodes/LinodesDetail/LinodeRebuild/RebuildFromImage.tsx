@@ -1,34 +1,27 @@
-import {
-  RebuildRequest,
-  UserData,
-  rebuildLinode,
-} from '@linode/api-v4/lib/linodes';
+import { rebuildLinode } from '@linode/api-v4';
+import { Box, Divider } from '@linode/ui';
 import { RebuildLinodeSchema } from '@linode/validation/lib/linodes.schema';
 import Grid from '@mui/material/Unstable_Grid2';
-import { Formik, FormikProps } from 'formik';
+import { Formik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { isEmpty } from 'ramda';
 import * as React from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { AccessPanel } from 'src/components/AccessPanel/AccessPanel';
-import { Box } from 'src/components/Box';
 import { Checkbox } from 'src/components/Checkbox';
-import { Divider } from 'src/components/Divider';
 import { ImageSelect } from 'src/components/ImageSelect/ImageSelect';
 import { TypeToConfirm } from 'src/components/TypeToConfirm/TypeToConfirm';
-import { UserDataAccordion } from 'src/features/Linodes/LinodesCreate/UserDataAccordion/UserDataAccordion';
-import { regionSupportsMetadata } from 'src/features/Linodes/LinodesCreate/utilities';
+import { Typography } from 'src/components/Typography';
 import { useFlags } from 'src/hooks/useFlags';
 import { useEventsPollingActions } from 'src/queries/events/events';
-import { useAllImagesQuery } from 'src/queries/images';
 import { usePreferences } from 'src/queries/profile/preferences';
 import { useRegionsQuery } from 'src/queries/regions/regions';
-import { getAPIErrorOrDefault } from 'src/utilities/errorUtils';
 import {
   handleFieldErrors,
   handleGeneralErrors,
 } from 'src/utilities/formikErrorUtils';
+import { regionSupportsMetadata } from 'src/utilities/metadata';
 import { getQueryParamFromQueryString } from 'src/utilities/queryParams';
 import { scrollErrorIntoView } from 'src/utilities/scrollErrorIntoView';
 import { extendValidationSchema } from 'src/utilities/validatePassword';
@@ -38,6 +31,10 @@ import {
   StyledGrid,
   StyledNotice,
 } from './RebuildFromImage.styles';
+import { UserDataAccordion } from './UserDataAccordion/UserDataAccordion';
+
+import type { Image, RebuildRequest, UserData } from '@linode/api-v4';
+import type { FormikProps } from 'formik';
 
 interface Props {
   disabled: boolean;
@@ -96,17 +93,13 @@ export const RebuildFromImage = (props: Props) => {
   const { enqueueSnackbar } = useSnackbar();
   const flags = useFlags();
 
-  const {
-    data: _imagesData,
-    error: imagesError,
-    isLoading: isLoadingImages,
-  } = useAllImagesQuery();
   const { data: regionsData, isLoading: isLoadingRegions } = useRegionsQuery();
-  const isLoading = isLoadingPreferences || isLoadingImages || isLoadingRegions;
+  const isLoading = isLoadingPreferences || isLoadingRegions;
 
   const RebuildSchema = () => extendValidationSchema(RebuildLinodeSchema);
 
   const [confirmationText, setConfirmationText] = React.useState<string>('');
+  const [isCloudInit, setIsCloudInit] = React.useState(false);
 
   const [userData, setUserData] = React.useState<string | undefined>('');
   const [shouldReuseUserData, setShouldReuseUserData] = React.useState<boolean>(
@@ -202,10 +195,6 @@ export const RebuildFromImage = (props: Props) => {
       });
   };
 
-  const _imagesError = imagesError
-    ? getAPIErrorOrDefault(imagesError, 'Unable to load Images')[0].reason
-    : undefined;
-
   return (
     <Formik
       initialValues={{ ...initialValues, image: preselectedImageId }}
@@ -235,6 +224,11 @@ export const RebuildFromImage = (props: Props) => {
           });
         };
 
+        const handleImageChange = (image: Image | null) => {
+          setFieldValue('image', image?.id ?? '');
+          setIsCloudInit(image?.capabilities?.includes('cloud-init') ?? false);
+        };
+
         if (status) {
           handleRebuildError(status.generalError);
         }
@@ -242,26 +236,19 @@ export const RebuildFromImage = (props: Props) => {
         const shouldDisplayUserDataAccordion =
           flags.metadata &&
           regionSupportsMetadata(regionsData ?? [], linodeRegion ?? '') &&
-          Boolean(
-            values.image &&
-              _imagesData
-                ?.find((image) => image.id === values.image)
-                ?.capabilities?.includes('cloud-init')
-          );
+          isCloudInit;
 
         return (
           <StyledGrid>
             <form>
+              <Typography variant="h2">Select Image</Typography>
               <ImageSelect
-                handleSelectImage={(selected) =>
-                  setFieldValue('image', selected)
-                }
                 data-qa-select-image
                 disabled={disabled}
-                error={_imagesError || errors.image}
-                images={_imagesData ?? []}
-                selectedImageID={values.image}
-                title="Select Image"
+                errorText={errors.image}
+                label="Images"
+                onChange={handleImageChange}
+                value={values.image}
                 variant="all"
               />
               <AccessPanel

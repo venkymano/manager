@@ -1,10 +1,10 @@
-import { API_ROOT } from 'src/constants';
+import { BETA_API_ROOT as API_ROOT } from 'src/constants';
 import Request, { setData, setMethod, setURL } from '../request';
 import {
   JWEToken,
   JWETokenPayLoad,
   MetricDefinitions,
-  ServiceTypes,
+  ServiceTypesList,
 } from './types';
 import { ResourcePage as Page } from 'src/types';
 
@@ -31,4 +31,11 @@ export const getJWEToken = (data: JWETokenPayLoad, serviceType: string) =>
     ),
     setMethod('POST'),
     setData(data)
+  );
+
+// Returns the list of service types available
+export const getCloudPulseServiceTypes = () =>
+  Request<ServiceTypesList>(
+    setURL(`${API_ROOT}/monitor/services`),
+    setMethod('GET')
   );

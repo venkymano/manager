@@ -6,13 +6,13 @@ import { makeResourcePage } from 'src/mocks/serverHandlers';
 import { HttpResponse, http, server } from 'src/mocks/testServer';
 import { renderWithTheme } from 'src/utilities/testHelpers';
 
-import { ManageImageRegionsForm } from './ManageImageRegionsForm';
+import { ManageImageReplicasForm } from './ManageImageRegionsForm';
 
 describe('ManageImageRegionsDrawer', () => {
   it('should render a save button and a cancel button', () => {
     const image = imageFactory.build();
     const { getByText } = renderWithTheme(
-      <ManageImageRegionsForm image={image} onClose={vi.fn()} />
+      <ManageImageReplicasForm image={image} onClose={vi.fn()} />
     );
 
     const cancelButton = getByText('Cancel').closest('button');
@@ -49,18 +49,26 @@ describe('ManageImageRegionsDrawer', () => {
     );
 
     const { findByText } = renderWithTheme(
-      <ManageImageRegionsForm image={image} onClose={vi.fn()} />
+      <ManageImageReplicasForm image={image} onClose={vi.fn()} />
     );
 
-    await findByText('Newark, NJ');
+    await findByText('US, Newark, NJ');
     await findByText('available');
-    await findByText('Place, CA');
+    await findByText('US, Place, CA');
     await findByText('pending replication');
   });
 
   it('should render a status of "unsaved" when a new region is selected', async () => {
-    const region1 = regionFactory.build({ id: 'us-east', label: 'Newark, NJ' });
-    const region2 = regionFactory.build({ id: 'us-west', label: 'Place, CA' });
+    const region1 = regionFactory.build({
+      capabilities: ['Object Storage'],
+      id: 'us-east',
+      label: 'Newark, NJ',
+    });
+    const region2 = regionFactory.build({
+      capabilities: ['Object Storage'],
+      id: 'us-west',
+      label: 'Place, CA',
+    });
 
     const image = imageFactory.build({
       regions: [
@@ -78,7 +86,7 @@ describe('ManageImageRegionsDrawer', () => {
     );
 
     const { findByText, getByLabelText, getByText } = renderWithTheme(
-      <ManageImageRegionsForm image={image} onClose={vi.fn()} />
+      <ManageImageReplicasForm image={image} onClose={vi.fn()} />
     );
 
     const saveButton = getByText('Save').closest('button');
@@ -96,7 +104,7 @@ describe('ManageImageRegionsDrawer', () => {
     // Select new region
     await userEvent.click(await findByText('us-west', { exact: false }));
 
-    expect(getByText('Place, CA')).toBeVisible();
+    expect(getByText('US, Place, CA')).toBeVisible();
     expect(getByText('unsaved')).toBeVisible();
 
     // Verify the save button is enabled because changes have been made
@@ -127,12 +135,12 @@ describe('ManageImageRegionsDrawer', () => {
     );
 
     const { findByText, getByLabelText } = renderWithTheme(
-      <ManageImageRegionsForm image={image} onClose={vi.fn()} />
+      <ManageImageReplicasForm image={image} onClose={vi.fn()} />
     );
 
     // Verify both region labels have been loaded by the API
-    await findByText(region1.label);
-    await findByText(region2.label);
+    await findByText(`US, ${region1.label}`);
+    await findByText(`US, ${region2.label}`);
 
     // Both remove buttons should be enabled
     expect(getByLabelText('Remove us-east')).toBeEnabled();

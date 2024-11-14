@@ -1,11 +1,13 @@
-import { Volume } from '@linode/api-v4';
+import { Box, Notice } from '@linode/ui';
 import { CloneVolumeSchema } from '@linode/validation/lib/volumes.schema';
 import { useFormik } from 'formik';
 import * as React from 'react';
 
 import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
+import { Checkbox } from 'src/components/Checkbox';
 import { Drawer } from 'src/components/Drawer';
-import { Notice } from 'src/components/Notice/Notice';
+import { BLOCK_STORAGE_CLONING_INHERITANCE_CAVEAT } from 'src/components/Encryption/constants';
+import { useIsBlockStorageEncryptionFeatureEnabled } from 'src/components/Encryption/utils';
 import { TextField } from 'src/components/TextField';
 import { Typography } from 'src/components/Typography';
 import { useEventsPollingActions } from 'src/queries/events/events';
@@ -21,6 +23,8 @@ import {
 import { PRICES_RELOAD_ERROR_NOTICE_TEXT } from 'src/utilities/pricing/constants';
 
 import { PricePanel } from './VolumeDrawer/PricePanel';
+
+import type { Volume } from '@linode/api-v4';
 interface Props {
   onClose: () => void;
   open: boolean;
@@ -38,6 +42,10 @@ export const CloneVolumeDrawer = (props: Props) => {
 
   const { data: grants } = useGrants();
   const { data: types, isError, isLoading } = useVolumeTypesQuery();
+
+  const {
+    isBlockStorageEncryptionFeatureEnabled,
+  } = useIsBlockStorageEncryptionFeatureEnabled();
 
   // Even if a restricted user has the ability to create Volumes, they
   // can't clone a Volume they only have read only permission on.
@@ -108,6 +116,21 @@ export const CloneVolumeDrawer = (props: Props) => {
           required
           value={values.label}
         />
+        {isBlockStorageEncryptionFeatureEnabled && (
+          <Box
+            sx={{
+              marginLeft: '2px',
+              marginTop: '16px',
+            }}
+          >
+            <Checkbox
+              checked={volume?.encryption === 'enabled'}
+              disabled
+              text="Encrypt Volume"
+              toolTipText={BLOCK_STORAGE_CLONING_INHERITANCE_CAVEAT}
+            />
+          </Box>
+        )}
         <PricePanel
           currentSize={volume?.size ?? -1}
           regionId={volume?.region ?? ''}

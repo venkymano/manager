@@ -1,6 +1,7 @@
 import { COUNTRY_CODE_TO_CONTINENT_CODE } from './constants';
 
 export type Capabilities =
+  | 'Backups'
   | 'Bare Metal'
   | 'Block Storage'
   | 'Block Storage Encryption'
@@ -18,7 +19,8 @@ export type Capabilities =
   | 'Placement Group'
   | 'Premium Plans'
   | 'Vlans'
-  | 'VPCs';
+  | 'VPCs'
+  | 'StackScripts';
 
 export interface DNSResolvers {
   ipv4: string; // Comma-separated IP addresses
@@ -27,7 +29,7 @@ export interface DNSResolvers {
 
 export type RegionStatus = 'ok' | 'outage';
 
-export type RegionSite = 'core' | 'distributed' | 'edge';
+export type RegionSite = 'core' | 'distributed';
 
 export interface Region {
   id: string;
