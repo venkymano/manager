@@ -28,7 +28,7 @@ export const useCloudPulseJWEtokenQuery = (
   return useQuery<JWEToken, APIError[]>({
     ...queryFactory.token(serviceType, request),
     enabled: runQuery,
-    placeholderData: keepPreviousData,
+    // placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 };

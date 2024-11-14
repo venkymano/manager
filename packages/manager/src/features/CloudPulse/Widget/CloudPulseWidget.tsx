@@ -51,7 +51,7 @@ export interface CloudPulseWidgetProperties {
   /**
    * token to fetch metrics data
    */
-  authToken: string;
+  authToken?: string;
 
   /**
    * metrics defined of this widget
@@ -232,7 +232,7 @@ export const CloudPulseWidget = (props: CloudPulseWidgetProperties) => {
     },
     {
       authToken,
-      isFlags: Boolean(flags),
+      isFlags: Boolean(flags && authToken),
       label: widget.label,
       timeStamp,
       url: flags.aclpReadEndpoint!,
@@ -306,14 +306,14 @@ export const CloudPulseWidget = (props: CloudPulseWidgetProperties) => {
               {Boolean(
                 availableMetrics?.available_aggregate_functions?.length
               ) && (
-                <CloudPulseAggregateFunction
-                  availableAggregateFunctions={
-                    availableMetrics!.available_aggregate_functions
-                  }
-                  defaultAggregateFunction={widgetProp?.aggregate_function}
-                  onAggregateFuncChange={handleAggregateFunctionChange}
-                />
-              )}
+                  <CloudPulseAggregateFunction
+                    availableAggregateFunctions={
+                      availableMetrics!.available_aggregate_functions
+                    }
+                    defaultAggregateFunction={widgetProp?.aggregate_function}
+                    onAggregateFuncChange={handleAggregateFunctionChange}
+                  />
+                )}
               <Box sx={{ display: { lg: 'flex', xs: 'none' } }}>
                 <ZoomIcon
                   handleZoomToggle={handleZoomToggle}
@@ -328,12 +328,16 @@ export const CloudPulseWidget = (props: CloudPulseWidgetProperties) => {
                 ? metricsApiCallError ?? 'Error while rendering graph'
                 : undefined
             }
+            loading={
+              isLoading ||
+              metricsApiCallError === jweTokenExpiryError ||
+              !authToken
+            } // keep loading until we fetch the refresh token
             areas={areas}
             ariaLabel={ariaLabel ? ariaLabel : ''}
             data={data}
             height={480}
             legendRows={legendRows}
-            loading={isLoading || metricsApiCallError === jweTokenExpiryError} // keep loading until we fetch the refresh token
             showLegend={data.length !== 0}
             timezone={timezone}
             unit={currentUnit}
