@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import { Grid, Paper, Typography } from '@mui/material';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
@@ -24,8 +24,14 @@ export const AlertDetail = (props: AlertDetailProps) => {
 
   const alertDetails =
     alerts && alerts.length > 0
-      ? alerts.find((alert) => alert.id === alertId)
+      ? alerts.find((alert) => alert.id === Number(alertId))
       : null;
+
+  // const {
+  //   data: alertDetails,
+  //   isError: isErr,
+  //   isLoading: isLoad,
+  // } = useAlertDefinitionQuery(Number(alertId));
 
   const generateCrumbOverrides = () => {
     const overrides = [
@@ -55,20 +61,28 @@ export const AlertDetail = (props: AlertDetailProps) => {
     return null;
   }
 
-  return (
-    <>
-      <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
-      <Grid container spacing={2}>
-        <Grid item md={6} xs={12}>
-          <AlertDetailOverview alert={alertDetails} />
+  if (alertDetails) {
+    return (
+      <>
+        <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
+        <Grid container spacing={2}>
+          <Grid item md={6} xs={12}>
+            <AlertDetailOverview alert={alertDetails!} />
+          </Grid>
+          <Grid item md={6} xs={12}>
+            <AlertDetailCriteria alert={alertDetails!} />
+          </Grid>
+          <Grid item xs={12}>
+            <AlertDetailNotification alert={alertDetails!} />
+          </Grid>
         </Grid>
-        <Grid item md={6} xs={12}>
-          <AlertDetailCriteria alert={alertDetails} />
-        </Grid>
-        <Grid item xs={12}>
-          <AlertDetailNotification alert={alertDetails} />
-        </Grid>
-      </Grid>
-    </>
-  );
+      </>
+    );
+  } else {
+    return (
+      <Paper>
+        <Typography> Alert is still loading</Typography>
+      </Paper>
+    );
+  }
 };

@@ -3,7 +3,7 @@ type MetricAggregationType = 'avg' | 'sum' | 'min' | 'max' | 'count';
 type MetricOperatorType = 'eq' | 'gt' | 'lt' | 'gte' | 'lte';
 type DimensionFilterOperatorType = 'eq' | 'neq' | 'startswith' | 'endswith';
 type AlertDefinitionType = 'default' | 'custom';
-type AlertStatusType = 'enabled' | 'disabled';
+export type AlertStatusType = 'enabled' | 'disabled';
 export interface Dashboard {
   id: number;
   label: string;

@@ -1,9 +1,9 @@
 import { Grid } from '@mui/material';
 import React from 'react';
 
-import { Box } from 'src/components/Box';
+import { Box } from '@linode/ui';
 import { Chip } from 'src/components/Chip';
-import { Divider } from 'src/components/Divider';
+import { Divider } from '@linode/ui';
 import { Typography } from 'src/components/Typography';
 
 import type { Alert } from '@linode/api-v4';
@@ -13,7 +13,7 @@ interface NotificationProps {
 }
 export const AlertDetailNotification = (props: NotificationProps) => {
   const { alert } = props;
-  const notifications = alert.notification;
+  const notifications = alert.channels;
   return (
     <Box
       sx={(theme) => ({
@@ -42,19 +42,19 @@ export const AlertDetailNotification = (props: NotificationProps) => {
               </Grid>
               <Grid item sm={10} xs={9}>
                 <Typography variant="subtitle2">
-                  {notification.templateName}
+                  {notification.label}
                 </Typography>
               </Grid>
               <Grid alignContent={'center'} item sm={2} xs={12}>
                 <Typography variant="h3">To:</Typography>
               </Grid>
-              <Grid item sm={10} xs={12}>
+              {/* <Grid item sm={10} xs={12}>
                 {notification.values &&
                   notification.values.to.length > 0 &&
                   notification.values.to.map((email: string, id: number) => (
                     <Chip key={id} label={email} variant="outlined" />
                   ))}
-              </Grid>
+              </Grid> */}
             </Grid>
             {idx + 1 !== notifications.length && <Divider />}
           </>

@@ -1,9 +1,9 @@
-import { Card, Grid, Typography } from '@mui/material';
+import { Divider } from '@linode/ui';
+import { Box } from '@linode/ui';
+import { Grid, Typography } from '@mui/material';
 import React from 'react';
 
-import { Box } from 'src/components/Box';
 import { Chip } from 'src/components/Chip';
-import { Divider } from 'src/components/Divider';
 
 import type { Alert } from '@linode/api-v4';
 
@@ -51,13 +51,13 @@ export const AlertDetailCriteria = (props: CriteriaProps) => {
         </Grid>
         <Grid item sm={9} xs={12}>
           <Typography variant="body2">
-            {`${alert.triggerCondition.criteria_condition} Criteria are met for ${alert.triggerCondition.trigger_occurrences} consecutive occurance`}
+            {`All Criteria are met for ${alert.triggerCondition.trigger_occurrences} consecutive occurance`}
           </Typography>
         </Grid>
         {alert &&
-          alert.criteria &&
-          alert.criteria.length > 0 &&
-          alert.criteria.map((metric, idx) => (
+          alert.rule_criteria &&
+          alert.rule_criteria.rules.length > 0 &&
+          alert.rule_criteria.rules.map((metric, idx) => (
             <Grid container key={idx} margin={1} spacing={1}>
               <Grid item sm={12} xs={12}>
                 <Divider />

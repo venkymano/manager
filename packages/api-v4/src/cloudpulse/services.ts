@@ -19,11 +19,6 @@ export const getMetricDefinitionsByServiceType = (serviceType: string) => {
   );
 };
 
-export const getCloudPulseServiceTypes = () =>
-  Request<ServiceTypes>(
-    setURL(`${API_ROOT}/monitor/services`),
-    setMethod('GET')
-  );
 export const getJWEToken = (data: JWETokenPayLoad, serviceType: string) =>
   Request<JWEToken>(
     setURL(

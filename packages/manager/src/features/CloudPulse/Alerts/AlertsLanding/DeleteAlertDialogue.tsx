@@ -20,7 +20,7 @@ export const DeleteAlertDialogue = (props: Props) => {
     <TypeToConfirmDialog
       entity={{
         action: 'deletion',
-        name: alert?.name,
+        name: alert?.label,
         primaryBtnText: 'Delete',
         type: 'Alert',
       }}
@@ -29,7 +29,7 @@ export const DeleteAlertDialogue = (props: Props) => {
       onClick={onDelete}
       onClose={onClose}
       open={open}
-      title={`Delete Alert ${alert?.name}?`}
+      title={`Delete Alert ${alert?.label}?`}
       typographyStyle={{ marginTop: '10px' }}
     />
   );

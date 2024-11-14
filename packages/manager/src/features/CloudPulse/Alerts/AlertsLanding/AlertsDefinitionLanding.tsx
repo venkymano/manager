@@ -1,17 +1,19 @@
-import { Paper } from '@linode/ui';
 import * as React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
-import { Typography } from 'src/components/Typography';
-
 import { CreateAlertDefinition } from '../CreateAlert/CreateAlertDefinition';
+import { AlertListingLanding } from './AlertListingLanding';
 
 export const AlertDefinitionLanding = () => {
   return (
     <Switch>
-      <Route
+      {/* <Route
         component={AlertDefinition}
         exact
+        path="/monitor/cloudpulse/alerts/definitions"
+      /> */}
+      <Route
+        component={() => <AlertListingLanding />}
         path="/monitor/cloudpulse/alerts/definitions"
       />
       <Route
@@ -22,10 +24,10 @@ export const AlertDefinitionLanding = () => {
   );
 };
 
-const AlertDefinition = () => {
-  return (
-    <Paper>
-      <Typography variant="body1">Alert Definition</Typography>
-    </Paper>
-  );
-};
+// const AlertDefinition = () => {
+//   return (
+//     <Paper>
+//       <Typography variant="body1">Alert Definition</Typography>
+//     </Paper>
+//   );
+// };

@@ -5,7 +5,6 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 import { DebouncedSearchTextField } from 'src/components/DebouncedSearchTextField';
-import { DocumentTitleSegment } from 'src/components/DocumentTitle';
 import { Table } from 'src/components/Table';
 import { TableBody } from 'src/components/TableBody';
 import { TableCell } from 'src/components/TableCell';
@@ -14,38 +13,14 @@ import { TableRow } from 'src/components/TableRow';
 import { TableSortCell } from 'src/components/TableSortCell';
 import { useOrder } from 'src/hooks/useOrder';
 import { usePagination } from 'src/hooks/usePagination';
+import { useAlertDefinitionsQuery } from 'src/queries/cloudpulse/alerts';
 
 import { AlertTableRow } from './AlertTableRow';
 import { DeleteAlertDialogue } from './DeleteAlertDialogue';
 
 import type { Alert } from '@linode/api-v4';
 
-const useAlertsQuery = (pageInfo, filter) => {
-  const data = [
-    {
-      createdBy: 'satkumar',
-      id: 'someID',
-      lastModified: 'jan 16, 2024, 4:10 PM',
-      name: 'CPU Utilization - 20%',
-      serviceType: 'Linode',
-      severity: '1',
-      status: 'Enabled',
-    },
-    {
-      createdBy: 'satkumar',
-      id: 'someID1',
-      lastModified: 'jan 16, 2024, 4:10 PM',
-      name: 'CPU Utilization - 30%',
-      serviceType: 'Linode',
-      severity: '1',
-      status: 'Disabled',
-    },
-  ];
-
-  return { data, error: {}, isLoading: false };
-};
-
-const serviceFileterOptions = [
+const serviceFilterOptions = [
   {
     label: 'All Services',
     value: 'allServices',
@@ -81,7 +56,11 @@ const stausFilterOptions = [
 
 const preferenceKey = 'alerts';
 
-export const AlertListing = () => {
+interface AlertListingProps {
+  alerts: Alert[];
+}
+export const AlertListing = (props: AlertListingProps) => {
+  const { alerts } = props;
   const [searchText, setSearchText] = React.useState('');
   const [selectedAlertId, setSelectedAlertId] = React.useState<number>();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
@@ -117,13 +96,7 @@ export const AlertListing = () => {
     ['+order_by']: orderBy,
   };
 
-  const { data: alerts, error, isLoading } = useAlertsQuery(
-    {
-      page: pagination.page,
-      page_size: pagination.pageSize,
-    },
-    filter
-  );
+  // const { data: alerts, isError, isLoading } = useAlertDefinitionsQuery();
 
   const selectedAlert = alerts?.find((a) => a.id === selectedAlertId);
 
@@ -132,6 +105,7 @@ export const AlertListing = () => {
     setIsDeleteDialogOpen(true);
   };
 
+  // eslint-disable-next-line no-console
   const fetchResults = () => console.log('API Called with this:', searchText);
 
   const debouncedFetchResults = _.debounce(fetchResults, 300);
@@ -143,15 +117,17 @@ export const AlertListing = () => {
     return () => {
       debouncedFetchResults.cancel();
     };
-  }, [searchText]);
+  }, [debouncedFetchResults, searchText]);
 
-  const onChange = (val, operation: string) => {
+  const onChange = (val: any[], operation: string) => {
     if (operation === 'selectOption') {
       if (
         serviceFilter.length === 1 &&
         serviceFilter[0].value === 'allServices'
       ) {
-        const elms = val.filter((elm) => elm.value !== 'allServices');
+        const elms = val.filter(
+          (elm: { value: string }) => elm.value !== 'allServices'
+        );
         setServiceFilter(elms);
       } else if (val[val.length - 1].value === 'allServices') {
         setServiceFilter([
@@ -177,7 +153,7 @@ export const AlertListing = () => {
     }
   };
 
-  const onStausFilterChange = (val, operation: string) => {
+  const onStatusFilterChange = (val: any, operation: string) => {
     if (operation === 'selectOption') {
       setStatusFilter(val);
     } else {
@@ -187,11 +163,9 @@ export const AlertListing = () => {
       });
     }
   };
-
   const handleDetails = (alert: Alert) => {
     history.push(`${location.pathname}/detail/${alert.id}`);
   };
-
   return (
     <>
       <Grid container spacing={1}>
@@ -202,6 +176,7 @@ export const AlertListing = () => {
             isSearching={false}
             label="Search for something"
             onChange={(e) => setSearchText(e.target.value)}
+            // eslint-disable-next-line no-console
             onSearch={() => console.log('onSearch')}
             placeholder="Search for Alerts"
             value={searchText}
@@ -216,7 +191,7 @@ export const AlertListing = () => {
             multiple
             noMarginTop
             onChange={(_, val, operation) => onChange(val, operation)}
-            options={serviceFileterOptions}
+            options={serviceFilterOptions}
             placeholder=" "
             value={serviceFilter ?? []}
           />
@@ -227,7 +202,7 @@ export const AlertListing = () => {
               option.label === value.label
             }
             onChange={(_, val, operation) =>
-              onStausFilterChange(val, operation)
+              onStatusFilterChange(val, operation)
             }
             label=""
             noMarginTop
@@ -298,7 +273,7 @@ export const AlertListing = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {alerts.map((alert) => (
+            {alerts?.map((alert) => (
               <AlertTableRow
                 handlers={{
                   handleDelete: () => handleDelete(alert),

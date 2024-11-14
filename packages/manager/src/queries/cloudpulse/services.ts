@@ -21,7 +21,7 @@ export const useGetCloudPulseMetricDefinitionsByServiceType = (
 };
 
 export const useCloudPulseServices = () => {
-  return useQuery<ServiceTypes, APIError[]>({
+  return useQuery<ServiceTypesList, APIError[]>({
     ...queryFactory.serviceTypes,
   });
 };
