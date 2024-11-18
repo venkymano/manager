@@ -1,4 +1,4 @@
-import { Box, Divider } from '@linode/ui';
+import { Box, Divider, rotate360 } from '@linode/ui';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { IconButton } from '@mui/material';
 import Popover from '@mui/material/Popover';
@@ -25,7 +25,6 @@ import {
   useInitialEventsQuery,
   useMarkEventsAsSeen,
 } from 'src/queries/events/events';
-import { rotate360 } from 'src/styles/keyframes';
 
 import { TopMenuTooltip, topMenuIconButtonSx } from '../TopMenuTooltip';
 
@@ -88,7 +87,9 @@ export const NotificationMenu = () => {
         <IconButton
           sx={(theme) => ({
             ...topMenuIconButtonSx(theme),
-            color: notificationContext.menuOpen ? '#606469' : '#c9c7c7',
+            color: notificationContext.menuOpen
+              ? theme.tokens.color.Neutrals[70]
+              : theme.tokens.color.Neutrals[40],
           })}
           aria-describedby={id}
           aria-haspopup="true"
