@@ -1,50 +1,43 @@
 import * as React from 'react';
 
 import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
-import { getRestrictedResourceText } from 'src/features/Account/utils';
 
-import type { Action } from 'src/components/ActionMenu/ActionMenu';
+import { getAlertTypeToActionsList } from '../Utils/AlertsActionMenu';
+
+import type { AlertDefinitionType } from '@linode/api-v4';
 
 export interface ActionHandlers {
+  // These handlers will be enhanced based on the alert type and actions required
+  /*
+   * Callback for delete action
+   */
   handleDelete: () => void;
+
+  /*
+   * Callback for show details action
+   */
   handleDetails: () => void;
 }
 
-export interface Props {
-  alert: any;
+export interface AlertActionMenuProps {
+  /*
+   * Type of the alert
+   */
+  alertType: AlertDefinitionType;
+  /*
+   * Handlers for alert actions like delete, show details etc.,
+   */
   handlers: ActionHandlers;
 }
 
-export const AlertActionMenu = (props: Props) => {
-  const { handlers } = props;
-  const actions: Action[] = [
-    {
-      disabled: false,
-      onClick: handlers.handleDetails,
-      title: 'Show Details',
-      tooltip: false
-        ? getRestrictedResourceText({
-            action: 'view',
-            isSingular: true,
-            resourceType: 'Alerts',
-          })
-        : undefined,
-    },
-    {
-      disabled: false,
-      onClick: handlers.handleDelete,
-      title: 'Delete',
-      tooltip: false
-        ? getRestrictedResourceText({
-            action: 'delete',
-            isSingular: true,
-            resourceType: 'Alerts',
-          })
-        : undefined,
-    },
-  ];
+export const AlertActionMenu = (props: AlertActionMenuProps) => {
+  const { alertType, handlers } = props;
+
+  const actions = React.useMemo(() => {
+    return getAlertTypeToActionsList(handlers)[alertType] || [];
+  }, [alertType, handlers]); // recompute the actions only if the alert type and handler changes
 
   return (
-    <ActionMenu actionsList={actions} ariaLabel={`Action menu for Alert`} />
+    <ActionMenu actionsList={actions} ariaLabel={'Action menu for Alert'} />
   );
 };
