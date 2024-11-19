@@ -27,12 +27,13 @@ export const AlertTableRow = React.memo((props: Props) => {
           {alert.status}
         </Typography>
       </TableCell>
+      <TableCell>{alert.type}</TableCell>
       <TableCell>
         <DateTimeDisplay value={alert.updated} />
       </TableCell>
       <TableCell>{alert.created_by}</TableCell>
       <TableCell actionCell>
-        <AlertActionMenu alert={alert} handlers={handlers} />
+        <AlertActionMenu alertType={alert.type} handlers={handlers} />
       </TableCell>
     </TableRow>
   );

@@ -252,6 +252,15 @@ export const AlertListing = (props: AlertListingProps) => {
                 Status
               </TableSortCell>
               <TableSortCell
+                active={orderBy === 'type'}
+                colSpan={1}
+                direction={order}
+                handleClick={handleOrderChange}
+                label="type"
+              >
+                Type
+              </TableSortCell>
+              <TableSortCell
                 active={orderBy === 'lastModified'}
                 colSpan={1}
                 direction={order}
