@@ -1,4 +1,5 @@
-import { fireEvent } from '@testing-library/react';
+import { waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import { renderWithTheme } from 'src/utilities/testHelpers';
@@ -15,26 +16,34 @@ const handlers: ActionHandlers = {
 const alertLabel = 'Action menu for Alert';
 
 describe('AlertActionMenu component tests', () => {
-  it('should render the action menu items on correct props', () => {
+  it('should render the action menu items on correct props', async () => {
     const screen = renderWithTheme(
       <AlertActionMenu alertType={'default'} handlers={handlers} />
     );
     const actionButton = screen.getByLabelText(alertLabel);
 
-    fireEvent.click(actionButton);
+    // Use userEvent instead of fireEvent
+    await userEvent.click(actionButton);
 
-    expect(screen.getByText('Delete')).toBeInTheDocument();
+    // Use waitFor if necessary
+    await waitFor(() => {
+      expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
   });
 
-  it('should render the action menu items on correct props for custom alert type', () => {
+  it('should render the action menu items on correct props for custom alert type', async () => {
     const screen = renderWithTheme(
       <AlertActionMenu alertType={'custom'} handlers={handlers} />
     );
     const actionButton = screen.getByLabelText(alertLabel);
 
-    fireEvent.click(actionButton);
+    // Use userEvent instead of fireEvent
+    await userEvent.click(actionButton);
 
-    expect(screen.getByText('Delete')).toBeInTheDocument();
-    expect(screen.getByText('Clone')).toBeInTheDocument();
+    // Use waitFor if necessary
+    await waitFor(() => {
+      expect(screen.getByText('Delete')).toBeInTheDocument();
+      expect(screen.getByText('Clone')).toBeInTheDocument();
+    });
   });
 });
