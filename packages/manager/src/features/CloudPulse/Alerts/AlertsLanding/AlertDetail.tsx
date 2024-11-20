@@ -7,6 +7,7 @@ import { Breadcrumb } from 'src/components/Breadcrumb/Breadcrumb';
 import { AlertDetailCriteria } from './AlertDetailCriteria';
 import { AlertDetailNotification } from './AlertDetailNotification';
 import { AlertDetailOverview } from './AlertDetailOverview';
+import { AlertResources } from './AlertsResources';
 
 import type { Alert } from '@linode/api-v4';
 
@@ -71,6 +72,12 @@ export const AlertDetail = (props: AlertDetailProps) => {
           </Grid>
           <Grid item md={6} xs={12}>
             <AlertDetailCriteria alert={alertDetails!} />
+          </Grid>
+          <Grid item xs={12} minHeight={'642px'}>
+            <AlertResources
+              resourceIds={alertDetails.resource_ids}
+              serviceType={alertDetails.service_type}
+            />
           </Grid>
           <Grid item xs={12}>
             <AlertDetailNotification alert={alertDetails!} />
