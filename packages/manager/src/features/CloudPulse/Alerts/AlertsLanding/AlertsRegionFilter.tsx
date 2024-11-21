@@ -1,10 +1,12 @@
 import React from 'react';
 
-import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
+import { RegionMultiSelect } from 'src/components/RegionSelect/RegionMultiSelect';
+
+import type { Region } from '@linode/api-v4';
 
 export interface AlertsRegionProps {
-  handleSelectionChange: (region: string) => void;
-  regionOptions: AlertsRegionOption[];
+  handleSelectionChange: (regions: string[]) => void;
+  regionOptions: Region[];
 }
 
 export interface AlertsRegionOption {
@@ -15,27 +17,32 @@ export interface AlertsRegionOption {
 export const AlertsRegionFilter = React.memo((props: AlertsRegionProps) => {
   const { handleSelectionChange, regionOptions } = props;
 
-  const [
-    selectedRegion,
-    setSelectedRegion,
-  ] = React.useState<AlertsRegionOption>(regionOptions[0]);
-
+  const [selectedRegion, setSelectedRegion] = React.useState<Region[]>(
+    regionOptions
+  );
   return (
-    <Autocomplete
-      onChange={(_e, region) => {
-        if (region) {
-          handleSelectionChange(region.id);
-          setSelectedRegion(region);
-        }
+    <RegionMultiSelect
+      onChange={(ids: string[]) => {
+        handleSelectionChange(ids);
+        setSelectedRegion(
+          regionOptions.filter((region) => ids.includes(region.id))
+        );
+      }}
+      slotProps={{
+        popper: {
+          placement: 'bottom',
+        },
       }}
       textFieldProps={{
         hideLabel: true,
       }}
-      disableClearable
-      getOptionLabel={(option) => option.label}
-      label="Select Region"
-      options={regionOptions}
-      placeholder="Select Region"
+      currentCapability={undefined}
+      isClearable
+      label="Select Regions"
+      limitTags={1}
+      placeholder={Boolean(selectedRegion?.length) ? '' : 'Select Regions'}
+      regions={regionOptions}
+      selectedIds={selectedRegion.map((region) => region.id)}
       value={selectedRegion}
     />
   );
