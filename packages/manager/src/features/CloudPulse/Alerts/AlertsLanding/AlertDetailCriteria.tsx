@@ -1,9 +1,7 @@
-import { Divider } from '@linode/ui';
 import { Box } from '@linode/ui';
-import { Grid, Typography } from '@mui/material';
+import { Divider } from '@linode/ui';
+import { Grid, Typography, useTheme } from '@mui/material';
 import React from 'react';
-
-import { Chip } from 'src/components/Chip';
 
 import type { Alert } from '@linode/api-v4';
 
@@ -22,6 +20,8 @@ export const AlertDetailCriteria = (props: CriteriaProps) => {
 
   const { rule_criteria } = alert;
 
+  const theme = useTheme();
+
   return (
     <Box
       sx={(theme) => ({
@@ -30,9 +30,9 @@ export const AlertDetailCriteria = (props: CriteriaProps) => {
         borderRadius: 1,
         p: 1,
       })}
-      height={'500px'}
+      height={theme.spacing(62.5)}
       overflow={'auto'}
-      p={3}
+      p={theme.spacing(3)}
     >
       <Typography gutterBottom marginBottom={2} variant="h2">
         Criteria

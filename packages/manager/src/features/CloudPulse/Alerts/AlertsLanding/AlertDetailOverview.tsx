@@ -1,5 +1,5 @@
 import { Box } from '@linode/ui';
-import { Grid, Typography } from '@mui/material';
+import { Grid, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
 import type { Alert } from '@linode/api-v4';
@@ -21,6 +21,8 @@ export const AlertDetailOverview = (props: OverviewProps) => {
     updated,
   } = alert;
 
+  const theme = useTheme();
+
   return (
     <Box
       sx={(theme) => ({
@@ -29,8 +31,8 @@ export const AlertDetailOverview = (props: OverviewProps) => {
         borderRadius: 1,
         p: 1,
       })}
-      height={'500px'}
-      p={3}
+      height={theme.spacing(62.5)}
+      p={theme.spacing(3)}
     >
       <Typography gutterBottom marginBottom={2} variant="h2">
         Overview
