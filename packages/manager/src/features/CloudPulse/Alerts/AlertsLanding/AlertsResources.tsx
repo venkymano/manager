@@ -48,6 +48,8 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     isError: isRegionsError,
     isFetching: isRegionsFetching,
   } = useRegionsQuery();
+
+  // The map holds the id of the region to the entire region object that needs to be displayed in table
   const regionsIdToLabelMap: Map<string, Region> = React.useMemo(() => {
     if (!regions) {
       return new Map();
@@ -57,7 +59,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   }, [regions]);
 
   /**
-   * The constant holds the resources that are
+   * Holds the resources that are
    * filtered based on the passed resourceIds, typed searchText and filtered regions
    */
   const filteredResources = React.useMemo(() => {
@@ -83,8 +85,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
           return filteredRegions.includes(resource.region ?? '');
         }
         return true;
-      })
-      .sort((a, b) => a.label.localeCompare(b.label));
+      });
   }, [
     data,
     resourceIds,
@@ -95,7 +96,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   ]);
 
   /**
-   * The constant holds the regions associated with the resources from list of regions
+   * Holds the regions associated with the resources from list of regions
    */
   const regionOptions: Region[] = React.useMemo(() => {
     return Array.from(
@@ -111,6 +112,17 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       (region): region is Region => region !== null && region !== undefined
     );
   }, [data, resourceIds, regionsIdToLabelMap]);
+
+  const resourceOptions = React.useMemo(() => {
+    return filteredResources?.map((resource) => {
+      return {
+        ...resource,
+        region:
+          regionsIdToLabelMap.get(resource.region ?? '')?.label ||
+          resource.label, // Ensure fallback to original label
+      };
+    });
+  }, [filteredResources, regionsIdToLabelMap]);
 
   if (isFetching || isRegionsFetching) {
     return <CircleProgress />;
@@ -166,14 +178,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
           <Grid item xs={12}>
             {/* Pass filtered data */}
             <DisplayAlertResources
-              filteredResources={filteredResources?.map((resource) => {
-                return {
-                  ...resource,
-                  region:
-                    regionsIdToLabelMap.get(resource.region ?? '')?.label ||
-                    resource.label, // Ensure fallback to original label
-                };
-              })}
+              filteredResources={resourceOptions}
               pageSize={pageSize}
             />
           </Grid>

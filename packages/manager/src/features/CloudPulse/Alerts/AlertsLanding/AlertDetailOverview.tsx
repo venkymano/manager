@@ -84,6 +84,12 @@ export const AlertDetailOverview = (props: OverviewProps) => {
         <Grid item xs={9}>
           <Typography variant="body2">{service_type}</Typography>
         </Grid>
+        <Grid item xs={3}>
+          <Typography variant="h3">Region:</Typography>
+        </Grid>
+        <Grid item xs={9}>
+          <Typography variant="body2">How to add??</Typography>
+        </Grid>
       </Grid>
     </Box>
   );
@@ -93,11 +99,11 @@ function formatTimestamp(timestamp: string): string {
   const date = new Date(timestamp);
 
   const options: Intl.DateTimeFormatOptions = {
-    month: 'short', // Short month name (e.g., Nov)
     day: 'numeric', // Numeric day (e.g., 20)
     hour: 'numeric', // Numeric hour
-    minute: 'numeric', // Numeric minutes
     hour12: true, // Use 12-hour clock
+    minute: 'numeric', // Numeric minutes
+    month: 'short', // Short month name (e.g., Nov)
   };
 
   const formattedDate = date.toLocaleString('en-US', options);

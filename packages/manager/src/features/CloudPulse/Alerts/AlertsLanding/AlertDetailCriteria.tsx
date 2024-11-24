@@ -14,6 +14,14 @@ interface CriteriaProps {
 export const AlertDetailCriteria = (props: CriteriaProps) => {
   const { alert } = props;
 
+  const {
+    evaluation_period_seconds,
+    polling_interval_seconds,
+    trigger_occurrences,
+  } = alert.triggerCondition;
+
+  const { rule_criteria } = alert;
+
   return (
     <Box
       sx={(theme) => ({
@@ -35,7 +43,7 @@ export const AlertDetailCriteria = (props: CriteriaProps) => {
         </Grid>
         <Grid item sm={9}>
           <Typography variant="body2">
-            {`${alert.triggerCondition.polling_interval_seconds} seconds`}
+            {`${polling_interval_seconds} seconds`}
           </Typography>
         </Grid>
         <Grid item sm={3}>
@@ -43,7 +51,7 @@ export const AlertDetailCriteria = (props: CriteriaProps) => {
         </Grid>
         <Grid item sm={9}>
           <Typography variant="body2">
-            {`${alert.triggerCondition.evaluation_period_seconds} seconds`}
+            {`${evaluation_period_seconds} seconds`}
           </Typography>
         </Grid>
         <Grid item sm={3} xs={12}>
@@ -51,42 +59,28 @@ export const AlertDetailCriteria = (props: CriteriaProps) => {
         </Grid>
         <Grid item sm={9} xs={12}>
           <Typography variant="body2">
-            {`All Criteria are met for ${alert.triggerCondition.trigger_occurrences} consecutive occurance`}
+            {`All Criteria are met for ${trigger_occurrences} consecutive occurrence`}
           </Typography>
         </Grid>
-        {alert &&
-          alert.rule_criteria &&
-          alert.rule_criteria.rules.length > 0 &&
-          alert.rule_criteria.rules.map((metric, idx) => (
-            <Grid container key={idx} margin={1} spacing={1}>
-              <Grid item sm={12} xs={12}>
-                <Divider />
+        {rule_criteria &&
+          rule_criteria.rules.length > 0 &&
+          rule_criteria.rules.map(
+            ({ aggregation_type, metric, operator, value }, idx) => (
+              <Grid container key={idx} margin={1} spacing={1}>
+                <Grid item sm={12} xs={12}>
+                  <Divider />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <Typography variant="h3">Threshold: </Typography>
+                </Grid>
+                <Grid item sm={9} xs={12}>
+                  <Typography variant="body2">
+                    {`${metric} ${aggregation_type} ${operator} ${value}`}
+                  </Typography>
+                </Grid>
               </Grid>
-              <Grid item sm={3} xs={12}>
-                <Typography variant="h3">Threshold: </Typography>
-              </Grid>
-              <Grid item sm={9} xs={12}>
-                <Typography variant="body2">
-                  {`${metric.metric} ${metric.aggregation_type} ${metric.operator} ${metric.value}`}
-                </Typography>
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <Typography variant="h3">Dimension filter: </Typography>
-              </Grid>
-              <Grid item sm={9} xs={12}>
-                {metric &&
-                  metric.dimension_filters.length > 0 &&
-                  metric.dimension_filters.map((dim, idx) => (
-                    <Box key={`${dim.dimension_label}-${idx}`}>
-                      <Chip
-                        label={`${dim.dimension_label} ${dim.operator} ${dim.value}`}
-                        variant="outlined"
-                      />
-                    </Box>
-                  ))}
-              </Grid>
-            </Grid>
-          ))}
+            )
+          )}
       </Grid>
     </Box>
   );
