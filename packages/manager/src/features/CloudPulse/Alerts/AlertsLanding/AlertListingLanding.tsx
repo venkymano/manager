@@ -18,7 +18,7 @@ export const AlertListingLanding = () => {
         exact
         path="/monitor/cloudpulse/alerts/definitions/detail/:alertId"
       >
-        <AlertDetail alerts={alerts?.data ?? []} />
+        <AlertDetail />
       </Route>
     </Switch>
   );

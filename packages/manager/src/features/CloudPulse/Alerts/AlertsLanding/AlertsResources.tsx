@@ -1,13 +1,20 @@
-import { Box, CircleProgress } from '@linode/ui';
+import { Box, CircleProgress, Notice, Paper } from '@linode/ui';
 import { Grid } from '@mui/material';
 import React from 'react';
 
 import { DebouncedSearchTextField } from 'src/components/DebouncedSearchTextField';
+import { DismissibleBanner } from 'src/components/DismissibleBanner/DismissibleBanner';
+import { StyledNotice } from 'src/components/DismissibleBanner/DismissibleBanner.styles';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Typography } from 'src/components/Typography';
 import { useResourcesQuery } from 'src/queries/cloudpulse/resources';
 import { useRegionsQuery } from 'src/queries/regions/regions';
 
+import {
+  getFilteredResources,
+  getRegionOptions,
+  getRegionsIdLabelMap,
+} from '../Utils/AlertResourceUtils';
 import { AlertsRegionFilter } from './AlertsRegionFilter';
 import { DisplayAlertResources } from './DisplayAlertResource';
 
@@ -43,19 +50,32 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     {}
   );
 
+  const [selectedResources, setSelectedResources] = React.useState<string[]>(
+    []
+  );
+
   const {
     data: regions,
     isError: isRegionsError,
     isFetching: isRegionsFetching,
   } = useRegionsQuery();
 
+  const handleSelection = React.useCallback(
+    (ids: string[], isSelectionAction: boolean) => {
+      const onlySelected = isSelectionAction
+        ? selectedResources
+        : selectedResources.filter((resource) => !ids.includes(resource));
+
+      const newlySelected = ids.filter((id) => !selectedResources.includes(id));
+
+      setSelectedResources([...onlySelected, ...newlySelected]);
+    },
+    [selectedResources]
+  );
+
   // The map holds the id of the region to the entire region object that needs to be displayed in table
   const regionsIdToLabelMap: Map<string, Region> = React.useMemo(() => {
-    if (!regions) {
-      return new Map();
-    }
-
-    return new Map(regions.map((region) => [region.id, region]));
+    return getRegionsIdLabelMap(regions);
   }, [regions]);
 
   /**
@@ -63,66 +83,33 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
    * filtered based on the passed resourceIds, typed searchText and filtered regions
    */
   const filteredResources = React.useMemo(() => {
-    if (isSelectionsNeeded) {
-      return data;
-    }
-
-    return data
-      ?.filter((resource) => resourceIds.includes(String(resource.id)))
-      .filter((resource) => {
-        if (searchText) {
-          const regionLabel =
-            regionsIdToLabelMap.get(resource.region ?? '')?.label ?? '';
-          return (
-            regionLabel.includes(searchText) ||
-            resource.label.includes(searchText)
-          );
-        }
-        return true;
-      })
-      .filter((resource) => {
-        if (filteredRegions) {
-          return filteredRegions.includes(resource.region ?? '');
-        }
-        return true;
-      });
+    return getFilteredResources({
+      data,
+      filteredRegions,
+      regionsIdToLabelMap,
+      resourceIds,
+      searchText,
+      selectedResources,
+    });
   }, [
     data,
     resourceIds,
     searchText,
     filteredRegions,
     regionsIdToLabelMap,
-    isSelectionsNeeded,
+    selectedResources,
   ]);
 
   /**
    * Holds the regions associated with the resources from list of regions
    */
   const regionOptions: Region[] = React.useMemo(() => {
-    return Array.from(
-      new Set(
-        data
-          ?.filter((resource) => resourceIds.includes(String(resource.id)))
-          ?.map((resource) => {
-            const regionId = resource.region;
-            return regionId ? regionsIdToLabelMap.get(regionId) : null;
-          })
-      )
-    ).filter(
-      (region): region is Region => region !== null && region !== undefined
-    );
-  }, [data, resourceIds, regionsIdToLabelMap]);
-
-  const resourceOptions = React.useMemo(() => {
-    return filteredResources?.map((resource) => {
-      return {
-        ...resource,
-        region:
-          regionsIdToLabelMap.get(resource.region ?? '')?.label ||
-          resource.label, // Ensure fallback to original label
-      };
+    return getRegionOptions({
+      data,
+      regionsIdToLabelMap,
+      resourceIds,
     });
-  }, [filteredResources, regionsIdToLabelMap]);
+  }, [data, resourceIds, regionsIdToLabelMap]);
 
   if (isFetching || isRegionsFetching) {
     return <CircleProgress />;
@@ -152,7 +139,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       )}
 
       {resourceIds.length > 0 && (
-        <Grid container gap={1}>
+        <Grid container gap={2}>
           <Grid item md={4} xs={12}>
             <DebouncedSearchTextField
               onSearch={(value) => {
@@ -175,10 +162,23 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item md={6} xs={12}>
+            <StyledNotice
+              style={{
+                backgroundColor: 'white',
+              }}
+              variant="info"
+            >
+              {selectedResources.length} out of {data?.length} selected
+            </StyledNotice>
+          </Grid>
+
+          <Grid item marginTop={-1} xs={12}>
             {/* Pass filtered data */}
             <DisplayAlertResources
-              filteredResources={resourceOptions}
+              filteredResources={filteredResources}
+              handleSelection={isSelectionsNeeded ? handleSelection : undefined}
+              isSelectionsNeeded={isSelectionsNeeded}
               pageSize={pageSize}
             />
           </Grid>

@@ -1,6 +1,7 @@
 import { TableBody, TableHead } from '@mui/material';
 import React from 'react';
 
+import { Checkbox } from 'src/components/Checkbox';
 import { sortData } from 'src/components/OrderBy';
 import Paginate from 'src/components/Paginate';
 import { PaginationFooter } from 'src/components/PaginationFooter/PaginationFooter';
@@ -9,14 +10,28 @@ import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow/TableRow';
 import { TableSortCell } from 'src/components/TableSortCell';
 
-import type { CloudPulseResources } from '../../shared/CloudPulseResourcesSelect';
 import type { Order } from 'src/hooks/useOrder';
+
+export interface AlertInstances {
+  checked: boolean;
+  id: string;
+  label: string;
+  region?: string;
+}
 
 export interface DisplayAlertResourceProp {
   /**
    * The resources that needs to be displayed
    */
-  filteredResources: CloudPulseResources[] | undefined;
+  filteredResources: AlertInstances[] | undefined;
+
+  handleSelection?: (id: string[], isSelectAction: boolean) => void;
+
+  /**
+   * This controls whether to show the selection check box or not
+   */
+  isSelectionsNeeded?: boolean;
+
   /**
    * The pageSize needed in the table
    */
@@ -25,7 +40,12 @@ export interface DisplayAlertResourceProp {
 
 export const DisplayAlertResources = React.memo(
   (props: DisplayAlertResourceProp) => {
-    const { filteredResources, pageSize } = props;
+    const {
+      filteredResources,
+      handleSelection,
+      isSelectionsNeeded = false,
+      pageSize,
+    } = props;
 
     const [sorting, setSorting] = React.useState<{
       order: Order;
@@ -40,7 +60,7 @@ export const DisplayAlertResources = React.memo(
       return sortData(
         sorting.orderBy,
         sorting.order
-      )(filteredResources ?? []) as CloudPulseResources[];
+      )(filteredResources ?? []) as AlertInstances[];
     }, [filteredResources, sorting]);
 
     const handleSort = React.useCallback((orderBy: string, order: Order) => {
@@ -49,6 +69,19 @@ export const DisplayAlertResources = React.memo(
         orderBy,
       });
     }, []);
+
+    const handleSelectionChange = React.useCallback(
+      (id: string[], isSelectionAction: boolean) => {
+        if (handleSelection) {
+          handleSelection(id, isSelectionAction);
+        }
+      },
+      [handleSelection]
+    );
+
+    const isAllPageSelected = (paginatedData: AlertInstances[]): boolean => {
+      return paginatedData.every((resource) => resource.checked);
+    };
 
     return (
       <Paginate data={sortedData ?? []} pageSize={pageSize}>
@@ -64,6 +97,19 @@ export const DisplayAlertResources = React.memo(
             <Table>
               <TableHead>
                 <TableRow>
+                  {isSelectionsNeeded && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        onClick={() =>
+                          handleSelectionChange(
+                            paginatedData.map((resource) => resource.id),
+                            !isAllPageSelected(paginatedData)
+                          )
+                        }
+                        checked={isAllPageSelected(paginatedData)}
+                      />
+                    </TableCell>
+                  )}
                   <TableSortCell
                     active={sorting.orderBy === 'label'}
                     direction={sorting.order}
@@ -90,8 +136,18 @@ export const DisplayAlertResources = React.memo(
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedData.map(({ id, label, region }) => (
+                  paginatedData.map(({ checked, id, label, region }) => (
                     <TableRow key={id}>
+                      {isSelectionsNeeded && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            onChange={() => {
+                              handleSelectionChange([id], !checked);
+                            }}
+                            checked={checked}
+                          />
+                        </TableCell>
+                      )}
                       <TableCell>{label}</TableCell>
                       <TableCell>{region}</TableCell>
                     </TableRow>
