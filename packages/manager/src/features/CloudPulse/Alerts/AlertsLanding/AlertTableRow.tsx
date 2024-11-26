@@ -1,9 +1,9 @@
+import { Typography } from '@linode/ui';
 import * as React from 'react';
 
 import { DateTimeDisplay } from 'src/components/DateTimeDisplay';
 import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow';
-import { Typography } from 'src/components/Typography';
 
 import { AlertActionMenu } from './AlertActionMenu';
 

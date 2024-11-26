@@ -24,20 +24,26 @@ import type {
 const key = 'Clousepulse';
 
 export const queryFactory = createQueryKeys(key, {
-  alerts: (alertId: number) => ({
+  alertById: (alertId: number) => ({
     queryFn: () => getAlertDefinitionById(alertId),
     queryKey: [alertId],
   }),
+  alerts: {
+    contextQueries: {
+      alerts: (params?: Params, filter?: Filter) => ({
+        queryFn: () => getAlertDefinitions(params, filter),
+        queryKey: [params, filter],
+      }),
+    },
+    // This query key is a placeholder , it will be updated once the relevant queries are added
+    queryKey: null,
+  },
   dashboardById: (dashboardId: number) => ({
     queryFn: () => getDashboardById(dashboardId),
     queryKey: [dashboardId],
   }),
   lists: {
     contextQueries: {
-      alerts: (params?: Params, filter?: Filter) => ({
-        queryFn: () => getAlertDefinitions(params, filter),
-        queryKey: [params, filter],
-      }),
       dashboards: (serviceType: string) => ({
         queryFn: () => getDashboards(serviceType),
         queryKey: [serviceType],

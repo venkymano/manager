@@ -7,27 +7,14 @@ import { AlertListingLanding } from './AlertListingLanding';
 export const AlertDefinitionLanding = () => {
   return (
     <Switch>
-      {/* <Route
-        component={AlertDefinition}
-        exact
-        path="/monitor/cloudpulse/alerts/definitions"
-      /> */}
       <Route
         component={() => <AlertListingLanding />}
-        path="/monitor/cloudpulse/alerts/definitions"
+        path="/monitor/alerts/definitions"
       />
       <Route
         component={() => <CreateAlertDefinition />}
-        path="/monitor/cloudpulse/alerts/definitions/create"
+        path="/monitor/alerts/definitions/create"
       />
     </Switch>
   );
 };
-
-// const AlertDefinition = () => {
-//   return (
-//     <Paper>
-//       <Typography variant="body1">Alert Definition</Typography>
-//     </Paper>
-//   );
-// };

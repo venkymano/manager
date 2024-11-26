@@ -5,20 +5,21 @@ import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 
 import { alertSeverityOptions } from '../../constants';
 
+import type { CreateAlertDefinitionForm } from '../types';
 import type { AlertSeverityType } from '@linode/api-v4';
-export interface CloudViewRegionSelectProps {
+import type { FieldPathByValue } from 'react-hook-form';
+export interface CloudPulseAlertSeveritySelectProps {
   /**
    * name used for the component in the form
    */
-  name: string;
+  name: FieldPathByValue<CreateAlertDefinitionForm, AlertSeverityType | null>;
 }
 
 export const CloudPulseAlertSeveritySelect = (
-  props: CloudViewRegionSelectProps
+  props: CloudPulseAlertSeveritySelectProps
 ) => {
   const { name } = props;
-
-  const { control } = useFormContext();
+  const { control } = useFormContext<CreateAlertDefinitionForm>();
 
   return (
     <Controller
@@ -38,7 +39,7 @@ export const CloudPulseAlertSeveritySelect = (
           }}
           textFieldProps={{
             labelTooltipText:
-              'Define a severity level associated with the alert to help you prioritize and manage alerts in the Recent activity tab',
+              'Define a severity level associated with the alert to help you prioritize and manage alerts in the Recent activity tab.',
           }}
           value={
             field.value !== null

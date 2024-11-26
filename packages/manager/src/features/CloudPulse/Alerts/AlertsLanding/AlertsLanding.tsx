@@ -1,4 +1,4 @@
-import { Box, Paper } from '@linode/ui';
+import { Box, Button, Paper } from '@linode/ui';
 import * as React from 'react';
 import {
   Redirect,
@@ -9,7 +9,6 @@ import {
   useRouteMatch,
 } from 'react-router-dom';
 
-import { Button } from 'src/components/Button/Button';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
 import { Tabs } from 'src/components/Tabs/Tabs';
 import { useFlags } from 'src/hooks/useFlags';
@@ -71,7 +70,7 @@ export const AlertsLanding = React.memo(() => {
           {pathname === `${url}/definitions` && (
             <Box>
               <Button
-                onClick={(_) => {
+                onClick={() => {
                   history.push(`${url}/definitions/create`);
                 }}
                 buttonType="primary"
@@ -85,12 +84,9 @@ export const AlertsLanding = React.memo(() => {
         <Switch>
           <Route
             component={AlertDefinitionLanding}
-            path={'/monitor/cloudpulse/alerts/definitions'}
+            path={'/monitor/alerts/definitions'}
           />
-          <Redirect
-            from="/monitor/cloudpulse/alerts"
-            to="/monitor/cloudpulse/alerts/definitions"
-          />
+          <Redirect from="*" to="/monitor/alerts/definitions" />
         </Switch>
       </Tabs>
     </Paper>

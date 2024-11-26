@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type {
   Alert,
+  AlertServiceType,
   CreateAlertDefinitionPayload,
 } from '@linode/api-v4/lib/cloudpulse';
 import type {
@@ -13,27 +14,25 @@ import type {
 } from '@linode/api-v4/lib/types';
 import { queryFactory } from './queries';
 
-export const aclpQueryKey = 'aclp-alerts';
-
-export const useCreateAlertDefinition = () => {
+export const useCreateAlertDefinition = (service_type: AlertServiceType) => {
   const queryClient = useQueryClient();
   return useMutation<Alert, APIError[], CreateAlertDefinitionPayload>({
-    mutationFn: (data) => createAlertDefinition(data),
+    mutationFn: (data) => createAlertDefinition(data, service_type),
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: [aclpQueryKey] });
+      queryClient.invalidateQueries(queryFactory.alerts);
     },
   });
 };
 
 export const useAlertDefinitionsQuery = (params?: Params, filter?: Filter) => {
   return useQuery<ResourcePage<Alert>, APIError[]>({
-    ...queryFactory.lists._ctx.alerts(params, filter),
+    ...queryFactory.alerts._ctx.alerts(params, filter),
   });
 };
 
 export const useAlertDefinitionQuery = (alertId: number) => {
   return useQuery<Alert, APIError[]>({
-    ...queryFactory.alerts(alertId),
+    ...queryFactory.alertById(alertId),
     enabled: alertId !== undefined,
   });
 };

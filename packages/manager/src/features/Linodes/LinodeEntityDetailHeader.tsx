@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from '@linode/ui';
+import { Box, Button, Stack, TooltipIcon } from '@linode/ui';
 import { Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
@@ -6,7 +6,6 @@ import * as React from 'react';
 import { EntityHeader } from 'src/components/EntityHeader/EntityHeader';
 import { Hidden } from 'src/components/Hidden';
 import { StatusIcon } from 'src/components/StatusIcon/StatusIcon';
-import { TooltipIcon } from 'src/components/TooltipIcon';
 import { LinodeActionMenu } from 'src/features/Linodes/LinodesLanding/LinodeActionMenu/LinodeActionMenu';
 import { ProgressDisplay } from 'src/features/Linodes/LinodesLanding/LinodeRow/LinodeRow';
 import { lishLaunch } from 'src/features/Lish/lishUtils';
@@ -20,7 +19,7 @@ import { getLinodeIconStatus } from './LinodesLanding/utils';
 import type { LinodeHandlers } from './LinodesLanding/LinodesLanding';
 import type { Config, LinodeBackups } from '@linode/api-v4';
 import type { Linode, LinodeType } from '@linode/api-v4/lib/linodes/types';
-import type { TypographyProps } from 'src/components/Typography';
+import type { TypographyProps } from '@linode/ui';
 
 interface LinodeEntityDetailProps {
   id: number;

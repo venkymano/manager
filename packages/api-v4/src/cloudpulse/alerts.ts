@@ -6,29 +6,35 @@ import Request, {
   setParams,
   setXFilter,
 } from '../request';
-import { Alert, CreateAlertDefinitionPayload } from './types';
+import { Alert, AlertServiceType, CreateAlertDefinitionPayload } from './types';
 import { BETA_API_ROOT as API_ROOT } from 'src/constants';
 import { Params, Filter, ResourcePage } from 'src/types';
 
-export const createAlertDefinition = (data: CreateAlertDefinitionPayload) =>
+export const createAlertDefinition = (
+  data: CreateAlertDefinitionPayload,
+  service_type: AlertServiceType
+) =>
   Request<Alert>(
-    setURL(`${API_ROOT}/monitor/alert-definitions`),
+    setURL(
+      `${API_ROOT}/monitor/services/${encodeURIComponent(
+        service_type!
+      )}/alert-definitions`
+    ),
     setMethod('POST'),
     setData(data, createAlertDefinitionSchema)
   );
-
-export const getAlertDefinitions = (params?: Params, filters?: Filter) =>
-  Request<ResourcePage<Alert>>(
-    setURL(`${API_ROOT}/monitor/alert-definitions`),
-    setMethod('GET'),
-    setParams(params),
-    setXFilter(filters)
-  );
-
-export const getAlertDefinitionById = (alertId: number) =>
-  Request<Alert>(
-    setURL(
-      `${API_ROOT}/monitor/alert-definitions/${encodeURIComponent(alertId)}`
-    ),
-    setMethod('GET')
-  );
+  export const getAlertDefinitions = (params?: Params, filters?: Filter) =>
+    Request<ResourcePage<Alert>>(
+      setURL(`${API_ROOT}/monitor/alert-definitions`),
+      setMethod('GET'),
+      setParams(params),
+      setXFilter(filters)
+    );
+  
+  export const getAlertDefinitionById = (alertId: number) =>
+    Request<Alert>(
+      setURL(
+        `${API_ROOT}/monitor/alert-definitions/${encodeURIComponent(alertId)}`
+      ),
+      setMethod('GET')
+    );

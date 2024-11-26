@@ -1,9 +1,7 @@
 import { Divider } from '@linode/ui';
-import { Box } from '@linode/ui';
+import { Box, Chip } from '@linode/ui';
 import { Grid, Typography } from '@mui/material';
 import React from 'react';
-
-import { Chip } from 'src/components/Chip';
 
 import type { Alert } from '@linode/api-v4';
 
