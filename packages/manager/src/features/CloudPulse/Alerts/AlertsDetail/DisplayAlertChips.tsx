@@ -14,9 +14,9 @@ export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
   const { chips: values, label } = props;
 
   const iterables: string[][] =
-    Array.isArray(values) && values.every((item) => typeof item === 'string')
-      ? [values]
-      : values;
+    Array.isArray(values) && values.every((item) => Array.isArray(item))
+      ? values
+      : [values];
 
   return iterables.map((value, idx) => (
     <React.Fragment key={idx}>
