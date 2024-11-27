@@ -17,3 +17,19 @@ export const convertSecondsToMinutes = (seconds: number): string => {
 
   return minuteString + secondString;
 };
+
+export const formatTimestamp = (timestamp: string): string => {
+  const date = new Date(timestamp);
+
+  const options: Intl.DateTimeFormatOptions = {
+    day: 'numeric', // Numeric day (e.g., 20)
+    hour: 'numeric', // Numeric hour
+    hour12: true, // Use 12-hour clock
+    minute: 'numeric', // Numeric minutes
+    month: 'short', // Short month name (e.g., Nov)
+  };
+
+  const formattedDate = date.toLocaleString('en-US', options);
+
+  return formattedDate + '.';
+};

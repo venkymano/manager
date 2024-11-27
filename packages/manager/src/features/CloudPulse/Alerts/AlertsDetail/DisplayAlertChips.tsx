@@ -19,11 +19,11 @@ export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
       : [values];
 
   return iterables.map((value, idx) => (
-    <React.Fragment key={idx}>
-      <Grid item key={idx} sm={3} xs={12}>
+    <React.Fragment key={label + '_' + idx}>
+      <Grid item sm={3} xs={12}>
         {idx === 0 && <Typography variant="h3">{label}: </Typography>}
       </Grid>
-      <Grid item key={idx} sm={6} xs={12}>
+      <Grid item sm={6} xs={12}>
         {value.map((label, index) => (
           <StyledAlertChip key={index} label={label} variant="outlined" />
         ))}

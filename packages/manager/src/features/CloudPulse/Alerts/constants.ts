@@ -33,3 +33,10 @@ export const operatorLabel = {
   neq: 'not equals',
   startswith: 'starts with',
 };
+
+export const severityMap = {
+  0: 'Severe',
+  1: 'Medium',
+  2: 'Low',
+  3: 'Info',
+};
