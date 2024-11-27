@@ -27,7 +27,7 @@ export const DisplayAlertMetricAndDimensions = React.memo(
         { aggregation_type, dimension_filters, metric, operator, value },
         idx
       ) => (
-        <Grid columnGap={3} container key={idx} rowGap={1}>
+        <Grid columnGap={3} container key={idx} rowGap={0.5}>
           <DisplayAlertChips
             chips={[
               aggregation_type

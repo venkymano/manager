@@ -95,12 +95,12 @@ export const StyledAlertsBox = styled(Box, { label: 'StyledAlertsBox' })(
   })
 );
 
-export const StyledAlertChip = styled(Chip, { label: 'StyledAlertChip' })(
-  ({ theme }) => ({
-    backgroundColor: 'white',
-    marginBottom: 0,
-    marginLeft: theme.spacing(-1),
-    marginTop: 0,
-    p: theme.spacing(1),
-  })
-);
+export const StyledAlertChip = styled(Chip, { label: 'StyledAlertChip' })<{
+  borderRadius?: string;
+}>(({ borderRadius, theme }) => ({
+  '& .MuiChip-label': {
+    padding: theme.spacing(2), // Add padding inside the label
+  },
+  backgroundColor: 'white',
+  borderRadius: borderRadius || 0,
+}));
