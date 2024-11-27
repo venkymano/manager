@@ -56,68 +56,53 @@ export const AlertDetailOverview = (props: OverviewProps) => {
         Overview
       </Typography>
       <Grid alignItems="center" container spacing={2}>
-        <Grid item xs={3}>
-          <Typography variant="h3">Name:</Typography>
-        </Grid>
-        <Grid item xs={9}>
-          <Typography variant="body2">{label}</Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h3">Status:</Typography>
-        </Grid>
-        <Grid item xs={9}>
-          <Typography
-            sx={{
-              color: statusColorMap[status],
-            }}
-            variant="body2"
-          >
-            {convertStringToCamelCasesWithSpaces(status)}
-          </Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h3">Type:</Typography>
-        </Grid>
-        <Grid item xs={9}>
-          <Typography variant="body2">{type}</Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h3">Description:</Typography>
-        </Grid>
-        <Grid item xs={9}>
-          <Typography variant="body2">{description}</Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h3">Severity:</Typography>
-        </Grid>
-        <Grid item xs={9}>
-          <Typography variant="body2">
-            {severity ? severityMap[severity] : severity}
-          </Typography>
-          {/* todo, maintain a map*/}
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h3">Last Modified:</Typography>
-        </Grid>
-        <Grid item xs={9}>
-          <Typography variant="body2">{formatTimestamp(updated)}</Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h3">Created By:</Typography>
-        </Grid>
-        <Grid item xs={9}>
-          <Typography variant="body2">{created_by}</Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h3">Service:</Typography>
-        </Grid>
-        <Grid item xs={9}>
-          <Typography variant="body2">{service_type}</Typography>
-        </Grid>
+        <DetailRow label="Name" value={label} />
+        <DetailRow
+          color={statusColorMap[status]}
+          label="Status"
+          value={convertStringToCamelCasesWithSpaces(status)}
+        />
+        <DetailRow label="Type" value={type} />
+        <DetailRow label="Description" value={description} />
+        <DetailRow
+          label="Severity"
+          value={severity ? severityMap[severity] : severity || null}
+        />
+        <DetailRow label="Last Modified" value={formatTimestamp(updated)} />
+        <DetailRow label="Created By" value={created_by} />
+        <DetailRow label="Service" value={service_type} />
       </Grid>
     </Box>
   );
 };
+
+const DetailRow = ({
+  color,
+  label,
+  value,
+}: {
+  color?: string;
+  label: string;
+  value: null | string;
+}) => (
+  <Grid item xs={12}>
+    <Grid container>
+      <Grid item xs={3}>
+        <Typography variant="h3">{label}:</Typography>
+      </Grid>
+      <Grid item xs={9}>
+        <Typography
+          sx={{
+            color,
+          }}
+          variant="body2"
+        >
+          {value}
+        </Typography>
+      </Grid>
+    </Grid>
+  </Grid>
+);
 
 function formatTimestamp(timestamp: string): string {
   const date = new Date(timestamp);

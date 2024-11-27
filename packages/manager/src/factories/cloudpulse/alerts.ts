@@ -101,9 +101,9 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
   severity: Factory.each(() => pickRandom([0, 1, 2, 3])),
   status: Factory.each(() => pickRandom(['enabled', 'disabled'])),
   triggerCondition: {
-    evaluation_period_seconds: 0,
-    polling_interval_seconds: 0,
-    trigger_occurrences: 0,
+    evaluation_period_seconds: 60,
+    polling_interval_seconds: 122,
+    trigger_occurrences: 60,
   },
   type: Factory.each(() => pickRandom(['default', 'custom'])),
   updated: new Date().toISOString(),

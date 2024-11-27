@@ -1,5 +1,5 @@
-import { CircleProgress } from '@linode/ui';
-import { Grid } from '@mui/material';
+import { Box, Chip, CircleProgress } from '@linode/ui';
+import { Grid, styled } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -7,10 +7,10 @@ import { Breadcrumb } from 'src/components/Breadcrumb/Breadcrumb';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { useAlertDefinitionQuery } from 'src/queries/cloudpulse/alerts';
 
+import { AlertResources } from '../AlertsResources/AlertsResources';
 import { AlertDetailCriteria } from './AlertDetailCriteria';
 import { AlertDetailNotification } from './AlertDetailNotification';
 import { AlertDetailOverview } from './AlertDetailOverview';
-import { AlertResources } from '../AlertsResources/AlertsResources';
 
 interface RouteParams {
   alertId: string;
@@ -69,9 +69,9 @@ export const AlertDetail = () => {
         </Grid>
         <Grid item xs={12}>
           <AlertResources
+            isSelectionsNeeded
             resourceIds={alertDetails?.resource_ids}
             serviceType={alertDetails?.service_type}
-            isSelectionsNeeded
           />
         </Grid>
         {/* <Grid item xs={12}>
@@ -81,3 +81,26 @@ export const AlertDetail = () => {
     </>
   );
 };
+
+export const StyledAlertsBox = styled(Box, { label: 'StyledAlertsBox' })(
+  ({ theme }) => ({
+    backgroundColor:
+      theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
+    borderRadius: 1,
+    height: theme.spacing(90),
+    maxHeight: theme.spacing(90),
+    maxWidth: theme.spacing(71.75),
+    overflow: 'auto',
+    width: theme.spacing(71.75),
+  })
+);
+
+export const StyledAlertChip = styled(Chip, { label: 'StyledAlertChip' })(
+  ({ theme }) => ({
+    backgroundColor: 'white',
+    marginBottom: 0,
+    marginLeft: theme.spacing(-1),
+    marginTop: 0,
+    p: theme.spacing(1),
+  })
+);

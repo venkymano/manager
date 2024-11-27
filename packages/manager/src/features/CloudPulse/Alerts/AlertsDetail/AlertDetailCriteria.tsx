@@ -1,7 +1,10 @@
-import { Box } from '@linode/ui';
-import { Grid, Typography, useTheme } from '@mui/material';
+import { Chip } from '@linode/ui';
+import { Grid, Typography } from '@mui/material';
 import React from 'react';
 
+import { convertSecondsToMinutes } from '../Utils/utils';
+import { StyledAlertsBox } from './AlertDetail';
+import { DisplayAlertChips } from './DisplayAlertChips';
 import { DisplayAlertMetricAndDimensions } from './DisplayAlertMetricAndDimensions';
 
 import type { Alert } from '@linode/api-v4';
@@ -10,7 +13,7 @@ interface CriteriaProps {
   alert: Alert;
 }
 
-export const AlertDetailCriteria = (props: CriteriaProps) => {
+export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
   const { alert } = props;
 
   const {
@@ -19,55 +22,52 @@ export const AlertDetailCriteria = (props: CriteriaProps) => {
     trigger_occurrences,
   } = alert.triggerCondition;
 
-  const { rule_criteria } = alert;
-
-  const theme = useTheme();
+  const { rule_criteria = { rules: [] } } = alert;
 
   return (
-    <Box
-      sx={(theme) => ({
-        backgroundColor:
-          theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
-        borderRadius: 1,
-        p: 1,
-      })}
-      height={theme.spacing(90)}
-      maxHeight={theme.spacing(90)}
-      overflow={'auto'}
-      p={theme.spacing(3)}
-    >
+    <StyledAlertsBox padding={3}>
       <Typography gutterBottom marginBottom={2} variant="h2">
         Criteria
       </Typography>
-      {/** Display alerts metrics and dimensions */}
-      <DisplayAlertMetricAndDimensions ruleCriteria={rule_criteria} />{' '}
-      {/** Display rest of the information */}
-      <Grid alignItems="center" container id="ds" spacing={2}>
-        <Grid item marginTop={1} sm={3}>
-          <Typography variant="h3">Polling interval: </Typography>
-        </Grid>
-        <Grid item sm={9}>
-          <Typography variant="body2">
-            {`${polling_interval_seconds} seconds`}
-          </Typography>
-        </Grid>
-        <Grid item sm={3}>
-          <Typography variant="h3">Evaluation period: </Typography>
-        </Grid>
-        <Grid item sm={9}>
-          <Typography variant="body2">
-            {`${evaluation_period_seconds} seconds`}
-          </Typography>
-        </Grid>
+
+      <DisplayAlertMetricAndDimensions ruleCriteria={rule_criteria} />
+
+      <Grid alignItems="center" columnGap={3} container rowGap={2}>
+        <DisplayAlertChips // label chip for polling interval
+          chips={[convertSecondsToMinutes(polling_interval_seconds)]}
+          label={'Polling Interval'}
+        />
+
+        <DisplayAlertChips // label chip for evaluation period
+          chips={[convertSecondsToMinutes(evaluation_period_seconds)]}
+          label={'Evaluation Period'}
+        />
+
         <Grid item sm={3} xs={12}>
           <Typography variant="h3">Trigger Alert When: </Typography>
         </Grid>
-        <Grid item sm={9} xs={12}>
-          <Typography variant="body2">
-            {`All Criteria are met for ${trigger_occurrences} consecutive occurrence`}
+        <Grid
+          sx={{
+            display: 'flex',
+          }}
+          item
+          sm={8}
+          xs={12}
+        >
+          <Typography marginLeft={-1} variant="body1">
+            All Criteria are met for{' '}
           </Typography>
+          <Chip
+            sx={{
+              backgroundColor: 'white',
+              marginLeft: 0.5,
+            }}
+            label={trigger_occurrences}
+            variant="outlined"
+          />
+          <Typography variant="body1">consecutive occurrence</Typography>
         </Grid>
       </Grid>
-    </Box>
+    </StyledAlertsBox>
   );
-};
+});
