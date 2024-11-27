@@ -1,7 +1,8 @@
 import { Box } from '@linode/ui';
-import { Divider } from '@linode/ui';
 import { Grid, Typography, useTheme } from '@mui/material';
 import React from 'react';
+
+import { DisplayAlertMetricAndDimensions } from './DisplayAlertMetricAndDimensions';
 
 import type { Alert } from '@linode/api-v4';
 
@@ -30,15 +31,19 @@ export const AlertDetailCriteria = (props: CriteriaProps) => {
         borderRadius: 1,
         p: 1,
       })}
-      height={theme.spacing(62.5)}
+      height={theme.spacing(90)}
+      maxHeight={theme.spacing(90)}
       overflow={'auto'}
       p={theme.spacing(3)}
     >
       <Typography gutterBottom marginBottom={2} variant="h2">
         Criteria
       </Typography>
+      {/** Display alerts metrics and dimensions */}
+      <DisplayAlertMetricAndDimensions ruleCriteria={rule_criteria} />{' '}
+      {/** Display rest of the information */}
       <Grid alignItems="center" container id="ds" spacing={2}>
-        <Grid item sm={3}>
+        <Grid item marginTop={1} sm={3}>
           <Typography variant="h3">Polling interval: </Typography>
         </Grid>
         <Grid item sm={9}>
@@ -55,32 +60,13 @@ export const AlertDetailCriteria = (props: CriteriaProps) => {
           </Typography>
         </Grid>
         <Grid item sm={3} xs={12}>
-          <Typography variant="h3">Trigger alert when: </Typography>
+          <Typography variant="h3">Trigger Alert When: </Typography>
         </Grid>
         <Grid item sm={9} xs={12}>
           <Typography variant="body2">
             {`All Criteria are met for ${trigger_occurrences} consecutive occurrence`}
           </Typography>
         </Grid>
-        {rule_criteria &&
-          rule_criteria.rules.length > 0 &&
-          rule_criteria.rules.map(
-            ({ aggregation_type, metric, operator, value }, idx) => (
-              <Grid container key={idx} margin={1} spacing={1}>
-                <Grid item sm={12} xs={12}>
-                  <Divider />
-                </Grid>
-                <Grid item sm={3} xs={12}>
-                  <Typography variant="h3">Threshold: </Typography>
-                </Grid>
-                <Grid item sm={9} xs={12}>
-                  <Typography variant="body2">
-                    {`${metric} ${aggregation_type} ${operator} ${value}`}
-                  </Typography>
-                </Grid>
-              </Grid>
-            )
-          )}
       </Grid>
     </Box>
   );

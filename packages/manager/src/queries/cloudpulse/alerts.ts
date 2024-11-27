@@ -1,6 +1,8 @@
 import { createAlertDefinition } from '@linode/api-v4/lib/cloudpulse';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { queryFactory } from './queries';
+
 import type {
   Alert,
   CreateAlertDefinitionPayload,
@@ -11,7 +13,6 @@ import type {
   Params,
   ResourcePage,
 } from '@linode/api-v4/lib/types';
-import { queryFactory } from './queries';
 
 export const aclpQueryKey = 'aclp-alerts';
 
@@ -31,9 +32,12 @@ export const useAlertDefinitionsQuery = (params?: Params, filter?: Filter) => {
   });
 };
 
-export const useAlertDefinitionQuery = (alertId: number) => {
+export const useAlertDefinitionQuery = (
+  alertId: number,
+  serviceType: string
+) => {
   return useQuery<Alert, APIError[]>({
-    ...queryFactory.alerts(alertId),
+    ...queryFactory.alerts(alertId, serviceType),
     enabled: alertId !== undefined,
   });
 };

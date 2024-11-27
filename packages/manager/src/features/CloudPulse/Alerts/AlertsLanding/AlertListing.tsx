@@ -13,7 +13,6 @@ import { TableRow } from 'src/components/TableRow';
 import { TableSortCell } from 'src/components/TableSortCell';
 import { useOrder } from 'src/hooks/useOrder';
 import { usePagination } from 'src/hooks/usePagination';
-import { useAlertDefinitionsQuery } from 'src/queries/cloudpulse/alerts';
 
 import { AlertTableRow } from './AlertTableRow';
 import { DeleteAlertDialogue } from './DeleteAlertDialogue';
@@ -164,7 +163,9 @@ export const AlertListing = (props: AlertListingProps) => {
     }
   };
   const handleDetails = (alert: Alert) => {
-    history.push(`${location.pathname}/detail/${alert.id}`);
+    history.push(
+      `${location.pathname}/detail/${alert.service_type}/${alert.id}`
+    );
   };
   return (
     <>

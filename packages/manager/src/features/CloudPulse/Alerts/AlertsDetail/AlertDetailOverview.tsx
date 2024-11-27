@@ -2,6 +2,8 @@ import { Box } from '@linode/ui';
 import { Grid, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
+import { convertStringToCamelCasesWithSpaces } from '../../Utils/utils';
+
 import type { Alert } from '@linode/api-v4';
 
 interface OverviewProps {
@@ -23,6 +25,20 @@ export const AlertDetailOverview = (props: OverviewProps) => {
 
   const theme = useTheme();
 
+  const statusColorMap = {
+    disabled: theme.color.grey1,
+    enabled: theme.color.green,
+    failed: theme.color.red,
+    provisioning: theme.color.orange,
+  };
+
+  const severityMap = {
+    0: 'Severe',
+    1: 'Medium',
+    2: 'Low',
+    3: 'Info',
+  };
+
   return (
     <Box
       sx={(theme) => ({
@@ -31,7 +47,9 @@ export const AlertDetailOverview = (props: OverviewProps) => {
         borderRadius: 1,
         p: 1,
       })}
-      height={theme.spacing(62.5)}
+      height={theme.spacing(90)}
+      maxHeight={theme.spacing(90)}
+      overflow={'auto'}
       p={theme.spacing(3)}
     >
       <Typography gutterBottom marginBottom={2} variant="h2">
@@ -48,7 +66,14 @@ export const AlertDetailOverview = (props: OverviewProps) => {
           <Typography variant="h3">Status:</Typography>
         </Grid>
         <Grid item xs={9}>
-          <Typography variant="body2">{status}</Typography>
+          <Typography
+            sx={{
+              color: statusColorMap[status],
+            }}
+            variant="body2"
+          >
+            {convertStringToCamelCasesWithSpaces(status)}
+          </Typography>
         </Grid>
         <Grid item xs={3}>
           <Typography variant="h3">Type:</Typography>
@@ -66,7 +91,10 @@ export const AlertDetailOverview = (props: OverviewProps) => {
           <Typography variant="h3">Severity:</Typography>
         </Grid>
         <Grid item xs={9}>
-          <Typography variant="body2">{severity}</Typography>
+          <Typography variant="body2">
+            {severity ? severityMap[severity] : severity}
+          </Typography>
+          {/* todo, maintain a map*/}
         </Grid>
         <Grid item xs={3}>
           <Typography variant="h3">Last Modified:</Typography>
@@ -85,12 +113,6 @@ export const AlertDetailOverview = (props: OverviewProps) => {
         </Grid>
         <Grid item xs={9}>
           <Typography variant="body2">{service_type}</Typography>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h3">Region:</Typography>
-        </Grid>
-        <Grid item xs={9}>
-          <Typography variant="body2">How to add??</Typography>
         </Grid>
       </Grid>
     </Box>

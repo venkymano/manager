@@ -1,10 +1,9 @@
-import { Box, CircleProgress, Notice, Paper } from '@linode/ui';
+import { Box, CircleProgress } from '@linode/ui';
 import { Grid } from '@mui/material';
 import React from 'react';
 
+import { Checkbox } from 'src/components/Checkbox';
 import { DebouncedSearchTextField } from 'src/components/DebouncedSearchTextField';
-import { DismissibleBanner } from 'src/components/DismissibleBanner/DismissibleBanner';
-import { StyledNotice } from 'src/components/DismissibleBanner/DismissibleBanner.styles';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Typography } from 'src/components/Typography';
 import { useResourcesQuery } from 'src/queries/cloudpulse/resources';
@@ -16,6 +15,7 @@ import {
   getRegionsIdLabelMap,
 } from '../Utils/AlertResourceUtils';
 import { AlertsRegionFilter } from './AlertsRegionFilter';
+import { AlertsResourcesNotice } from './AlertsResourcesNotice';
 import { DisplayAlertResources } from './DisplayAlertResource';
 
 import type { Region } from '@linode/api-v4';
@@ -54,6 +54,8 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     []
   );
 
+  const [selectedOnly, setSelectedOnly] = React.useState<boolean>(false);
+
   const {
     data: regions,
     isError: isRegionsError,
@@ -89,6 +91,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       regionsIdToLabelMap,
       resourceIds,
       searchText,
+      selectedOnly,
       selectedResources,
     });
   }, [
@@ -98,7 +101,23 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     filteredRegions,
     regionsIdToLabelMap,
     selectedResources,
+    selectedOnly,
   ]);
+
+  const handleAllSelection = React.useCallback(() => {
+    if (!data) {
+      // Guard clause if data is undefined
+      return;
+    }
+
+    if (selectedResources.length === data.length) {
+      // Unselect all
+      setSelectedResources([]);
+    } else {
+      // Select all
+      setSelectedResources([...data.map((resource) => resource.id)]);
+    }
+  }, [data, selectedResources]);
 
   /**
    * Holds the regions associated with the resources from list of regions
@@ -139,7 +158,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       )}
 
       {resourceIds.length > 0 && (
-        <Grid container gap={2}>
+        <Grid container gap={3}>
           <Grid item md={4} xs={12}>
             <DebouncedSearchTextField
               onSearch={(value) => {
@@ -161,19 +180,32 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
               regionOptions={regionOptions ?? []}
             />
           </Grid>
+          {isSelectionsNeeded && (
+            <Grid item lg={3} xs={12}>
+              <Checkbox
+                sx={{
+                  maxHeight: '34px',
+                  pt: 0.5,
+                }}
+                checked={selectedOnly}
+                onClick={() => setSelectedOnly(!selectedOnly)}
+                text={'Show Selected Only'}
+                value={'Show Selected'}
+              />
+            </Grid>
+          )}
 
-          <Grid item md={6} xs={12}>
-            <StyledNotice
-              style={{
-                backgroundColor: 'white',
-              }}
-              variant="info"
-            >
-              {selectedResources.length} out of {data?.length} selected
-            </StyledNotice>
-          </Grid>
+          {isSelectionsNeeded && (
+            <Grid item xs={12}>
+              <AlertsResourcesNotice
+                handleSelectionChange={handleAllSelection}
+                selectedResources={selectedResources.length}
+                totalResources={data?.length ?? 0}
+              />
+            </Grid>
+          )}
 
-          <Grid item marginTop={-1} xs={12}>
+          <Grid item xs={12}>
             {/* Pass filtered data */}
             <DisplayAlertResources
               filteredResources={filteredResources}

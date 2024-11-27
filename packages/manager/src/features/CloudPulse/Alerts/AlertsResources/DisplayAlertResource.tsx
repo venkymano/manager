@@ -80,7 +80,10 @@ export const DisplayAlertResources = React.memo(
     );
 
     const isAllPageSelected = (paginatedData: AlertInstances[]): boolean => {
-      return paginatedData.every((resource) => resource.checked);
+      return (
+        Boolean(paginatedData?.length) &&
+        paginatedData.every((resource) => resource.checked)
+      );
     };
 
     return (
@@ -129,30 +132,22 @@ export const DisplayAlertResources = React.memo(
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedData.length === 0 ? (
-                  <TableRow>
-                    <TableCell align="center" colSpan={2}>
-                      No resources found.
-                    </TableCell>
+                {paginatedData.map(({ checked, id, label, region }) => (
+                  <TableRow key={id}>
+                    {isSelectionsNeeded && (
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          onChange={() => {
+                            handleSelectionChange([id], !checked);
+                          }}
+                          checked={checked}
+                        />
+                      </TableCell>
+                    )}
+                    <TableCell>{label}</TableCell>
+                    <TableCell>{region}</TableCell>
                   </TableRow>
-                ) : (
-                  paginatedData.map(({ checked, id, label, region }) => (
-                    <TableRow key={id}>
-                      {isSelectionsNeeded && (
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            onChange={() => {
-                              handleSelectionChange([id], !checked);
-                            }}
-                            checked={checked}
-                          />
-                        </TableCell>
-                      )}
-                      <TableCell>{label}</TableCell>
-                      <TableCell>{region}</TableCell>
-                    </TableRow>
-                  ))
-                )}
+                ))}
               </TableBody>
             </Table>
             <PaginationFooter

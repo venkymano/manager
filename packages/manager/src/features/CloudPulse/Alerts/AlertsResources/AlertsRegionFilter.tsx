@@ -17,13 +17,16 @@ export interface AlertsRegionOption {
 export const AlertsRegionFilter = React.memo((props: AlertsRegionProps) => {
   const { handleSelectionChange, regionOptions } = props;
 
-  const [selectedRegion, setSelectedRegion] = React.useState<Region[]>(
-    regionOptions
-  );
+  const [selectedRegion, setSelectedRegion] = React.useState<Region[]>([]);
   return (
     <RegionMultiSelect
       onChange={(ids: string[]) => {
-        handleSelectionChange(ids);
+        if (!ids || ids.length === 0) {
+          handleSelectionChange(regionOptions.map(({ id }) => id));
+        } else {
+          handleSelectionChange(ids);
+        }
+
         setSelectedRegion(
           regionOptions.filter((region) => ids.includes(region.id))
         );
@@ -37,7 +40,7 @@ export const AlertsRegionFilter = React.memo((props: AlertsRegionProps) => {
         hideLabel: true,
       }}
       currentCapability={undefined}
-      isClearable
+      isClearable={true}
       label="Select Regions"
       limitTags={1}
       placeholder={Boolean(selectedRegion?.length) ? '' : 'Select Regions'}

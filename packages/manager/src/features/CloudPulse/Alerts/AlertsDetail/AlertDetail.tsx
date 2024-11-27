@@ -10,17 +10,19 @@ import { useAlertDefinitionQuery } from 'src/queries/cloudpulse/alerts';
 import { AlertDetailCriteria } from './AlertDetailCriteria';
 import { AlertDetailNotification } from './AlertDetailNotification';
 import { AlertDetailOverview } from './AlertDetailOverview';
-import { AlertResources } from './AlertsResources';
+import { AlertResources } from '../AlertsResources/AlertsResources';
 
 interface RouteParams {
   alertId: string;
+  serviceType: string;
 }
 
 export const AlertDetail = () => {
-  const { alertId } = useParams<RouteParams>();
+  const { alertId, serviceType } = useParams<RouteParams>();
 
   const { data: alertDetails, isError, isFetching } = useAlertDefinitionQuery(
-    Number(alertId)
+    Number(alertId),
+    serviceType
   );
 
   const generateCrumbOverrides = () => {
@@ -72,9 +74,9 @@ export const AlertDetail = () => {
             isSelectionsNeeded
           />
         </Grid>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <AlertDetailNotification alert={alertDetails} />
-        </Grid>
+        </Grid> */}
       </Grid>
     </>
   );
