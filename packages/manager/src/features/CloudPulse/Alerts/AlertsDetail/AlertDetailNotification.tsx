@@ -76,10 +76,21 @@ export const AlertDetailNotification = (props: NotificationProps) => {
             <AlertOverviewDetailRow
               label="Type"
               value={convertStringToCamelCasesWithSpaces(value.channel_type)}
+              xsLabel={2}
+              xsValue={10}
             />
-            <AlertOverviewDetailRow label="Channel" value={value.label} />
+            <AlertOverviewDetailRow
+              label="Channel"
+              value={value.label}
+              xsLabel={2}
+              xsValue={10}
+            />
             <Grid item xs={12}>
-              <DisplayAlertChips {...getLabel(value)} />
+              <DisplayAlertChips
+                {...getLabel(value)}
+                mdLabel={2}
+                mdValue={10}
+              />
             </Grid>
             <Grid item xs={12}>
               <Divider />

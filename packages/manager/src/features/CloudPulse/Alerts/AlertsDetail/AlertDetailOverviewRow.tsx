@@ -5,19 +5,21 @@ interface AlertOverviewDetailRowProps {
   color?: string;
   label: string;
   value: null | string;
+  xsLabel?: number;
+  xsValue?: number;
 }
 
 export const AlertOverviewDetailRow = React.memo(
   (props: AlertOverviewDetailRowProps) => {
-    const { color, label, value } = props;
+    const { color, label, value, xsLabel, xsValue } = props;
 
     return (
       <Grid item xs={12}>
         <Grid container>
-          <Grid item xs={4}>
+          <Grid item xs={xsLabel ?? 4}>
             <Typography variant="h3">{label}:</Typography>
           </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={xsLabel ?? 8}>
             <Typography
               sx={{
                 color,

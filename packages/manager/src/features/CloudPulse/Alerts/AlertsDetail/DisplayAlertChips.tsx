@@ -9,10 +9,12 @@ interface AlertDimensionsProp {
   chips: Array<string> | Array<string[]>;
   isJoin?: boolean;
   label: string;
+  mdLabel? : number;
+  mdValue?: number;
 }
 
 export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
-  const { chips: values, isJoin = false, label } = props;
+  const { chips: values, isJoin = false, label, mdLabel, mdValue } = props;
 
   const iterables: string[][] =
     Array.isArray(values) && values.every((item) => Array.isArray(item))
@@ -25,10 +27,10 @@ export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
     <Grid container spacing={1}>
       {iterables.map((value, idx) => (
         <React.Fragment key={idx}>
-          <Grid item md={4} xs={12}>
+          <Grid item md={mdLabel ?? 4} xs={12}>
             {idx === 0 && <Typography variant="h3">{label}: </Typography>}
           </Grid>
-          <Grid item md={8} xs={12}>
+          <Grid item md={mdValue ?? 8} xs={12}>
             <Grid
               container
               flexWrap={!isJoin ? 'wrap' : 'nowrap'}
