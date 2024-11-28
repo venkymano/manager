@@ -29,7 +29,5 @@ export const formatTimestamp = (timestamp: string): string => {
     month: 'short', // Short month name (e.g., Nov)
   };
 
-  const formattedDate = date.toLocaleString('en-US', options);
-
-  return formattedDate + '.';
+  return date.toLocaleString('en-US', options);
 };
