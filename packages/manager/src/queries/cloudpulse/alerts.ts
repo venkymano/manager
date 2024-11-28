@@ -6,6 +6,7 @@ import { queryFactory } from './queries';
 import type {
   Alert,
   CreateAlertDefinitionPayload,
+  NotificationChannel,
 } from '@linode/api-v4/lib/cloudpulse';
 import type {
   APIError,
@@ -39,5 +40,14 @@ export const useAlertDefinitionQuery = (
   return useQuery<Alert, APIError[]>({
     ...queryFactory.alerts(alertId, serviceType),
     enabled: alertId !== undefined,
+  });
+};
+
+export const useAlertNotificationChannelsQuery = (
+  params?: Params,
+  filter?: Filter
+) => {
+  return useQuery<ResourcePage<NotificationChannel>, APIError[]>({
+    ...queryFactory.notificationChannels._ctx.channels(params, filter),
   });
 };

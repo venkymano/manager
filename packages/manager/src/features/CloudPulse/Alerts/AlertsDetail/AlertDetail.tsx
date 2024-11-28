@@ -60,23 +60,35 @@ export const AlertDetail = () => {
   return (
     <>
       <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
-      <Grid container spacing={2}>
-        <Grid item md={6} xs={12}>
-          <AlertDetailOverview alert={alertDetails} />
+      <Grid columnGap={1} container gap={2} width={'100%'}>
+        <Grid container flexWrap={'nowrap'} gap={2} item>
+          <StyledAlertsGrid item md={6} xs={12}>
+            <AlertDetailOverview alert={alertDetails} />
+          </StyledAlertsGrid>
+          <StyledAlertsGrid
+            item
+            maxHeight={'724px'}
+            md={6}
+            overflow={'auto'}
+            xs={12}
+          >
+            <AlertDetailCriteria alert={alertDetails} />
+          </StyledAlertsGrid>
         </Grid>
-        <Grid item md={6} xs={12}>
-          <AlertDetailCriteria alert={alertDetails} />
-        </Grid>
-        <Grid item xs={12}>
+        <StyledAlertsGrid item xs={12}>
           <AlertResources
             isSelectionsNeeded
             resourceIds={alertDetails?.resource_ids}
             serviceType={alertDetails?.service_type}
           />
-        </Grid>
-        {/* <Grid item xs={12}>
-          <AlertDetailNotification alert={alertDetails} />
-        </Grid> */}
+        </StyledAlertsGrid>
+        <StyledAlertsGrid item xs={12}>
+          <AlertDetailNotification
+            channelIds={alertDetails.channels.map((channel) =>
+              Number(channel.id)
+            )}
+          />
+        </StyledAlertsGrid>
       </Grid>
     </>
   );
@@ -89,9 +101,20 @@ export const StyledAlertsBox = styled(Box, { label: 'StyledAlertsBox' })(
     borderRadius: 1,
     height: theme.spacing(90),
     maxHeight: theme.spacing(90),
-    maxWidth: theme.spacing(71.75),
+    maxWidth: theme.spacing(30.75),
     overflow: 'auto',
-    width: theme.spacing(71.75),
+    padding: theme.spacing(3),
+    width: theme.spacing(30.75),
+  })
+);
+
+export const StyledAlertsGrid = styled(Grid, { label: 'StyledAlertsGrid' })(
+  ({ theme }) => ({
+    backgroundColor:
+      theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
+    borderRadius: 1,
+    overflow: 'auto',
+    padding: theme.spacing(3),
   })
 );
 

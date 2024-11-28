@@ -27,32 +27,38 @@ export const DisplayAlertMetricAndDimensions = React.memo(
         { aggregation_type, dimension_filters, metric, operator, value },
         idx
       ) => (
-        <Grid columnGap={3} container key={idx} rowGap={0.5}>
-          <DisplayAlertChips
-            chips={[
-              aggregation_type
-                ? aggregationTypes[aggregation_type]
-                : aggregation_type,
-              metric,
-              operator ? operators[operator] : operator,
-              String(value),
-            ]}
-            label={'Metric Threshold'}
-          />
-          <DisplayAlertChips
-            chips={dimension_filters.map(
-              ({ dimension_label, operator, value }) => [
-                dimension_label,
-                operator,
-                value,
-              ]
-            )}
-            label={'Dimension Filter'}
-          />
-          <Grid item sm={12} xs={12}>
+        <React.Fragment key={idx}>
+          <Grid item xs={12}>
+            <DisplayAlertChips
+              chips={[
+                aggregation_type
+                  ? aggregationTypes[aggregation_type]
+                  : aggregation_type,
+                metric,
+                operator ? operators[operator] : operator,
+                String(value),
+              ]}
+              isJoin
+              label={'Metric Threshold'}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <DisplayAlertChips
+              chips={dimension_filters.map(
+                ({ dimension_label, operator, value }) => [
+                  dimension_label,
+                  operator,
+                  value,
+                ]
+              )}
+              isJoin
+              label={'Dimension Filter'}
+            />
+          </Grid>
+          <Grid item xs={12}>
             <Divider />
           </Grid>
-        </Grid>
+        </React.Fragment>
       )
     );
   }

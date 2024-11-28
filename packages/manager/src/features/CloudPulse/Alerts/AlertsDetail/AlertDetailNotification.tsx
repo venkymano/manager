@@ -1,78 +1,87 @@
+import { Box, CircleProgress } from '@linode/ui';
 import { Grid } from '@mui/material';
+import { val } from 'factory.ts/lib/async';
 import React from 'react';
 
-import { Box } from '@linode/ui';
-import { Chip } from 'src/components/Chip';
-import { Divider } from '@linode/ui';
+import NullComponent from 'src/components/NullComponent';
 import { Typography } from 'src/components/Typography';
+import { useAlertNotificationChannelsQuery } from 'src/queries/cloudpulse/alerts';
 
-import type { Alert } from '@linode/api-v4';
+import { convertStringToCamelCasesWithSpaces } from '../../Utils/utils';
+import { StyledAlertsGrid } from './AlertDetail';
+import { AlertDetailOverview } from './AlertDetailOverview';
+import { AlertOverviewDetailRow } from './AlertDetailOverviewRow';
+import { DisplayAlertChips } from './DisplayAlertChips';
+
+import type { NotificationChannel } from '@linode/api-v4';
 
 interface NotificationProps {
-  alert: Alert;
+  channelIds: number[];
 }
 export const AlertDetailNotification = (props: NotificationProps) => {
-  const { alert } = props;
-  const notifications = alert.channels;
+  const { channelIds } = props;
+
+  const { data, isError, isFetching } = useAlertNotificationChannelsQuery(
+    {},
+    { id: channelIds.join(',') }
+  );
+
+  if (isFetching) {
+    return <CircleProgress />;
+  }
+
+  if (isError || !data) {
+    return <NullComponent />;
+  }
+
+  if (!data || data.data.length === 0) {
+    return <NullComponent />;
+  }
+
+  const channels = data.data;
+
+  const getLabel = (value: NotificationChannel) => {
+    if (value.channel_type === 'email') {
+      return {
+        chips: value.content.channel_type.email_addresses,
+        label: 'To',
+      };
+    } else if (value.channel_type === 'slack') {
+      return {
+        chips: [value.content.channel_type.slack_webhook_url],
+        label: 'Slack Webhook URL',
+      };
+    } else if (value.channel_type === 'pagerduty') {
+      return {
+        chips: [value.content.channel_type.service_api_key],
+        label: 'Service API Key',
+      };
+    } else {
+      return {
+        chips: [value.content.channel_type.webhook_url],
+        label: 'Webhook URL',
+      };
+    }
+  };
+
   return (
-    <Box
-      sx={(theme) => ({
-        backgroundColor:
-          theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
-        borderRadius: 1,
-        p: 1,
-      })}
-      p={3}
-    >
+    // <Grid container display={'inline'} item xs={12}>
+    <React.Fragment>
       <Typography gutterBottom marginBottom={2} variant="h2">
-        Notification
+        Notification Channels
       </Typography>
-      {notifications.length > 0 &&
-        notifications.map((notification, idx) => (
-          <>
-            <Grid container spacing={1}>
-              <Grid item sm={2} xs={3}>
-                <Typography variant="h3">Type:</Typography>
-              </Grid>
-              <Grid item sm={10} xs={9}>
-                <Typography variant="subtitle2">{notification.type}</Typography>
-              </Grid>
-              <Grid item sm={2} xs={3}>
-                <Typography variant="h3">Template Name:</Typography>
-              </Grid>
-              <Grid item sm={10} xs={9}>
-                <Typography variant="subtitle2">
-                  {notification.label}
-                </Typography>
-              </Grid>
-              <Grid alignContent={'center'} item sm={2} xs={12}>
-                <Typography variant="h3">To:</Typography>
-              </Grid>
-              {/* <Grid item sm={10} xs={12}>
-                {notification.values &&
-                  notification.values.to.length > 0 &&
-                  notification.values.to.map((email: string, id: number) => (
-                    <Chip key={id} label={email} variant="outlined" />
-                  ))}
-              </Grid> */}
-            </Grid>
-            {idx + 1 !== notifications.length && <Divider />}
-          </>
+      <Grid alignItems="center" columnGap={3} container rowGap={2}>
+        {channels.map((value, idx) => (
+          <React.Fragment key={idx}>
+            <AlertOverviewDetailRow
+              label="Type"
+              value={convertStringToCamelCasesWithSpaces(value.channel_type)}
+            />
+            <AlertOverviewDetailRow label="Channel" value={value.label} />
+            <DisplayAlertChips {...getLabel(value)} />
+          </React.Fragment>
         ))}
-      <Grid container paddingLeft={2}>
-        {/* <Grid alignContent={'center'} item md={1}>
-          <Typography variant="h3">To:</Typography>
-        </Grid>
-        <Grid item md={11}>
-          {alert.notification.values &&
-            alert.notification.values.to.length > 0 &&
-            alert.notification.values.to.map(
-              (email: string, id: number) => (
-                <Chip key={id} label={email} />
-              )
-            )}
-        </Grid> */}
       </Grid>
-    </Box>
+    </React.Fragment>
   );
 };

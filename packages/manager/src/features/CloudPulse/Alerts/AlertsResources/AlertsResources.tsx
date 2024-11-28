@@ -1,4 +1,4 @@
-import { Box, CircleProgress } from '@linode/ui';
+import { CircleProgress } from '@linode/ui';
 import { Grid } from '@mui/material';
 import React from 'react';
 
@@ -139,15 +139,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   }
 
   return (
-    <Box
-      sx={(theme) => ({
-        backgroundColor:
-          theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
-        borderRadius: 1,
-        minHeight: 'inherit',
-      })}
-      p={3}
-    >
+    <React.Fragment>
       <Typography gutterBottom marginBottom={2} variant="h2">
         Resources
       </Typography>
@@ -216,6 +208,6 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
           </Grid>
         </Grid>
       )}
-    </Box>
+    </React.Fragment>
   );
 });

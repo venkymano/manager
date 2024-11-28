@@ -6,7 +6,11 @@ import Request, {
   setParams,
   setXFilter,
 } from '../request';
-import { Alert, CreateAlertDefinitionPayload } from './types';
+import {
+  Alert,
+  CreateAlertDefinitionPayload,
+  NotificationChannel,
+} from './types';
 import { BETA_API_ROOT as API_ROOT } from 'src/constants';
 import { Params, Filter, ResourcePage } from 'src/types';
 
@@ -33,4 +37,12 @@ export const getAlertDefinitionById = (alertId: number, serviceType: string) =>
       )}/alert-definitions/${encodeURIComponent(alertId)}`
     ),
     setMethod('GET')
+  );
+
+export const getNotificationChannels = (params?: Params, filters?: Filter) =>
+  Request<ResourcePage<NotificationChannel>>(
+    setURL(`${API_ROOT}/monitor/alert-channels`),
+    setMethod('GET'),
+    setParams(params),
+    setXFilter(filters)
   );

@@ -25,25 +25,27 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
   const { rule_criteria = { rules: [] } } = alert;
 
   return (
-    <StyledAlertsBox padding={3}>
+    <React.Fragment>
       <Typography gutterBottom marginBottom={2} variant="h2">
         Criteria
       </Typography>
-
-      <DisplayAlertMetricAndDimensions ruleCriteria={rule_criteria} />
-
-      <Grid alignItems="center" columnGap={3} container rowGap={2}>
-        <DisplayAlertChips // label chip for polling interval
-          chips={[convertSecondsToMinutes(polling_interval_seconds)]}
-          label={'Polling Interval'}
-        />
-
-        <DisplayAlertChips // label chip for evaluation period
-          chips={[convertSecondsToMinutes(evaluation_period_seconds)]}
-          label={'Evaluation Period'}
-        />
-
-        <Grid item sm={3} xs={12}>
+      <Grid alignItems="center" container spacing={3}>
+        <DisplayAlertMetricAndDimensions ruleCriteria={rule_criteria} />
+        <Grid item xs={12}>
+          <DisplayAlertChips // label chip for polling interval
+            chips={[convertSecondsToMinutes(polling_interval_seconds)]}
+            isJoin
+            label={'Polling Interval'}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <DisplayAlertChips // label chip for evaluation period
+            chips={[convertSecondsToMinutes(evaluation_period_seconds)]}
+            isJoin
+            label={'Evaluation Period'}
+          />
+        </Grid>
+        <Grid item sm={4} xs={12}>
           <Typography variant="h3">Trigger Alert When: </Typography>
         </Grid>
         <Grid
@@ -68,6 +70,6 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
           <Typography variant="body1">consecutive occurrence</Typography>
         </Grid>
       </Grid>
-    </StyledAlertsBox>
+    </React.Fragment>
   );
 });

@@ -4,7 +4,14 @@ import { pickRandom } from 'src/utilities/random';
 import type { Alert } from '@linode/api-v4';
 
 export const alertFactory = Factory.Sync.makeFactory<Alert>({
-  channels: [],
+  channels: [
+    {
+      id: 'Test',
+      label: 'Test',
+      type: 'channel',
+      url: 'someUrl',
+    },
+  ],
   created: new Date().toISOString(),
   created_by: Factory.each(() => pickRandom(['user1', 'user2', 'user3'])),
   description: 'Test Description',
@@ -66,22 +73,8 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
             value: 'MacOS',
           },
           {
-            dimension_label: 'OperatingSystem',
-            operator: 'eq',
-            value: 'Windows',
-          },
-          {
-            dimension_label: 'Test',
-            operator: 'neq',
-            value: '40',
-          },
-          {
-            dimension_label: 'OperatingSystem',
-            operator: 'eq',
-            value: 'MacOS',
-          },
-          {
-            dimension_label: 'OperatingSystem',
+            dimension_label:
+              'OperatingSystemOperatingSystemssssssssssssssssOperatingSystemOperatingSystemssssssssssssssss',
             operator: 'eq',
             value: 'Windows',
           },
