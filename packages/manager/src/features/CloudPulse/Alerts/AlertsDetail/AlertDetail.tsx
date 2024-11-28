@@ -62,7 +62,13 @@ export const AlertDetail = () => {
       <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
       <Grid columnGap={1} container gap={2} width={'100%'}>
         <Grid container flexWrap={'nowrap'} gap={2} item>
-          <StyledAlertsGrid item md={6} xs={12}>
+          <StyledAlertsGrid
+            item
+            maxHeight={'724px'}
+            md={6}
+            overflow={'auto'}
+            xs={12}
+          >
             <AlertDetailOverview alert={alertDetails} />
           </StyledAlertsGrid>
           <StyledAlertsGrid

@@ -1,5 +1,5 @@
 import { Box, CircleProgress } from '@linode/ui';
-import { Grid } from '@mui/material';
+import { Divider, Grid } from '@mui/material';
 import { val } from 'factory.ts/lib/async';
 import React from 'react';
 
@@ -70,7 +70,7 @@ export const AlertDetailNotification = (props: NotificationProps) => {
       <Typography gutterBottom marginBottom={2} variant="h2">
         Notification Channels
       </Typography>
-      <Grid alignItems="center" columnGap={3} container rowGap={2}>
+      <Grid alignItems="center" container spacing={4}>
         {channels.map((value, idx) => (
           <React.Fragment key={idx}>
             <AlertOverviewDetailRow
@@ -78,7 +78,12 @@ export const AlertDetailNotification = (props: NotificationProps) => {
               value={convertStringToCamelCasesWithSpaces(value.channel_type)}
             />
             <AlertOverviewDetailRow label="Channel" value={value.label} />
-            <DisplayAlertChips {...getLabel(value)} />
+            <Grid item xs={12}>
+              <DisplayAlertChips {...getLabel(value)} />
+            </Grid>
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
           </React.Fragment>
         ))}
       </Grid>

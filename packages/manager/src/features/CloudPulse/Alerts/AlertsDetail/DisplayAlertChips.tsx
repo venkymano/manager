@@ -22,16 +22,20 @@ export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
   const theme = useTheme();
 
   return (
-    <Grid container>
+    <Grid container spacing={1}>
       {iterables.map((value, idx) => (
         <React.Fragment key={idx}>
           <Grid item md={4} xs={12}>
             {idx === 0 && <Typography variant="h3">{label}: </Typography>}
           </Grid>
           <Grid item md={8} xs={12}>
-            <Grid container display={'flex'} flexWrap={'nowrap'}>
+            <Grid
+              container
+              flexWrap={!isJoin ? 'wrap' : 'nowrap'}
+              gap={isJoin ? 0 : 1}
+            >
               {value.map((label, index) => (
-                <Grid item key={index} marginLeft={isJoin ? -1 : 1}>
+                <Grid item key={index} marginLeft={isJoin ? -1 : 0}>
                   <StyledAlertChip
                     borderRadius={
                       value.length === 1

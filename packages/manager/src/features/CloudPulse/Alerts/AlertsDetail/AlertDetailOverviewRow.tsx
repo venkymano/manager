@@ -14,10 +14,10 @@ export const AlertOverviewDetailRow = React.memo(
     return (
       <Grid item xs={12}>
         <Grid container>
-          <Grid item xs={3}>
+          <Grid item xs={4}>
             <Typography variant="h3">{label}:</Typography>
           </Grid>
-          <Grid item xs={9}>
+          <Grid item xs={8}>
             <Typography
               sx={{
                 color,

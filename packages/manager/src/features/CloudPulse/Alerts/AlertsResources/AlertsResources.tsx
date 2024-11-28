@@ -150,42 +150,44 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       )}
 
       {resourceIds.length > 0 && (
-        <Grid container gap={3}>
-          <Grid item md={4} xs={12}>
-            <DebouncedSearchTextField
-              onSearch={(value) => {
-                setSearchText(value);
-              }}
-              debounceTime={300}
-              hideLabel
-              isSearching={false}
-              label="Search for resource"
-              placeholder="Search for resource"
-              value={searchText ?? ''}
-            />
-          </Grid>
-          <Grid item md={4} xs={12}>
-            <AlertsRegionFilter
-              handleSelectionChange={(value) => {
-                setFilteredRegions(value);
-              }}
-              regionOptions={regionOptions ?? []}
-            />
-          </Grid>
-          {isSelectionsNeeded && (
-            <Grid item lg={3} xs={12}>
-              <Checkbox
-                sx={{
-                  maxHeight: '34px',
-                  pt: 0.5,
+        <Grid container spacing={3}>
+          <Grid container item flexWrap={'nowrap'} spacing={3}>
+            <Grid item md={4} xs={12}>
+              <DebouncedSearchTextField
+                onSearch={(value) => {
+                  setSearchText(value);
                 }}
-                checked={selectedOnly}
-                onClick={() => setSelectedOnly(!selectedOnly)}
-                text={'Show Selected Only'}
-                value={'Show Selected'}
+                debounceTime={300}
+                hideLabel
+                isSearching={false}
+                label="Search for resource"
+                placeholder="Search for resource"
+                value={searchText ?? ''}
               />
             </Grid>
-          )}
+            <Grid item md={4} xs={12}>
+              <AlertsRegionFilter
+                handleSelectionChange={(value) => {
+                  setFilteredRegions(value);
+                }}
+                regionOptions={regionOptions ?? []}
+              />
+            </Grid>
+            {isSelectionsNeeded && (
+              <Grid item lg={4} xs={12}>
+                <Checkbox
+                  sx={{
+                    maxHeight: '34px',
+                    pt: 0.5,
+                  }}
+                  checked={selectedOnly}
+                  onClick={() => setSelectedOnly(!selectedOnly)}
+                  text={'Show Selected Only'}
+                  value={'Show Selected'}
+                />
+              </Grid>
+            )}
+          </Grid>
 
           {isSelectionsNeeded && (
             <Grid item xs={12}>
