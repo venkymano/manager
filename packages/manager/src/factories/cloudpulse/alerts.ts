@@ -67,22 +67,22 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
             operator: 'neq',
             value: '40',
           },
-          {
-            dimension_label: 'OperatingSystem',
-            operator: 'eq',
-            value: 'MacOS',
-          },
-          {
-            dimension_label:
-              'OperatingSystemOperatingSystemssssssssssssssssOperatingSystemOperatingSystemssssssssssssssss',
-            operator: 'eq',
-            value: 'Windows',
-          },
-          {
-            dimension_label: 'Test',
-            operator: 'neq',
-            value: '40',
-          },
+          // {
+          //   dimension_label: 'OperatingSystem',
+          //   operator: 'eq',
+          //   value: 'MacOS',
+          // },
+          // {
+          //   dimension_label:
+          //     'OperatingSystemOperatingSystemssssssssssssssssOperatingSystemOperatingSystemssssssssssssssss',
+          //   operator: 'eq',
+          //   value: 'Windows',
+          // },
+          // {
+          //   dimension_label: 'Test',
+          //   operator: 'neq',
+          //   value: '40',
+          // },
         ],
         metric: 'CPU Usage',
         operator: 'gt',
@@ -94,8 +94,8 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
   severity: Factory.each(() => pickRandom([0, 1, 2, 3])),
   status: Factory.each(() => pickRandom(['enabled', 'disabled'])),
   triggerCondition: {
-    evaluation_period_seconds: 60,
-    polling_interval_seconds: 122,
+    evaluation_period_seconds: 600,
+    polling_interval_seconds: 60,
     trigger_occurrences: 60,
   },
   type: Factory.each(() => pickRandom(['default', 'custom'])),

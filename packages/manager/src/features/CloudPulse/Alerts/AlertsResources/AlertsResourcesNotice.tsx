@@ -1,5 +1,5 @@
 import { Button, Notice } from '@linode/ui';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import React from 'react';
 
 interface AlertResourceNoticeProps {
@@ -12,10 +12,11 @@ export const AlertsResourcesNotice = React.memo(
   (props: AlertResourceNoticeProps) => {
     const { handleSelectionChange, selectedResources, totalResources } = props;
 
+    const theme = useTheme();
     return (
       <StyledNotice
         sx={{
-          height: '54px',
+          height: theme.spacing(6.75),
         }}
         variant="info"
       >
@@ -23,54 +24,47 @@ export const AlertsResourcesNotice = React.memo(
           {selectedResources} out of {totalResources} resources are selected{' '}
         </b>
         {selectedResources !== totalResources && (
-          <Button
-            sx={{
-              mb: 0.5,
-              minHeight: 'auto',
-              minWidth: 'auto',
-              p: 0,
-            }}
+          <StyledButton
             aria-label="Select All Resources"
             onClick={handleSelectionChange}
             variant="text"
           >
             Select all.
-          </Button>
+          </StyledButton>
         )}
         {selectedResources === totalResources && (
-          <Button
-            sx={{
-              mb: 0.5,
-              minHeight: 'auto',
-              minWidth: 'auto',
-              p: 0,
-            }}
+          <StyledButton
             aria-label="Unselect All Resources"
             onClick={handleSelectionChange}
             variant="text"
           >
             Unselect all.
-          </Button>
+          </StyledButton>
         )}
       </StyledNotice>
     );
   }
 );
 
-export const StyledNotice = styled(Notice, { label: 'StyledNotice' })(
-  ({ theme }) => ({
-    '&&': {
-      p: {
-        lineHeight: '1.25rem',
-      },
+const StyledNotice = styled(Notice, { label: 'StyledNotice' })(({ theme }) => ({
+  '&&': {
+    p: {
+      lineHeight: '1.25rem',
     },
-    alignItems: 'center',
-    background: theme.bg.bgPaper,
-    borderRadius: 1,
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing(0),
-    padding: theme.spacing(2),
-  })
-);
+  },
+  alignItems: 'center',
+  background: theme.bg.bgPaper,
+  borderRadius: 1,
+  display: 'flex',
+  flexFlow: 'row nowrap',
+  justifyContent: 'space-between',
+  marginBottom: theme.spacing(0),
+  padding: theme.spacing(2),
+}));
+
+const StyledButton = styled(Button, { label: 'StyledButton' })(({ theme }) => ({
+  marginBottom: theme.spacing(0.5),
+  minHeight: 'auto',
+  minWidth: 'auto',
+  padding: 0,
+}));

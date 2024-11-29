@@ -5,11 +5,11 @@ import { Typography } from 'src/components/Typography';
 
 import { StyledAlertChip } from './AlertDetail';
 
-interface AlertDimensionsProp {
+export interface AlertDimensionsProp {
   chips: Array<string> | Array<string[]>;
   isJoin?: boolean;
   label: string;
-  mdLabel? : number;
+  mdLabel?: number;
   mdValue?: number;
 }
 
@@ -28,7 +28,11 @@ export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
       {iterables.map((value, idx) => (
         <React.Fragment key={idx}>
           <Grid item md={mdLabel ?? 4} xs={12}>
-            {idx === 0 && <Typography variant="h3">{label}: </Typography>}
+            {idx === 0 && (
+              <Typography fontSize={theme.spacing(1.75)} variant="h2">
+                {label}:{' '}
+              </Typography>
+            )}
           </Grid>
           <Grid item md={mdValue ?? 8} xs={12}>
             <Grid
@@ -37,10 +41,16 @@ export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
               gap={isJoin ? 0 : 1}
             >
               {value.map((label, index) => (
-                <Grid item key={index} marginLeft={isJoin ? -1 : 0}>
+                <Grid
+                  item
+                  key={index}
+                  marginLeft={isJoin && index > 0 ? -1 : 0}
+                >
                   <StyledAlertChip
                     borderRadius={
-                      value.length === 1
+                      !isJoin
+                        ? theme.spacing(0.3)
+                        : value.length === 1
                         ? theme.spacing(0.3)
                         : index === 0
                         ? `${theme.spacing(0.3)} 0 0 ${theme.spacing(0.3)}` // First chip

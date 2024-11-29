@@ -109,6 +109,9 @@ export const DisplayAlertResources = React.memo(
                             !isAllPageSelected(paginatedData)
                           )
                         }
+                        sx={{
+                          padding: 0,
+                        }}
                         checked={isAllPageSelected(paginatedData)}
                       />
                     </TableCell>
@@ -139,6 +142,9 @@ export const DisplayAlertResources = React.memo(
                         <Checkbox
                           onChange={() => {
                             handleSelectionChange([id], !checked);
+                          }}
+                          sx={{
+                            padding: 0,
                           }}
                           checked={checked}
                         />

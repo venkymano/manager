@@ -11,12 +11,11 @@ export const notificationChannelFactory = Factory.Sync.makeFactory<NotificationC
       type: 'alerts-definitions',
       url: 'Sample',
     },
+
     channel_type: 'email',
     content: {
       channel_type: {
-            email_addresses: ['test@test.com', 'test2@test.com', 'test@test.com', 'test2@test.com', 'test@test.com', 'test2@test.com', 'test@test.com', 'test2@test.com', 'test@test.com', 'test2@test.com'
-              , 'test@test.com', 'test2@test.com', 'test@test.com', 'test2@test.com', 'test@test.com', 'test2@test.com'
-            ],
+        email_addresses: ['test@test.com', 'test2@test.com'],
         message: 'You have a new Alert',
         subject: 'Sample Alert',
       },

@@ -7,8 +7,7 @@ import { useCloudPulseServiceTypes } from 'src/queries/cloudpulse/services';
 import { convertStringToCamelCasesWithSpaces } from '../../Utils/utils';
 import { severityMap } from '../constants';
 import { formatTimestamp } from '../Utils/utils';
-import { StyledAlertsBox } from './AlertDetail';
-import { AlertOverviewDetailRow } from './AlertDetailOverviewRow';
+import { AlertDetailRow } from './AlertDetailRow';
 
 import type { Alert } from '@linode/api-v4';
 
@@ -29,11 +28,7 @@ export const AlertDetailOverview = (props: OverviewProps) => {
     updated,
   } = alert;
 
-  const {
-    data: servriceTypes,
-    isError,
-    isFetching,
-  } = useCloudPulseServiceTypes(true);
+  const { data: serviceTypes, isFetching } = useCloudPulseServiceTypes(true);
 
   const theme = useTheme();
 
@@ -49,11 +44,12 @@ export const AlertDetailOverview = (props: OverviewProps) => {
   }
 
   const getServiceTypeLabel = (serviceType: string) => {
-    if (!servriceTypes) {
+    // TODO: this can be moved to util
+    if (!serviceTypes) {
       return serviceType;
     }
 
-    for (const service of servriceTypes?.data) {
+    for (const service of serviceTypes?.data) {
       if (service.service_type === serviceType) {
         return service.label;
       }
@@ -63,32 +59,36 @@ export const AlertDetailOverview = (props: OverviewProps) => {
   };
 
   return (
-    // <StyledAlertsBox>
     <React.Fragment>
-      <Typography gutterBottom marginBottom={2} variant="h2">
+      <Typography
+        fontSize={theme.spacing(2.25)}
+        gutterBottom
+        marginBottom={2}
+        variant="h2"
+      >
         Overview
       </Typography>
-      <Grid alignItems="center" container spacing={3}>
-        <AlertOverviewDetailRow label="Name" value={label} />
-        <AlertOverviewDetailRow
+      <Grid alignItems="center" container spacing={2}>
+        <AlertDetailRow label="Name" value={label} />
+        <AlertDetailRow
           color={statusColorMap[status]}
           label="Status"
           value={convertStringToCamelCasesWithSpaces(status)}
         />
-        <AlertOverviewDetailRow label="Type" value={type} />
-        <AlertOverviewDetailRow label="Description" value={description} />
-        <AlertOverviewDetailRow
+        <AlertDetailRow label="Type" value={type} />
+        <AlertDetailRow label="Description" value={description} />
+        <AlertDetailRow
           label="Severity"
           value={severity ? severityMap[severity] : severity || null}
         />
-        <AlertOverviewDetailRow
+        <AlertDetailRow
           label="Last Modified"
           value={formatTimestamp(updated)}
         />
-        <AlertOverviewDetailRow label="Created By" value={created_by} />
-        <AlertOverviewDetailRow
+        <AlertDetailRow label="Created By" value={created_by} />
+        <AlertDetailRow
           value={
-            servriceTypes ? getServiceTypeLabel(service_type) : service_type
+            serviceTypes ? getServiceTypeLabel(service_type) : service_type
           }
           label="Service"
         />

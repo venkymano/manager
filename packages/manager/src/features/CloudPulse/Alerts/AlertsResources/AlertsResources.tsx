@@ -1,5 +1,5 @@
 import { CircleProgress } from '@linode/ui';
-import { Grid } from '@mui/material';
+import { Grid, useTheme } from '@mui/material';
 import React from 'react';
 
 import { Checkbox } from 'src/components/Checkbox';
@@ -55,6 +55,8 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   );
 
   const [selectedOnly, setSelectedOnly] = React.useState<boolean>(false);
+
+  const theme = useTheme();
 
   const {
     data: regions,
@@ -140,7 +142,12 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
 
   return (
     <React.Fragment>
-      <Typography gutterBottom marginBottom={2} variant="h2">
+      <Typography
+        fontSize={theme.spacing(2.25)}
+        gutterBottom
+        marginBottom={2}
+        variant="h2"
+      >
         Resources
       </Typography>
       {resourceIds.length === 0 && (
@@ -151,11 +158,14 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
 
       {resourceIds.length > 0 && (
         <Grid container spacing={3}>
-          <Grid container item flexWrap={'nowrap'} spacing={3}>
+          <Grid container flexWrap={'nowrap'} item spacing={3}>
             <Grid item md={4} xs={12}>
               <DebouncedSearchTextField
                 onSearch={(value) => {
                   setSearchText(value);
+                }}
+                sx={{
+                  maxHeight: theme.spacing(4.25),
                 }}
                 debounceTime={300}
                 hideLabel
@@ -177,8 +187,8 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
               <Grid item lg={4} xs={12}>
                 <Checkbox
                   sx={{
-                    maxHeight: '34px',
-                    pt: 0.5,
+                    maxHeight: theme.spacing(4.25),
+                    pt: theme.spacing(1),
                   }}
                   checked={selectedOnly}
                   onClick={() => setSelectedOnly(!selectedOnly)}

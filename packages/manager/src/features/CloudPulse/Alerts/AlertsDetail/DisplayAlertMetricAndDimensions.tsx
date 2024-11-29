@@ -4,7 +4,7 @@ import React from 'react';
 import NullComponent from 'src/components/NullComponent';
 
 import { aggregationTypes, operators } from '../constants';
-import { DisplayAlertChips } from './DisplayAlertChips';
+import { DisplayAlertChips } from './AlertDetailChips';
 
 import type { MetricCriteria } from '@linode/api-v4';
 
