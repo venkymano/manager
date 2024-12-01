@@ -13,6 +13,9 @@ import { DisplayAlertChips } from './AlertDetailChips';
 import { AlertDetailRow } from './AlertDetailRow';
 
 interface NotificationProps {
+  /*
+   * The list of channel ids associated with the alert for which we need to display the notification channels
+   */
   channelIds: number[];
 }
 export const AlertDetailNotification = (props: NotificationProps) => {
@@ -27,22 +30,24 @@ export const AlertDetailNotification = (props: NotificationProps) => {
     return <CircleProgress />;
   }
 
-  if (!data || data.data.length === 0) {
+  if (!data?.data?.length) {
     return <NullComponent />;
   }
 
   const channels = data.data;
 
   return (
-    // <Grid container display={'inline'} item xs={12}>
     <React.Fragment>
       <Typography gutterBottom marginBottom={2} variant="h2">
         Notification Channels
       </Typography>
+      {isError && (
+        <ErrorState errorText="Failed to load notification channels" />
+      )}
       {!isError && (
         <Grid alignItems="center" container spacing={2}>
-          {channels.map((value, idx) => (
-            <React.Fragment key={idx}>
+          {channels.map((value) => (
+            <Grid container item key={value.id} spacing={2}>
               <AlertDetailRow
                 label="Type"
                 mdLabel={1}
@@ -65,12 +70,9 @@ export const AlertDetailNotification = (props: NotificationProps) => {
               <Grid item xs={12}>
                 <Divider />
               </Grid>
-            </React.Fragment>
+            </Grid>
           ))}
         </Grid>
-      )}
-      {isError && (
-        <ErrorState errorText={'Failed to load notification channels'} />
       )}
     </React.Fragment>
   );

@@ -12,6 +12,9 @@ import { AlertDetailRow } from './AlertDetailRow';
 import type { Alert } from '@linode/api-v4';
 
 interface OverviewProps {
+  /*
+   * The alert for which the criteria is displayed
+   */
   alert: Alert;
 }
 export const AlertDetailOverview = (props: OverviewProps) => {

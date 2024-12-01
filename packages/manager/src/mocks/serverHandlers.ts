@@ -107,6 +107,7 @@ import { getStorage } from 'src/utilities/storage';
 const getRandomWholeNumber = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1) + min);
 
+import { notificationChannelFactory } from 'src/factories/cloudpulse/channels';
 import { pickRandom } from 'src/utilities/random';
 
 import type {
@@ -203,7 +204,7 @@ const entityTransfers = [
 
 const databases = [
   http.get('*/databases/instances', () => {
-    const databases = databaseInstanceFactory.buildList(9);
+    const databases = databaseInstanceFactory.buildList(30);
     return HttpResponse.json(makeResourcePage(databases));
   }),
 
@@ -629,13 +630,9 @@ export const handlers = [
       region: 'us-den-10',
       site_type: 'distributed',
     });
-    const onlineLinodes = linodeFactory.buildList(40, {
+    const onlineLinodes = linodeFactory.buildList(19, {
       backups: { enabled: false },
       ipv4: ['000.000.000.000'],
-    });
-    const linodeWithEligibleVolumes = linodeFactory.build({
-      id: 20,
-      label: 'debianDistro',
     });
     const offlineLinodes = linodeFactory.buildList(1, { status: 'offline' });
     const busyLinodes = linodeFactory.buildList(1, { status: 'migrating' });
@@ -661,7 +658,7 @@ export const handlers = [
       metadataLinodeWithCompatibleImageAndRegion,
       linodeInDistributedRegion,
       ...onlineLinodes,
-      linodeWithEligibleVolumes,
+      // linodeWithEligibleVolumes,
       ...offlineLinodes,
       ...busyLinodes,
       linodeFactory.build({
@@ -1180,6 +1177,7 @@ export const handlers = [
       'resizing',
     ];
     const volumes = statuses.map((status) => volumeFactory.build({ status }));
+    volumes.push(...volumeFactory.buildList(100));
     return HttpResponse.json(makeResourcePage(volumes));
   }),
   http.get('*/volumes/types', () => {
@@ -2354,11 +2352,24 @@ export const handlers = [
 
     return HttpResponse.json(makeResourcePage(alerts));
   }),
-  http.get('*/monitor/alert-definitions/:alerltId', ({ params }) => {
-    if (params.id !== undefined) {
-      return HttpResponse.json(alertFactory.build({ id: Number(params.id) }));
+  http.get(
+    '*/monitor/services/:serviceType/alert-definitions/:id',
+    ({ params }) => {
+      if (params.id !== undefined) {
+        return HttpResponse.json(
+          alertFactory.build({
+            id: Number(params.id),
+            service_type: String(params.serviceType) ?? 'dbaas',
+          })
+        );
+      }
+      return HttpResponse.json({}, { status: 404 });
     }
-    return HttpResponse.json({}, { status: 404 });
+  ),
+  http.get('*/monitor/alert-channels', () => {
+    return HttpResponse.json(
+      makeResourcePage(notificationChannelFactory.buildList(3))
+    );
   }),
   http.get('*/monitor/services', () => {
     const response: ServiceTypesList = {

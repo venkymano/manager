@@ -9,6 +9,9 @@ import { DisplayAlertMetricAndDimensions } from './DisplayAlertMetricAndDimensio
 import type { Alert } from '@linode/api-v4';
 
 interface CriteriaProps {
+  /*
+   * The alert for which the criteria is displayed
+   */
   alert: Alert;
 }
 
@@ -16,14 +19,33 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
   const { alert } = props;
 
   const {
-    evaluation_period_seconds,
-    polling_interval_seconds,
-    trigger_occurrences,
+    evaluation_period_seconds: evaluationPeriod,
+    polling_interval_seconds: pollingIntervalSeconds,
+    trigger_occurrences: triggerOccurrences,
   } = alert.triggerCondition;
 
-  const { rule_criteria = { rules: [] } } = alert;
+  const { rule_criteria: ruleCriteria = { rules: [] } } = alert;
 
   const theme = useTheme();
+
+  // Memoized trigger criteria rendering
+  const renderTriggerCriteria = React.useMemo(
+    () => (
+      <Grid alignItems="center" container item sm={8} xs={12}>
+        <Typography variant="body1">All Criteria are met for</Typography>
+        <Chip
+          sx={{
+            backgroundColor: 'white',
+            marginLeft: theme.spacing(0.5),
+          }}
+          label={triggerOccurrences}
+          variant="outlined"
+        />
+        <Typography variant="body1">consecutive occurrence(s)</Typography>
+      </Grid>
+    ),
+    [theme, triggerOccurrences]
+  );
 
   return (
     <React.Fragment>
@@ -36,17 +58,17 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
         Criteria
       </Typography>
       <Grid alignItems="center" container spacing={2}>
-        <DisplayAlertMetricAndDimensions ruleCriteria={rule_criteria} />
+        <DisplayAlertMetricAndDimensions ruleCriteria={ruleCriteria} />
         <Grid item xs={12}>
           <DisplayAlertChips // label chip for polling interval
-            chips={[convertSecondsToMinutes(polling_interval_seconds)]}
+            chips={[convertSecondsToMinutes(pollingIntervalSeconds)]}
             isJoin
             label={'Polling Interval'}
           />
         </Grid>
         <Grid item xs={12}>
           <DisplayAlertChips // label chip for evaluation period
-            chips={[convertSecondsToMinutes(evaluation_period_seconds)]}
+            chips={[convertSecondsToMinutes(evaluationPeriod)]}
             isJoin
             label={'Evaluation Period'}
           />
@@ -56,25 +78,7 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
             Trigger Alert When:
           </Typography>
         </Grid>
-        <Grid
-          sx={{
-            display: 'flex',
-          }}
-          item
-          sm={8}
-          xs={12}
-        >
-          <Typography variant="body1">All Criteria are met for</Typography>
-          <Chip
-            sx={{
-              backgroundColor: 'white',
-              marginLeft: theme.spacing(0.5),
-            }}
-            label={trigger_occurrences}
-            variant="outlined"
-          />
-          <Typography variant="body1">consecutive occurrence</Typography>
-        </Grid>
+        {renderTriggerCriteria}
       </Grid>
     </React.Fragment>
   );

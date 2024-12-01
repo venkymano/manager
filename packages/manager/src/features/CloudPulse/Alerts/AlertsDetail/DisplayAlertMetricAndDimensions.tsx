@@ -9,6 +9,9 @@ import { DisplayAlertChips } from './AlertDetailChips';
 import type { MetricCriteria } from '@linode/api-v4';
 
 interface AlertMetricAndDimensionsProp {
+  /*
+   * The rule criteria associated with the alert for which the dimension filters are needed to be displayed
+   */
   ruleCriteria: {
     rules: MetricCriteria[];
   };

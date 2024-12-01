@@ -13,7 +13,13 @@ import { AlertDetailNotification } from './AlertDetailNotification';
 import { AlertDetailOverview } from './AlertDetailOverview';
 
 interface RouteParams {
+  /*
+   * The id of the alert for which the data needs to be shown
+   */
   alertId: string;
+  /*
+   * The service type like linode, dbaas etc., of the the alert for which the data needs to be shown
+   */
   serviceType: string;
 }
 
@@ -111,7 +117,10 @@ export const StyledAlertsGrid = styled(Grid, { label: 'StyledAlertsGrid' })(
   })
 );
 
-export const StyledAlertChip = styled(Chip, { label: 'StyledAlertChip' })<{
+export const StyledAlertChip = styled(Chip, {
+  label: 'StyledAlertChip',
+  shouldForwardProp: (prop) => prop !== 'borderRadius',
+})<{
   borderRadius?: string;
 }>(({ borderRadius, theme }) => ({
   '& .MuiChip-label': {
