@@ -3,7 +3,7 @@ import React from 'react';
 
 interface AlertDetailRowProps {
   /*
-   * The color of the text that needs to be displayed 
+   * The color of the text that needs to be displayed
    */
   color?: string;
   /*
