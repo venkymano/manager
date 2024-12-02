@@ -25,19 +25,19 @@ interface AlertDetailRowProps {
 }
 
 export const AlertDetailRow = React.memo((props: AlertDetailRowProps) => {
-  const { color, label, mdLabel, mdValue, value } = props;
+  const { color, label, mdLabel = 4, mdValue = 8, value } = props;
 
   const theme = useTheme();
 
   return (
     <Grid item xs={12}>
       <Grid container>
-        <Grid item md={mdLabel ?? 4} xs={12}>
+        <Grid item md={mdLabel} xs={12}>
           <Typography fontSize={theme.spacing(1.75)} variant="h2">
             {label}:
           </Typography>
         </Grid>
-        <Grid item md={mdValue ?? 8} xs={12}>
+        <Grid item md={mdValue} xs={12}>
           <Typography
             sx={{
               color,
