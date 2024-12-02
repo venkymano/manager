@@ -87,7 +87,10 @@ export const AlertDetailOverview = (props: OverviewProps) => {
           label="Service"
           value={serviceTypes ? getServiceTypeLabel(serviceType) : serviceType}
         />
-        <AlertDetailRow label="Type" value={type} />
+        <AlertDetailRow
+          label="Type"
+          value={convertStringToCamelCasesWithSpaces(type)}
+        />
         <AlertDetailRow label="Created By" value={createdBy} />
         <AlertDetailRow
           label="Last Modified"
