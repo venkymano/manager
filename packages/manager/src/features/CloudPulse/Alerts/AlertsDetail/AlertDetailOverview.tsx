@@ -69,12 +69,8 @@ export const AlertDetailOverview = (props: OverviewProps) => {
           value={severity !== undefined ? severityMap[severity] : severity}
         />
         <AlertDetailRow
-          value={
-            serviceTypes
-              ? getServiceTypeLabel(serviceType, serviceTypes)
-              : serviceType
-          }
           label="Service"
+          value={getServiceTypeLabel(serviceType, serviceTypes)}
         />
         <AlertDetailRow
           label="Type"

@@ -51,4 +51,18 @@ describe('AlertDetail component tests', () => {
     // Assert other sections do not render
     expect(queryByText('Overview')).not.toBeInTheDocument();
   });
+
+  it('should render the no data placeholder', async () => {
+    // Override only the failing query
+    queryMocks.useAlertDefinitionQuery.mockReturnValueOnce({
+      data: null,
+      isError: false,
+      isFetching: false,
+    });
+
+    const { getByText } = renderWithTheme(<AlertDetail />);
+
+    // Assert error message is displayed
+    expect(getByText('No Data to display.')).toBeInTheDocument();
+  });
 });

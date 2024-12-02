@@ -3,8 +3,10 @@ import { Grid, styled, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
+import EntityIcon from 'src/assets/icons/entityIcons/alert.svg';
 import { Breadcrumb } from 'src/components/Breadcrumb/Breadcrumb';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
+import { Placeholder } from 'src/components/Placeholder/Placeholder';
 import { useAlertDefinitionQuery } from 'src/queries/cloudpulse/alerts';
 
 import { AlertDetailOverview } from './AlertDetailOverview';
@@ -30,7 +32,7 @@ export const AlertDetail = () => {
     serviceType
   );
 
-  const generateCrumbOverrides = React.useCallback((): BreadcrumbProps => {
+  const { crumbOverrides, pathname } = React.useMemo((): BreadcrumbProps => {
     const overrides = [
       {
         label: 'Definitions',
@@ -43,14 +45,8 @@ export const AlertDetail = () => {
         position: 2,
       },
     ];
-
     return { crumbOverrides: overrides, pathname: '/Definitions/Details' };
   }, [alertId, serviceType]);
-
-  const { crumbOverrides, pathname } = React.useMemo(
-    () => generateCrumbOverrides(),
-    [generateCrumbOverrides]
-  );
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -60,8 +56,22 @@ export const AlertDetail = () => {
     return <CircleProgress />;
   }
 
-  if (isError || !alertDetails) {
-    return <ErrorState errorText={'Error loading alert details.'} />;
+  if (isError) {
+    return (
+      <>
+        <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
+        <ErrorState errorText={'Error loading alert details.'} />
+      </>
+    );
+  }
+
+  if (!alertDetails) {
+    return (
+      <>
+        <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
+        <Placeholder icon={EntityIcon} title="No Data to display." />
+      </>
+    );
   }
 
   return (
@@ -69,13 +79,7 @@ export const AlertDetail = () => {
       <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
       <Grid container gap={2}>
         <Grid container flexWrap={flexWrap} gap={2} item>
-          <StyledAlertsGrid
-            item
-            maxHeight={theme.spacing(90.5)}
-            md={6}
-            overflow={'auto'}
-            xs={12}
-          >
+          <StyledAlertsGrid item maxHeight={theme.spacing(90.5)} md={6} xs={12}>
             <AlertDetailOverview alert={alertDetails} />
           </StyledAlertsGrid>
         </Grid>
