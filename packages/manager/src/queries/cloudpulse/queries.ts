@@ -1,4 +1,5 @@
 import {
+  getAlertDefinitionById,
   getCloudPulseServiceTypes,
   getDashboardById,
   getDashboards,
@@ -23,11 +24,10 @@ import type {
 const key = 'Clousepulse';
 
 export const queryFactory = createQueryKeys(key, {
-  alert: {
-    // contextQueries: {
-    // This query key is a placeholder , it will be updated once the relevant queries are added
-    queryKey: null,
-  },
+  alertById: (alertId: number, serviceType: string) => ({
+    queryFn: () => getAlertDefinitionById(alertId, serviceType),
+    queryKey: [alertId, serviceType],
+  }),
   alerts: {
     contextQueries: {
       all: (params: Params = {}, filter: Filter = {}) => ({
