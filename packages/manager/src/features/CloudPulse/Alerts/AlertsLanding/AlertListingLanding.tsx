@@ -10,12 +10,12 @@ export const AlertListingLanding = () => {
   const { data: alerts, isError, isLoading } = useAlertDefinitionsQuery();
   return (
     <Switch>
-      <Route exact path="/monitor/cloudpulse/alerts/definitions">
+      <Route exact path="/monitor/alerts/definitions">
         <AlertListing alerts={alerts?.data ?? []} />
       </Route>
       <Route
         exact
-        path="/monitor/cloudpulse/alerts/definitions/detail/:serviceType/:alertId"
+        path="/monitor/alerts/definitions/detail/:serviceType/:alertId"
       >
         <AlertDetail />
       </Route>

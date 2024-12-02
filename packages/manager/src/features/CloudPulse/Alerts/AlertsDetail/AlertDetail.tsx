@@ -32,12 +32,12 @@ export const AlertDetail = () => {
     const overrides = [
       {
         label: 'Definitions',
-        linkTo: '/monitor/cloudpulse/alerts/definitions',
+        linkTo: '/monitor/alerts/definitions',
         position: 1,
       },
       {
         label: 'Details',
-        linkTo: `/monitor/cloudpulse/alerts/definitions/details/${alertId}`,
+        linkTo: `/monitor/alerts/definitions/details/${alertId}`,
         position: 2,
       },
     ];

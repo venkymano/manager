@@ -48,18 +48,18 @@ const initialValues: CreateAlertDefinitionForm = {
 const overrides = [
   {
     label: 'Definitions',
-    linkTo: '/monitor/cloudpulse/alerts/definitions',
+    linkTo: '/monitor/alerts/definitions',
     position: 1,
   },
   {
     label: 'Details',
-    linkTo: `/monitor/cloudpulse/alerts/definitions/create`,
+    linkTo: `/monitor/alerts/definitions/create`,
     position: 2,
   },
 ];
 export const CreateAlertDefinition = () => {
   const history = useHistory();
-  const alertCreateExit = () => history.push('/monitor/cloudpulse/alerts/definitions');
+  const alertCreateExit = () => history.push('/monitor/alerts/definitions');
 
   const formMethods = useForm<CreateAlertDefinitionForm>({
     defaultValues: initialValues,

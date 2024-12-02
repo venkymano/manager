@@ -32,7 +32,7 @@ export const CloudPulseTabs = () => {
       {
         isEnabled: true,
         tab: {
-          routeName: `${url}/cloudpulse/dashboards`,
+          routeName: `${url}/dashboards`,
           title: 'Dashboards',
         },
       },
@@ -43,7 +43,7 @@ export const CloudPulseTabs = () => {
             flags.aclpAlerting?.notificationChannels || true
         ),
         tab: {
-          routeName: `${url}/cloudpulse/alerts`,
+          routeName: `${url}/alerts`,
           title: 'Alerts',
         },
       },
@@ -77,10 +77,10 @@ export const CloudPulseTabs = () => {
           <Route
             component={CloudPulseDashboardLanding}
             exact
-            path={`${url}/cloudpulse/dashboards`}
+            path={`${url}/dashboards`}
           />
-          <Route component={AlertsLanding} path={`${url}/cloudpulse/alerts`} />
-          <Redirect from="*" to="/monitor/cloudpulse/dashboards" />
+          <Route component={AlertsLanding} path={`${url}/alerts`} />
+          <Redirect from="*" to="/monitor/dashboards" />
         </Switch>
       </React.Suspense>
     </Tabs>

@@ -37,12 +37,12 @@ export const AlertDetail = (props: AlertDetailProps) => {
     const overrides = [
       {
         label: 'Definitions',
-        linkTo: '/monitor/cloudpulse/alerts/definitions',
+        linkTo: '/monitor/alerts/definitions',
         position: 1,
       },
       {
         label: 'Details',
-        linkTo: `/monitor/cloudpulse/alerts/definitions/details/${alertId}`,
+        linkTo: `/monitor/alerts/definitions/details/${alertId}`,
         position: 2,
       },
     ];
@@ -57,7 +57,7 @@ export const AlertDetail = (props: AlertDetailProps) => {
   );
 
   if (!alertDetails && alertId) {
-    history.push('/monitor/cloudpulse/alerts/definitions');
+    history.push('/monitor/alerts/definitions');
     return null;
   }
 
