@@ -37,7 +37,7 @@ export const AlertDetail = () => {
       },
       {
         label: 'Details',
-        linkTo: `/monitor/alerts/definitions/details/${alertId}`,
+        linkTo: `/monitor/alerts/definitions/details/${serviceType}/${alertId}`,
         position: 2,
       },
     ];
@@ -64,7 +64,7 @@ export const AlertDetail = () => {
   }
 
   return (
-    <>
+    <React.Fragment>
       <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
       <Grid container gap={2}>
         <Grid container flexWrap={flexWrap} gap={2} item>
@@ -79,7 +79,7 @@ export const AlertDetail = () => {
           </StyledAlertsGrid>
         </Grid>
       </Grid>
-    </>
+    </React.Fragment>
   );
 };
 
