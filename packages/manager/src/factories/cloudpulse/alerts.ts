@@ -1,7 +1,7 @@
 import Factory from 'src/factories/factoryProxy';
+import { pickRandom } from 'src/utilities/random';
 
 import type { Alert } from '@linode/api-v4';
-import { pickRandom } from 'src/utilities/random';
 
 export const alertFactory = Factory.Sync.makeFactory<Alert>({
   channels: [],
@@ -14,7 +14,7 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
   rule_criteria: {
     rules: [],
   },
-  service_type: pickRandom(['linode', 'dbaas']),
+  service_type: Factory.each((i) => pickRandom(['linode', 'dbaas'])),
   severity: 1,
   status: 'enabled',
   triggerCondition: {
