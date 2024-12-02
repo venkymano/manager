@@ -70,11 +70,11 @@ export const AlertsLanding = React.memo(() => {
           }}
         >
           <TabLinkList tabs={accessibleTabs} />
-          {pathname === `${url}/alerts/definitions` && (
+          {pathname === `${url}/definitions` && (
             <Box>
               <Button
                 onClick={() => {
-                  history.push(`${url}/alerts/definitions/create`);
+                  history.push(`${url}/definitions/create`);
                 }}
                 buttonType="primary"
                 variant="contained"
