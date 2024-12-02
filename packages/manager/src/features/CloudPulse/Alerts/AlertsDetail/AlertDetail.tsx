@@ -1,5 +1,5 @@
 import { Chip, CircleProgress } from '@linode/ui';
-import { Grid, styled, useTheme } from '@mui/material';
+import { Grid, styled, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -55,13 +55,14 @@ export const AlertDetail = () => {
   );
 
   const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const flexWrap = isSmallScreen ? 'wrap' : 'nowrap';
 
   if (isFetching) {
     return <CircleProgress />;
   }
 
   if (isError || !alertDetails) {
-    // TODO, add a error state according to UX
     return <ErrorState errorText={'Error loading alert details.'} />;
   }
 
@@ -69,7 +70,7 @@ export const AlertDetail = () => {
     <>
       <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
       <Grid container gap={2}>
-        <Grid container flexWrap={'nowrap'} gap={2} item>
+        <Grid container flexWrap={flexWrap} gap={2} item>
           <StyledAlertsGrid
             item
             maxHeight={theme.spacing(90.5)}

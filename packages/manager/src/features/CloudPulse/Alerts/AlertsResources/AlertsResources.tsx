@@ -157,9 +157,9 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       )}
 
       {resourceIds.length > 0 && (
-        <Grid container spacing={3}>
-          <Grid container flexWrap={'nowrap'} item spacing={3}>
-            <Grid item md={4} xs={12}>
+        <Grid container spacing={3} xs={12}>
+          <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
+            <Grid item lg={4} xs={12}>
               <DebouncedSearchTextField
                 onSearch={(value) => {
                   setSearchText(value);
