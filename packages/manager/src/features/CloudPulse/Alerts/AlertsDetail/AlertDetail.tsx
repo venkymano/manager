@@ -9,6 +9,8 @@ import { useAlertDefinitionQuery } from 'src/queries/cloudpulse/alerts';
 
 import { AlertDetailOverview } from './AlertDetailOverview';
 
+import type { BreadcrumbProps } from 'src/components/Breadcrumb/Breadcrumb';
+
 interface RouteParams {
   /*
    * The id of the alert for which the data needs to be shown
@@ -28,7 +30,7 @@ export const AlertDetail = () => {
     serviceType
   );
 
-  const generateCrumbOverrides = React.useCallback(() => {
+  const generateCrumbOverrides = React.useCallback((): BreadcrumbProps => {
     const overrides = [
       {
         label: 'Definitions',
@@ -42,10 +44,10 @@ export const AlertDetail = () => {
       },
     ];
 
-    return { newPathname: '/Definitions/Details', overrides };
+    return { crumbOverrides: overrides, pathname: '/Definitions/Details' };
   }, [alertId, serviceType]);
 
-  const { newPathname, overrides } = React.useMemo(
+  const { crumbOverrides, pathname } = React.useMemo(
     () => generateCrumbOverrides(),
     [generateCrumbOverrides]
   );
@@ -64,7 +66,7 @@ export const AlertDetail = () => {
 
   return (
     <React.Fragment>
-      <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
+      <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
       <Grid container gap={2}>
         <Grid container flexWrap={flexWrap} gap={2} item>
           <StyledAlertsGrid
