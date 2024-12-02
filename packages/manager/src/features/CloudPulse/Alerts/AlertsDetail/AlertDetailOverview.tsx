@@ -6,7 +6,7 @@ import { useCloudPulseServiceTypes } from 'src/queries/cloudpulse/services';
 
 import { convertStringToCamelCasesWithSpaces } from '../../Utils/utils';
 import { severityMap } from '../constants';
-import { formatTimestamp } from '../Utils/utils';
+import { formatTimestamp, getServiceTypeLabel } from '../Utils/utils';
 import { AlertDetailRow } from './AlertDetailRow';
 
 import type { Alert } from '@linode/api-v4';
@@ -46,21 +46,6 @@ export const AlertDetailOverview = (props: OverviewProps) => {
     return <CircleProgress />;
   }
 
-  const getServiceTypeLabel = (serviceType: string) => {
-    // TODO: this can be moved to util
-    if (!serviceTypes) {
-      return serviceType;
-    }
-
-    for (const service of serviceTypes?.data) {
-      if (service.service_type === serviceType) {
-        return service.label;
-      }
-    }
-
-    return serviceType;
-  };
-
   return (
     <React.Fragment>
       <Typography
@@ -84,8 +69,12 @@ export const AlertDetailOverview = (props: OverviewProps) => {
           value={severity !== undefined ? severityMap[severity] : severity}
         />
         <AlertDetailRow
+          value={
+            serviceTypes
+              ? getServiceTypeLabel(serviceType, serviceTypes)
+              : serviceType
+          }
           label="Service"
-          value={serviceTypes ? getServiceTypeLabel(serviceType) : serviceType}
         />
         <AlertDetailRow
           label="Type"
