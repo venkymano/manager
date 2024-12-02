@@ -1,6 +1,7 @@
 import { Paper } from '@linode/ui';
 import { Grid } from '@mui/material';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 import AlertIcon from 'src/assets/icons/entityIcons/alert.svg';
 import { Table } from 'src/components/Table';
@@ -16,6 +17,8 @@ import { useAllAlertDefinitionsQuery } from 'src/queries/cloudpulse/alerts';
 
 import { AlertTableRow } from './AlertTableRow';
 
+import type { Alert } from '@linode/api-v4';
+
 export const AlertListing = () => {
   // These are dummy order and handlers, will replace them in the next PR
   const order = 'asc';
@@ -23,6 +26,15 @@ export const AlertListing = () => {
     return 'asc';
   };
   const { data: alerts, isError, isLoading } = useAllAlertDefinitionsQuery();
+
+  const history = useHistory();
+
+  const handleDetails = (alert: Alert) => {
+    history.push(
+      `${location.pathname}/detail/${alert.service_type}/${alert.id}`
+    );
+  };
+
   if (alerts?.length === 0) {
     return (
       <Grid item xs={12}>
@@ -105,7 +117,13 @@ export const AlertListing = () => {
           )}
           {isLoading === true && <TableRowLoading columns={7} />}
           {alerts?.map((alert) => (
-            <AlertTableRow alert={alert} key={alert.id} />
+            <AlertTableRow
+              handlers={{
+                handleDetails: () => handleDetails(alert),
+              }}
+              alert={alert}
+              key={alert.id}
+            />
           ))}
         </TableBody>
       </Table>
