@@ -2365,6 +2365,25 @@ export const handlers = [
       return HttpResponse.json(response);
     }
   ),
+  http.get('*/monitor/alert-definitions', () => {
+    const alerts = alertFactory.buildList(5);
+
+    return HttpResponse.json(makeResourcePage(alerts));
+  }),
+  http.get(
+    '*/monitor/services/:serviceType/alert-definitions/:id',
+    ({ params }) => {
+      if (params.id !== undefined) {
+        return HttpResponse.json(
+          alertFactory.build({
+            id: Number(params.id),
+            service_type: params.serviceType === 'linode'? 'linode' : 'dbaas',
+          })
+        );
+      }
+      return HttpResponse.json({}, { status: 404 });
+    }
+  ),
   http.get('*/monitor/services', () => {
     const response: ServiceTypesList = {
       data: [

@@ -23,18 +23,20 @@ export const createAlertDefinition = (
     setMethod('POST'),
     setData(data, createAlertDefinitionSchema)
   );
-  export const getAlertDefinitions = (params?: Params, filters?: Filter) =>
-    Request<ResourcePage<Alert>>(
-      setURL(`${API_ROOT}/monitor/alert-definitions`),
-      setMethod('GET'),
-      setParams(params),
-      setXFilter(filters)
-    );
-  
-  export const getAlertDefinitionById = (alertId: number) =>
-    Request<Alert>(
-      setURL(
-        `${API_ROOT}/monitor/alert-definitions/${encodeURIComponent(alertId)}`
-      ),
-      setMethod('GET')
-    );
+export const getAlertDefinitions = (params?: Params, filters?: Filter) =>
+  Request<ResourcePage<Alert>>(
+    setURL(`${API_ROOT}/monitor/alert-definitions`),
+    setMethod('GET'),
+    setParams(params),
+    setXFilter(filters)
+  );
+
+export const getAlertDefinitionById = (alertId: number, serviceType: string) =>
+  Request<Alert>(
+    setURL(
+      `${API_ROOT}/monitor/services/${encodeURIComponent(
+        serviceType
+      )}/alert-definitions/${encodeURIComponent(alertId)}`
+    ),
+    setMethod('GET')
+  );

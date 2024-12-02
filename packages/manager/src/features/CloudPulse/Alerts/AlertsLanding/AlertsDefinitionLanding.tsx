@@ -9,11 +9,11 @@ export const AlertDefinitionLanding = () => {
     <Switch>
       <Route
         component={() => <AlertListingLanding />}
-        path="/monitor/alerts/definitions"
+        path="/monitor/cloudpulse/alerts/definitions"
       />
       <Route
         component={() => <CreateAlertDefinition />}
-        path="/monitor/alerts/definitions/create"
+        path="/monitor/cloudpulse/alerts/definitions/create"
       />
     </Switch>
   );

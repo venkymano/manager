@@ -26,7 +26,10 @@ export const AlertsLanding = React.memo(() => {
     () => [
       {
         isEnabled: Boolean(flags.aclpAlerting?.alertDefinitions),
-        tab: { routeName: `${url}/definitions`, title: 'Definitions' },
+        tab: {
+          routeName: `${url}/cloudpulse/definitions`,
+          title: 'Definitions',
+        },
       },
     ],
     [url, flags.aclpAlerting]
@@ -67,11 +70,11 @@ export const AlertsLanding = React.memo(() => {
           }}
         >
           <TabLinkList tabs={accessibleTabs} />
-          {pathname === `${url}/definitions` && (
+          {pathname === `${url}/cloudpulse/alerts/definitions` && (
             <Box>
               <Button
                 onClick={() => {
-                  history.push(`${url}/definitions/create`);
+                  history.push(`${url}/cloudpulse/alerts/definitions/create`);
                 }}
                 buttonType="primary"
                 variant="contained"
@@ -84,9 +87,9 @@ export const AlertsLanding = React.memo(() => {
         <Switch>
           <Route
             component={AlertDefinitionLanding}
-            path={'/monitor/alerts/definitions'}
+            path={'/monitor/cloudpulse/alerts/definitions'}
           />
-          <Redirect from="*" to="/monitor/alerts/definitions" />
+          <Redirect from="*" to="/monitor/cloudpulse/alerts/definitions" />
         </Switch>
       </Tabs>
     </Paper>
