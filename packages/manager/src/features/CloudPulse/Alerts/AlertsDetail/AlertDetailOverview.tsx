@@ -21,10 +21,10 @@ export const AlertDetailOverview = (props: OverviewProps) => {
   const { alert } = props;
 
   const {
-    created_by,
+    created_by: createdBy,
     description,
     label,
-    service_type,
+    service_type: serviceType,
     severity,
     status,
     type,
@@ -73,29 +73,25 @@ export const AlertDetailOverview = (props: OverviewProps) => {
       </Typography>
       <Grid alignItems="center" container spacing={2}>
         <AlertDetailRow label="Name" value={label} />
+        <AlertDetailRow label="Description" value={description} />
         <AlertDetailRow
           color={statusColorMap[status]}
           label="Status"
           value={convertStringToCamelCasesWithSpaces(status)}
         />
-        <AlertDetailRow label="Type" value={type} />
-        <AlertDetailRow label="Description" value={description} />
         <AlertDetailRow
-          value={
-            severity !== undefined ? severityMap[severity] : severity || null
-          }
           label="Severity"
+          value={severity !== undefined ? severityMap[severity] : severity}
         />
+        <AlertDetailRow
+          label="Service"
+          value={serviceTypes ? getServiceTypeLabel(serviceType) : serviceType}
+        />
+        <AlertDetailRow label="Type" value={type} />
+        <AlertDetailRow label="Created By" value={createdBy} />
         <AlertDetailRow
           label="Last Modified"
           value={formatTimestamp(updated)}
-        />
-        <AlertDetailRow label="Created By" value={created_by} />
-        <AlertDetailRow
-          value={
-            serviceTypes ? getServiceTypeLabel(service_type) : service_type
-          }
-          label="Service"
         />
       </Grid>
     </React.Fragment>
