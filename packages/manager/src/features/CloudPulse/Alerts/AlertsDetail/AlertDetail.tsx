@@ -28,7 +28,7 @@ export const AlertDetail = () => {
     serviceType
   );
 
-  const generateCrumbOverrides = () => {
+  const generateCrumbOverrides = React.useCallback(() => {
     const overrides = [
       {
         label: 'Definitions',
@@ -43,12 +43,11 @@ export const AlertDetail = () => {
     ];
 
     return { newPathname: '/Definitions/Details', overrides };
-  };
+  }, [alertId, serviceType]);
 
   const { newPathname, overrides } = React.useMemo(
     () => generateCrumbOverrides(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [generateCrumbOverrides]
   );
 
   const theme = useTheme();
