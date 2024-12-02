@@ -6,10 +6,10 @@ import { useCloudPulseServiceTypes } from 'src/queries/cloudpulse/services';
 
 import { convertStringToCamelCasesWithSpaces } from '../../Utils/utils';
 import { severityMap } from '../constants';
+import { formatTimestamp } from '../Utils/utils';
 import { AlertDetailRow } from './AlertDetailRow';
 
 import type { Alert } from '@linode/api-v4';
-import { formatTimestamp } from '../Utils/utils';
 
 interface OverviewProps {
   /*
@@ -81,8 +81,10 @@ export const AlertDetailOverview = (props: OverviewProps) => {
         <AlertDetailRow label="Type" value={type} />
         <AlertDetailRow label="Description" value={description} />
         <AlertDetailRow
+          value={
+            severity !== undefined ? severityMap[severity] : severity || null
+          }
           label="Severity"
-          value={severity !== undefined ? severityMap[severity] : severity || null}
         />
         <AlertDetailRow
           label="Last Modified"
