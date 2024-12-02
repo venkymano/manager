@@ -33,5 +33,5 @@ it('test formatTimestamp method', () => {
     getServiceTypeLabel(services[2].service_type, { data: services })
   ).toBe(services[2].label);
   expect(getServiceTypeLabel('test', { data: services })).toBe('test');
-    expect(getServiceTypeLabel('', { data: services })).toBe('');
+  expect(getServiceTypeLabel('', { data: services })).toBe('');
 });
