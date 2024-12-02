@@ -10,22 +10,23 @@ export const convertSecondsToMinutes = (seconds: number): string => {
   if (seconds === 0) {
     return '0 minutes';
   }
+
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
 
-  // Construct the result string
-  const minuteString =
-    minutes > 0 ? `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}` : '';
-  const secondString =
-    remainingSeconds > 0
-      ? `${remainingSeconds} ${remainingSeconds === 1 ? 'second' : 'seconds'}`
-      : '';
+  const minuteString = `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+  const secondString = `${remainingSeconds} ${
+    remainingSeconds === 1 ? 'second' : 'seconds'
+  }`;
 
-  if (minuteString && secondString) {
-    return `${minuteString} and ${secondString}`;
+  if (!minutes) {
+    return secondString;
+  }
+  if (!remainingSeconds) {
+    return minuteString;
   }
 
-  return minuteString || secondString;
+  return `${minuteString} and ${secondString}`;
 };
 
 /**
@@ -35,19 +36,17 @@ export const convertSecondsToMinutes = (seconds: number): string => {
 export const formatTimestamp = (timestamp: string): string => {
   const date = new Date(timestamp);
 
-  const options: Intl.DateTimeFormatOptions = {
-    day: 'numeric', // Numeric day (e.g., 20)
-    hour: 'numeric', // Numeric hour
-    hour12: true, // Use 12-hour clock
-    minute: 'numeric', // Numeric minutes
-    month: 'short', // Short month name (e.g., Nov)
-    year: 'numeric', // Include the year
-  };
+  // Intl.DateTimeFormat directly supports custom formatting
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    day: 'numeric',
+    hour: 'numeric',
+    hour12: true,
+    minute: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 
-  const formattedDate = date.toLocaleString('en-US', options);
-
-  // Ensure a comma is placed after the day and before the year
-  return formattedDate.replace(/(\w+ \d+)( \d{4})/, '$1,$2');
+  return formatter.format(date);
 };
 
 /**
