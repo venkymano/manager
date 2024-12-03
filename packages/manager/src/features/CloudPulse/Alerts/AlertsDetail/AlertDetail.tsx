@@ -53,14 +53,27 @@ export const AlertDetail = () => {
   const flexWrap = isSmallScreen ? 'wrap' : 'nowrap';
 
   if (isFetching) {
-    return <CircleProgress />;
+    return (
+      <>
+        <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
+        <Grid alignItems={'center'} container height={theme.spacing(75)}>
+          <Grid item xs={12}>
+            <CircleProgress />
+          </Grid>
+        </Grid>
+      </>
+    );
   }
 
   if (isError) {
     return (
       <>
-        <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname}/>
-        <ErrorState errorText={'Error loading alert details.'} />
+        <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
+        <Grid alignItems={'center'} container height={theme.spacing(75)}>
+          <Grid item xs={12}>
+            <ErrorState errorText={'Error loading alert details.'} />
+          </Grid>
+        </Grid>
       </>
     );
   }
@@ -69,11 +82,15 @@ export const AlertDetail = () => {
     return (
       <>
         <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
-        <StyledPlaceholder
-          icon={EntityIcon}
-          isEntity
-          title="No Data to display."
-        />
+        <Grid alignItems={'center'} container height={theme.spacing(75)}>
+          <Grid item xs={12}>
+            <StyledPlaceholder
+              icon={EntityIcon}
+              isEntity
+              title="No Data to display."
+            />
+          </Grid>
+        </Grid>
       </>
     );
   }
