@@ -59,11 +59,33 @@ export const AlertDetail = () => {
   const flexWrap = isSmallScreen ? 'wrap' : 'nowrap';
 
   if (isFetching) {
-    return <CircleProgress />;
+    return (
+      <Grid
+        alignItems="center"
+        container
+        height={theme.spacing(75)}
+        justifyContent="center"
+      >
+        <Grid item>
+          <CircleProgress />
+        </Grid>
+      </Grid>
+    );
   }
 
   if (isError || !alertDetails) {
-    return <ErrorState errorText={'Error loading alert details.'} />;
+    return (
+      <Grid
+        alignItems="center"
+        container
+        height={theme.spacing(75)}
+        justifyContent="center"
+      >
+        <Grid item>
+          <ErrorState errorText={'Error loading alert details.'} />
+        </Grid>
+      </Grid>
+    );
   }
 
   return (
