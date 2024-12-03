@@ -71,7 +71,11 @@ export const AlertDetail = () => {
         <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
         <Grid alignItems={'center'} container height={theme.spacing(75)}>
           <Grid item xs={12}>
-            <ErrorState errorText={'Error loading alert details.'} />
+            <ErrorState
+              errorText={
+                'An error occurred while loading the definitions. Please try again later'
+              }
+            />
           </Grid>
         </Grid>
       </>
