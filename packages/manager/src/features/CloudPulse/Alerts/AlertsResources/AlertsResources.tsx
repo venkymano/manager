@@ -1,10 +1,11 @@
 import { CircleProgress } from '@linode/ui';
-import { Grid, useTheme } from '@mui/material';
+import { Grid, styled, useTheme } from '@mui/material';
 import React from 'react';
 
+import EntityIcon from 'src/assets/icons/entityIcons/alert.svg';
 import { Checkbox } from 'src/components/Checkbox';
 import { DebouncedSearchTextField } from 'src/components/DebouncedSearchTextField';
-import { ErrorState } from 'src/components/ErrorState/ErrorState';
+import { Placeholder } from 'src/components/Placeholder/Placeholder';
 import { Typography } from 'src/components/Typography';
 import { useResourcesQuery } from 'src/queries/cloudpulse/resources';
 import { useRegionsQuery } from 'src/queries/regions/regions';
@@ -136,10 +137,6 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     return <CircleProgress />;
   }
 
-  if (isError || isRegionsError) {
-    return <ErrorState errorText={'Error loading resources'} />;
-  }
-
   return (
     <React.Fragment>
       <Typography
@@ -150,76 +147,100 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       >
         Resources
       </Typography>
-      {resourceIds.length === 0 && (
-        <Typography textAlign={'center'} variant="h2">
-          No Resources to display
-        </Typography>
+      {!isError && isRegionsError && resourceIds.length === 0 && (
+        <StyledPlaceholder
+          title={
+            'No resources are currently assigned to this alert definition.'
+          }
+          icon={EntityIcon}
+          subtitle="You can assign alerts during the resource creation process."
+        />
       )}
 
-      {resourceIds.length > 0 && (
-        <Grid container spacing={3} xs={12}>
-          <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
-            <Grid item md={3} xs={12}>
-              <DebouncedSearchTextField
-                onSearch={(value) => {
-                  setSearchText(value);
-                }}
-                sx={{
-                  maxHeight: theme.spacing(4.25),
-                }}
-                debounceTime={300}
-                hideLabel
-                isSearching={false}
-                label="Search for resource"
-                placeholder="Search for resource"
-                value={searchText ?? ''}
-              />
-            </Grid>
-            <Grid item md={3.5} xs={12}>
-              <AlertsRegionFilter
-                handleSelectionChange={(value) => {
-                  setFilteredRegions(value);
-                }}
-                regionOptions={regionOptions ?? []}
-              />
-            </Grid>
-            {isSelectionsNeeded && (
-              <Grid item lg={4} xs={12}>
-                <Checkbox
+      {resourceIds.length > 0 ||
+        ((isError || isRegionsError) && (
+          <Grid container spacing={3} xs={12}>
+            <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
+              <Grid item md={3} xs={12}>
+                <DebouncedSearchTextField
+                  onSearch={(value) => {
+                    setSearchText(value);
+                  }}
                   sx={{
                     maxHeight: theme.spacing(4.25),
-                    pt: theme.spacing(1),
                   }}
-                  checked={selectedOnly}
-                  onClick={() => setSelectedOnly(!selectedOnly)}
-                  text={'Show Selected Only'}
-                  value={'Show Selected'}
+                  debounceTime={300}
+                  hideLabel
+                  isSearching={false}
+                  label="Search for resource"
+                  placeholder="Search for resource"
+                  value={searchText ?? ''}
+                />
+              </Grid>
+              <Grid item md={3.5} xs={12}>
+                <AlertsRegionFilter
+                  handleSelectionChange={(value) => {
+                    setFilteredRegions(value);
+                  }}
+                  regionOptions={regionOptions ?? []}
+                />
+              </Grid>
+              {isSelectionsNeeded && (
+                <Grid item lg={4} xs={12}>
+                  <Checkbox
+                    sx={{
+                      maxHeight: theme.spacing(4.25),
+                      pt: theme.spacing(1),
+                    }}
+                    checked={selectedOnly}
+                    onClick={() => setSelectedOnly(!selectedOnly)}
+                    text={'Show Selected Only'}
+                    value={'Show Selected'}
+                  />
+                </Grid>
+              )}
+            </Grid>
+
+            {isSelectionsNeeded && !(isError || isRegionsError) && (
+              <Grid item xs={12}>
+                <AlertsResourcesNotice
+                  handleSelectionChange={handleAllSelection}
+                  selectedResources={selectedResources.length}
+                  totalResources={data?.length ?? 0}
                 />
               </Grid>
             )}
-          </Grid>
 
-          {isSelectionsNeeded && (
             <Grid item xs={12}>
-              <AlertsResourcesNotice
-                handleSelectionChange={handleAllSelection}
-                selectedResources={selectedResources.length}
-                totalResources={data?.length ?? 0}
+              {/* Pass filtered data */}
+              <DisplayAlertResources
+                handleSelection={
+                  isSelectionsNeeded ? handleSelection : undefined
+                }
+                errorText={'Table data is unavailable. Please try again later'}
+                filteredResources={filteredResources}
+                isDataLoadingError={isError || isRegionsError}
+                isSelectionsNeeded={isSelectionsNeeded}
+                pageSize={pageSize}
               />
             </Grid>
-          )}
-
-          <Grid item xs={12}>
-            {/* Pass filtered data */}
-            <DisplayAlertResources
-              filteredResources={filteredResources}
-              handleSelection={isSelectionsNeeded ? handleSelection : undefined}
-              isSelectionsNeeded={isSelectionsNeeded}
-              pageSize={pageSize}
-            />
           </Grid>
-        </Grid>
-      )}
+        ))}
     </React.Fragment>
   );
 });
+
+export const StyledPlaceholder = styled(Placeholder, {
+  label: 'StyledPlaceholder',
+})(({ theme }) => ({
+  h1: {
+    fontSize: '20px',
+  },
+  h2: {
+    fontSize: '16px',
+  },
+  svg: {
+    color: 'lightgreen',
+    maxHeight: theme.spacing(10.5),
+  },
+}));

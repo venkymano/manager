@@ -3,8 +3,10 @@ import { Grid, styled, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
+import EntityIcon from 'src/assets/icons/entityIcons/alert.svg';
 import { Breadcrumb } from 'src/components/Breadcrumb/Breadcrumb';
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
+import { Placeholder } from 'src/components/Placeholder/Placeholder';
 import { useAlertDefinitionQuery } from 'src/queries/cloudpulse/alerts';
 
 import { AlertResources } from '../AlertsResources/AlertsResources';
@@ -60,29 +62,33 @@ export const AlertDetail = () => {
 
   if (isFetching) {
     return (
-      <Grid
-        alignItems="center"
-        container
-        height={theme.spacing(75)}
-        justifyContent="center"
-      >
-        <Grid item>
+      <Grid alignItems="center" container height={theme.spacing(75)}>
+        <Grid item xs={12}>
           <CircleProgress />
         </Grid>
       </Grid>
     );
   }
 
-  if (isError || !alertDetails) {
+  if (isError) {
     return (
-      <Grid
-        alignItems="center"
-        container
-        height={theme.spacing(75)}
-        justifyContent="center"
-      >
-        <Grid item>
-          <ErrorState errorText={'Error loading alert details.'} />
+      <Grid alignItems="center" container height={theme.spacing(75)}>
+        <Grid item xs={12}>
+          <ErrorState
+            errorText={
+              'An error occurred while loading the definitions. Please try again later'
+            }
+          />
+        </Grid>
+      </Grid>
+    );
+  }
+
+  if (!alertDetails) {
+    return (
+      <Grid alignItems="center" container height={theme.spacing(75)}>
+        <Grid item xs={12}>
+          <StyledPlaceholder icon={EntityIcon} title="No Data to display." />
         </Grid>
       </Grid>
     );
@@ -151,4 +157,19 @@ export const StyledAlertChip = styled(Chip, {
   },
   backgroundColor: 'white',
   borderRadius: borderRadius || 0,
+}));
+
+export const StyledPlaceholder = styled(Placeholder, {
+  label: 'StyledPlaceholder',
+})(({ theme }) => ({
+  h1: {
+    fontSize: '20px',
+  },
+  h2: {
+    fontSize: '16px',
+  },
+  svg: {
+    color: 'lightgreen',
+    maxHeight: theme.spacing(10.5),
+  },
 }));

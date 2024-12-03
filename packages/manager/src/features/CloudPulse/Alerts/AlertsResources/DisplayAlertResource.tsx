@@ -8,6 +8,7 @@ import { PaginationFooter } from 'src/components/PaginationFooter/PaginationFoot
 import { Table } from 'src/components/Table/Table';
 import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow/TableRow';
+import { TableRowError } from 'src/components/TableRowError/TableRowError';
 import { TableSortCell } from 'src/components/TableSortCell';
 
 import type { Order } from 'src/hooks/useOrder';
@@ -20,12 +21,16 @@ export interface AlertInstances {
 }
 
 export interface DisplayAlertResourceProp {
+  errorText: string;
+
   /**
    * The resources that needs to be displayed
    */
   filteredResources: AlertInstances[] | undefined;
 
   handleSelection?: (id: string[], isSelectAction: boolean) => void;
+
+  isDataLoadingError: boolean;
 
   /**
    * This controls whether to show the selection check box or not
@@ -41,8 +46,10 @@ export interface DisplayAlertResourceProp {
 export const DisplayAlertResources = React.memo(
   (props: DisplayAlertResourceProp) => {
     const {
+      errorText,
       filteredResources,
       handleSelection,
+      isDataLoadingError,
       isSelectionsNeeded = false,
       pageSize,
     } = props;
@@ -135,35 +142,44 @@ export const DisplayAlertResources = React.memo(
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedData.map(({ checked, id, label, region }) => (
-                  <TableRow key={id}>
-                    {isSelectionsNeeded && (
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          onChange={() => {
-                            handleSelectionChange([id], !checked);
-                          }}
-                          sx={{
-                            padding: 0,
-                          }}
-                          checked={checked}
-                        />
-                      </TableCell>
-                    )}
-                    <TableCell>{label}</TableCell>
-                    <TableCell>{region}</TableCell>
-                  </TableRow>
-                ))}
+                {!isDataLoadingError &&
+                  paginatedData.map(({ checked, id, label, region }) => (
+                    <TableRow key={id}>
+                      {isSelectionsNeeded && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            onChange={() => {
+                              handleSelectionChange([id], !checked);
+                            }}
+                            sx={{
+                              padding: 0,
+                            }}
+                            checked={checked}
+                          />
+                        </TableCell>
+                      )}
+                      <TableCell>{label}</TableCell>
+                      <TableCell>{region}</TableCell>
+                    </TableRow>
+                  ))}
+                {isDataLoadingError && (
+                  <TableRowError
+                    colSpan={3}
+                    message={errorText ?? 'Table data is unavailable.'}
+                  />
+                )}
               </TableBody>
             </Table>
-            <PaginationFooter
-              count={count}
-              eventCategory="alerts_resources"
-              handlePageChange={handlePageChange}
-              handleSizeChange={handlePageSizeChange}
-              page={page}
-              pageSize={pageSize}
-            />
+            {!isDataLoadingError && (
+              <PaginationFooter
+                count={count}
+                eventCategory="alerts_resources"
+                handlePageChange={handlePageChange}
+                handleSizeChange={handlePageSizeChange}
+                page={page}
+                pageSize={pageSize}
+              />
+            )}
           </React.Fragment>
         )}
       </Paginate>

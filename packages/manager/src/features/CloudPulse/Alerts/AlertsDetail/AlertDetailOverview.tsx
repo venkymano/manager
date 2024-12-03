@@ -81,8 +81,12 @@ export const AlertDetailOverview = (props: OverviewProps) => {
         <AlertDetailRow label="Type" value={type} />
         <AlertDetailRow label="Description" value={description} />
         <AlertDetailRow
+          value={
+            severity !== undefined && severity !== null
+              ? severityMap[severity]
+              : severity || null
+          }
           label="Severity"
-          value={severity ? severityMap[severity] : severity || null}
         />
         <AlertDetailRow
           label="Last Modified"

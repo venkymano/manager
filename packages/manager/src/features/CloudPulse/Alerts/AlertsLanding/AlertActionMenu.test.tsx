@@ -18,7 +18,7 @@ const alertLabel = 'Action menu for Alert';
 describe('AlertActionMenu component tests', () => {
   it('should render the action menu items on correct props', async () => {
     const screen = renderWithTheme(
-      <AlertActionMenu alertType={'default'} handlers={handlers} />
+      <AlertActionMenu alertType={'system'} handlers={handlers} />
     );
     const actionButton = screen.getByLabelText(alertLabel);
 
@@ -33,7 +33,7 @@ describe('AlertActionMenu component tests', () => {
 
   it('should render the action menu items on correct props for custom alert type', async () => {
     const screen = renderWithTheme(
-      <AlertActionMenu alertType={'custom'} handlers={handlers} />
+      <AlertActionMenu alertType={'user'} handlers={handlers} />
     );
     const actionButton = screen.getByLabelText(alertLabel);
 
