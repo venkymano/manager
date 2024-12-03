@@ -21,6 +21,7 @@ import type {
   JWETokenPayLoad,
   Params,
 } from '@linode/api-v4';
+import { getAllNotificationChannels } from './requests';
 
 const key = 'Clousepulse';
 
@@ -68,8 +69,8 @@ export const queryFactory = createQueryKeys(key, {
   }),
   notificationChannels: {
     contextQueries: {
-      channels: (params?: Params, filter?: Filter) => ({
-        queryFn: () => getNotificationChannels(params, filter),
+      all: (params?: Params, filter?: Filter) => ({
+        queryFn: () => getAllNotificationChannels(params, filter),
         queryKey: [params, filter, 'alert-channel'],
       }),
     },

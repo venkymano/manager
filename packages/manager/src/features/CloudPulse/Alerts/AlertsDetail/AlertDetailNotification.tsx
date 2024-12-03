@@ -21,20 +21,19 @@ interface NotificationProps {
 export const AlertDetailNotification = (props: NotificationProps) => {
   const { channelIds } = props;
 
-  const { data, isError, isFetching } = useAlertNotificationChannelsQuery(
-    {},
-    { id: channelIds.join(',') }
-  );
+  const {
+    data: channels,
+    isError,
+    isFetching,
+  } = useAlertNotificationChannelsQuery({}, { id: channelIds.join(',') });
 
   if (isFetching) {
     return <CircleProgress />;
   }
 
-  if (!data?.data?.length) {
+  if (!channels?.length) {
     return <NullComponent />;
   }
-
-  const channels = data.data;
 
   return (
     <React.Fragment>

@@ -157,75 +157,72 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
         />
       )}
 
-      {resourceIds.length > 0 ||
-        ((isError || isRegionsError) && (
-          <Grid container spacing={3} xs={12}>
-            <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
-              <Grid item md={3} xs={12}>
-                <DebouncedSearchTextField
-                  onSearch={(value) => {
-                    setSearchText(value);
-                  }}
+      {(resourceIds.length > 0 || isError || isRegionsError) && (
+        <Grid container spacing={3} xs={12}>
+          <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
+            <Grid item md={3} xs={12}>
+              <DebouncedSearchTextField
+                onSearch={(value) => {
+                  setSearchText(value);
+                }}
+                sx={{
+                  maxHeight: theme.spacing(4.25),
+                }}
+                debounceTime={300}
+                hideLabel
+                isSearching={false}
+                label="Search for resource"
+                placeholder="Search for resource"
+                value={searchText ?? ''}
+              />
+            </Grid>
+            <Grid item md={3.5} xs={12}>
+              <AlertsRegionFilter
+                handleSelectionChange={(value) => {
+                  setFilteredRegions(value);
+                }}
+                regionOptions={regionOptions ?? []}
+              />
+            </Grid>
+            {isSelectionsNeeded && (
+              <Grid item lg={4} xs={12}>
+                <Checkbox
                   sx={{
                     maxHeight: theme.spacing(4.25),
+                    pt: theme.spacing(1),
                   }}
-                  debounceTime={300}
-                  hideLabel
-                  isSearching={false}
-                  label="Search for resource"
-                  placeholder="Search for resource"
-                  value={searchText ?? ''}
-                />
-              </Grid>
-              <Grid item md={3.5} xs={12}>
-                <AlertsRegionFilter
-                  handleSelectionChange={(value) => {
-                    setFilteredRegions(value);
-                  }}
-                  regionOptions={regionOptions ?? []}
-                />
-              </Grid>
-              {isSelectionsNeeded && (
-                <Grid item lg={4} xs={12}>
-                  <Checkbox
-                    sx={{
-                      maxHeight: theme.spacing(4.25),
-                      pt: theme.spacing(1),
-                    }}
-                    checked={selectedOnly}
-                    onClick={() => setSelectedOnly(!selectedOnly)}
-                    text={'Show Selected Only'}
-                    value={'Show Selected'}
-                  />
-                </Grid>
-              )}
-            </Grid>
-
-            {isSelectionsNeeded && !(isError || isRegionsError) && (
-              <Grid item xs={12}>
-                <AlertsResourcesNotice
-                  handleSelectionChange={handleAllSelection}
-                  selectedResources={selectedResources.length}
-                  totalResources={data?.length ?? 0}
+                  checked={selectedOnly}
+                  onClick={() => setSelectedOnly(!selectedOnly)}
+                  text={'Show Selected Only'}
+                  value={'Show Selected'}
                 />
               </Grid>
             )}
+          </Grid>
 
+          {isSelectionsNeeded && !(isError || isRegionsError) && (
             <Grid item xs={12}>
-              {/* Pass filtered data */}
-              <DisplayAlertResources
-                handleSelection={
-                  isSelectionsNeeded ? handleSelection : undefined
-                }
-                errorText={'Table data is unavailable. Please try again later'}
-                filteredResources={filteredResources}
-                isDataLoadingError={isError || isRegionsError}
-                isSelectionsNeeded={isSelectionsNeeded}
-                pageSize={pageSize}
+              <AlertsResourcesNotice
+                handleSelectionChange={handleAllSelection}
+                selectedResources={selectedResources.length}
+                totalResources={data?.length ?? 0}
               />
             </Grid>
+          )}
+
+          <Grid item xs={12}>
+            {/* Pass filtered data */}
+            <DisplayAlertResources
+              errorText={'Table data is unavailable. Please try again later'}
+              filteredResources={filteredResources}
+              handleSelection={isSelectionsNeeded ? handleSelection : undefined}
+              isDataLoadingError={isError || isRegionsError}
+              isSelectionsNeeded={isSelectionsNeeded}
+              pageSize={pageSize}
+            />
           </Grid>
-        ))}
+        </Grid>
+      )}
     </React.Fragment>
   );
 });

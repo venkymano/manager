@@ -47,7 +47,7 @@ export const useAlertNotificationChannelsQuery = (
   params?: Params,
   filter?: Filter
 ) => {
-  return useQuery<ResourcePage<NotificationChannel>, APIError[]>({
-    ...queryFactory.notificationChannels._ctx.channels(params, filter),
+  return useQuery<NotificationChannel[], APIError[]>({
+    ...queryFactory.notificationChannels._ctx.all(params, filter),
   });
 };
