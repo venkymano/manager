@@ -59,7 +59,7 @@ export const AlertDetail = () => {
   if (isError) {
     return (
       <>
-        <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
+        <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname}/>
         <ErrorState errorText={'Error loading alert details.'} />
       </>
     );

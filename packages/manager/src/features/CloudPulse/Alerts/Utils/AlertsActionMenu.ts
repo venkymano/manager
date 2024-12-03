@@ -11,8 +11,34 @@ import type { Action } from 'src/components/ActionMenu/ActionMenu';
 export const getAlertTypeToActionsList = (
   onClickHandlers: ActionHandlers
 ): Record<string, Action[]> => ({
+  system: [
+    {
+      disabled: false,
+      onClick: onClickHandlers.handleDetails,
+      title: 'Show Details',
+      tooltip: false
+        ? getRestrictedResourceText({
+            action: 'view',
+            isSingular: true,
+            resourceType: 'Alerts',
+          })
+        : undefined,
+    },
+    {
+      disabled: false,
+      onClick: onClickHandlers.handleDelete,
+      title: 'Delete',
+      tooltip: false
+        ? getRestrictedResourceText({
+            action: 'delete',
+            isSingular: true,
+            resourceType: 'Alerts',
+          })
+        : undefined,
+    },
+  ],
   // for now there is custom and default alert types, may be in future more alert types can be added
-  custom: [
+  user: [
     {
       disabled: false,
       onClick: onClickHandlers.handleDetails,
@@ -44,32 +70,6 @@ export const getAlertTypeToActionsList = (
       tooltip: false
         ? getRestrictedResourceText({
             action: 'clone',
-            isSingular: true,
-            resourceType: 'Alerts',
-          })
-        : undefined,
-    },
-  ],
-  default: [
-    {
-      disabled: false,
-      onClick: onClickHandlers.handleDetails,
-      title: 'Show Details',
-      tooltip: false
-        ? getRestrictedResourceText({
-            action: 'view',
-            isSingular: true,
-            resourceType: 'Alerts',
-          })
-        : undefined,
-    },
-    {
-      disabled: false,
-      onClick: onClickHandlers.handleDelete,
-      title: 'Delete',
-      tooltip: false
-        ? getRestrictedResourceText({
-            action: 'delete',
             isSingular: true,
             resourceType: 'Alerts',
           })
