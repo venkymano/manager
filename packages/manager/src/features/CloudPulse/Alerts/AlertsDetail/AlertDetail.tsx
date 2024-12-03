@@ -69,7 +69,11 @@ export const AlertDetail = () => {
     return (
       <>
         <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
-        <Placeholder icon={EntityIcon} title="No Data to display." />
+        <StyledPlaceholder
+          icon={EntityIcon}
+          isEntity
+          title="No Data to display."
+        />
       </>
     );
   }
@@ -108,4 +112,12 @@ export const StyledAlertChip = styled(Chip, {
   },
   backgroundColor: 'white',
   borderRadius: borderRadius || 0,
+}));
+
+export const StyledPlaceholder = styled(Placeholder, {
+  label: 'StyledPlaceholder',
+})(({ theme }) => ({
+  svg: {
+    maxHeight: theme.spacing(12.5),
+  },
 }));
