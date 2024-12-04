@@ -133,9 +133,20 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     });
   }, [data, resourceIds, regionsIdToLabelMap]);
 
+  const titleRef = React.useRef<HTMLDivElement>(null); // when the page size, page number of table changes lets scroll until the title of this component
+
   if (isFetching || isRegionsFetching) {
     return <CircleProgress />;
   }
+
+  const scrollToTitle = () => {
+    if (titleRef.current) {
+      window.scrollTo({
+        behavior: 'smooth',
+        top: titleRef.current.getBoundingClientRect().top + window.scrollY - 40, // Adjust offset if needed
+      });
+    }
+  };
 
   return (
     <React.Fragment>
@@ -143,6 +154,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
         fontSize={theme.spacing(2.25)}
         gutterBottom
         marginBottom={2}
+        ref={titleRef}
         variant="h2"
       >
         Resources
@@ -219,6 +231,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
               isDataLoadingError={isError || isRegionsError}
               isSelectionsNeeded={isSelectionsNeeded}
               pageSize={pageSize}
+              scrollToTitle={scrollToTitle}
             />
           </Grid>
         </Grid>

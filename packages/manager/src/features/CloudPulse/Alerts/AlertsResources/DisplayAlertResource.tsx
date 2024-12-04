@@ -1,5 +1,4 @@
-import { Box } from '@linode/ui';
-import { TableBody, TableHead, styled } from '@mui/material';
+import { TableBody, TableHead } from '@mui/material';
 import React from 'react';
 
 import { Checkbox } from 'src/components/Checkbox';
@@ -11,6 +10,7 @@ import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow/TableRow';
 import { TableRowError } from 'src/components/TableRowError/TableRowError';
 import { TableSortCell } from 'src/components/TableSortCell';
+import { usePagination } from 'src/hooks/usePagination';
 
 import type { Order } from 'src/hooks/useOrder';
 
@@ -42,6 +42,8 @@ export interface DisplayAlertResourceProp {
    * The pageSize needed in the table
    */
   pageSize: number;
+
+  scrollToTitle: () => void;
 }
 
 export const DisplayAlertResources = React.memo(
@@ -53,7 +55,10 @@ export const DisplayAlertResources = React.memo(
       isDataLoadingError,
       isSelectionsNeeded = false,
       pageSize,
+      scrollToTitle,
     } = props;
+
+    const pagination = usePagination(1);
 
     const [sorting, setSorting] = React.useState<{
       order: Order;
@@ -71,12 +76,33 @@ export const DisplayAlertResources = React.memo(
       )(filteredResources ?? []) as AlertInstances[];
     }, [filteredResources, sorting]);
 
-    const handleSort = React.useCallback((orderBy: string, order: Order) => {
-      setSorting({
-        order,
-        orderBy,
-      });
-    }, []);
+    const handleSort = React.useCallback(
+      (
+        orderBy: string,
+        order: Order | undefined,
+        handlePageChange: (page: number) => void
+      ) => {
+        if (!order) {
+          return;
+        }
+
+        setSorting({
+          order,
+          orderBy,
+        });
+        handlePageChange(1); // move to first page
+        scrollToTitle(); // scroll to title
+      },
+      [scrollToTitle]
+    );
+
+    const handlePageNumberChange = React.useCallback(
+      (handlePageChange: (page: number) => void, pageNumber: number) => {
+        handlePageChange(pageNumber); // move to first page
+        scrollToTitle(); // scroll to title
+      },
+      [scrollToTitle]
+    );
 
     const handleSelectionChange = React.useCallback(
       (id: string[], isSelectionAction: boolean) => {
@@ -124,17 +150,21 @@ export const DisplayAlertResources = React.memo(
                   </TableCell>
                 )}
                 <TableSortCell
+                  handleClick={(orderBy, order) => {
+                    handleSort(orderBy, order, handlePageChange);
+                  }}
                   active={sorting.orderBy === 'label'}
                   direction={sorting.order}
-                  handleClick={handleSort}
                   label="label"
                 >
                   Resource
                 </TableSortCell>
                 <TableSortCell
+                  handleClick={(orderBy, order) => {
+                    handleSort(orderBy, order, handlePageChange);
+                  }}
                   active={sorting.orderBy === 'region'}
                   direction={sorting.order}
-                  handleClick={handleSort}
                   label="region"
                 >
                   Region
@@ -172,10 +202,15 @@ export const DisplayAlertResources = React.memo(
                 <TableRow>
                   <TableCell colSpan={3} height={'48px'}>
                     <PaginationFooter
+                      handlePageChange={(pageNumber) => {
+                        handlePageNumberChange(handlePageChange, pageNumber);
+                      }}
+                      handleSizeChange={(pageSize) => {
+                        handlePageSizeChange(pageSize);
+                        handlePageNumberChange(handlePageChange, 1); // move to first page
+                      }}
                       count={count}
                       eventCategory="alerts_resources"
-                      handlePageChange={handlePageChange}
-                      handleSizeChange={handlePageSizeChange}
                       page={page}
                       pageSize={pageSize}
                     />
