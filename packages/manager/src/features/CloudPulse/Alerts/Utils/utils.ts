@@ -1,5 +1,6 @@
 import type { AlertDimensionsProp } from '../AlertsDetail/AlertDetailChips';
 import type { NotificationChannel, ServiceTypesList } from '@linode/api-v4';
+import type { Theme } from '@mui/material';
 
 /**
  * Converts seconds into a human-readable minutes and seconds format.
@@ -97,3 +98,15 @@ export const getServiceTypeLabel = (
 
   return serviceType;
 };
+
+/**
+ *
+ * @param theme mui theme
+ * @returns The style needed for grids in alerts
+ */
+export const getAlertGridStyles = (theme: Theme) => ({
+  backgroundColor:
+    theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
+  overflow: 'auto',
+  padding: theme.spacing(3),
+});

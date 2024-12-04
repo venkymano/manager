@@ -10,6 +10,7 @@ import { Placeholder } from 'src/components/Placeholder/Placeholder';
 import { useAlertDefinitionQuery } from 'src/queries/cloudpulse/alerts';
 
 import { AlertResources } from '../AlertsResources/AlertsResources';
+import { getAlertGridStyles } from '../Utils/utils';
 import { AlertDetailCriteria } from './AlertDetailCriteria';
 import { AlertDetailNotification } from './AlertDetailNotification';
 import { AlertDetailOverview } from './AlertDetailOverview';
@@ -96,53 +97,42 @@ export const AlertDetail = () => {
     <React.Fragment>
       <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
       <Grid container gap={2}>
-        <StyledAlertsGrid
+        <Grid
           item
           maxHeight={theme.spacing(98.125)}
           md={6}
           overflow={'auto'}
+          style={getAlertGridStyles(theme)}
           xs={12}
         >
           <AlertDetailOverview alert={alertDetails} />
-        </StyledAlertsGrid>
-        <StyledAlertsGrid
-          style={{
-            flex: 1,
-          }}
+        </Grid>
+        <Grid
           item
           maxHeight={theme.spacing(98.125)}
           md={6}
-          overflow={'auto'}
+          style={{ ...getAlertGridStyles(theme), flex: 1 }}
           xs={12}
         >
           <AlertDetailCriteria alert={alertDetails} />
-        </StyledAlertsGrid>
-        <StyledAlertsGrid item xs={12}>
+        </Grid>
+        <Grid item style={getAlertGridStyles(theme)} xs={12}>
           <AlertResources
             resourceIds={alertDetails?.resource_ids}
             serviceType={alertDetails?.service_type}
           />
-        </StyledAlertsGrid>
-        <StyledAlertsGrid item xs={12}>
+        </Grid>
+        <Grid item style={getAlertGridStyles(theme)} xs={12}>
           <AlertDetailNotification
             channelIds={alertDetails.channels.map((channel) =>
               Number(channel.id)
             )}
           />
-        </StyledAlertsGrid>
+        </Grid>
       </Grid>
     </React.Fragment>
   );
 };
-
-export const StyledAlertsGrid = styled(Grid, { label: 'StyledAlertsGrid' })(
-  ({ theme }) => ({
-    backgroundColor:
-      theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
-    overflow: 'auto',
-    padding: theme.spacing(3),
-  })
-);
 
 export const StyledAlertChip = styled(Chip, {
   label: 'StyledAlertChip',
