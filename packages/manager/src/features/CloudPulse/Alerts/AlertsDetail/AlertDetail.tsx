@@ -120,7 +120,6 @@ export const AlertDetail = () => {
         </Grid>
         <StyledAlertsGrid item xs={12}>
           <AlertResources
-            isSelectionsNeeded
             resourceIds={alertDetails?.resource_ids}
             serviceType={alertDetails?.service_type}
           />

@@ -6,7 +6,7 @@ import { useCloudPulseServiceTypes } from 'src/queries/cloudpulse/services';
 
 import { convertStringToCamelCasesWithSpaces } from '../../Utils/utils';
 import { severityMap } from '../constants';
-import { formatTimestamp } from '../Utils/utils';
+import { formatTimestamp, getServiceTypeLabel } from '../Utils/utils';
 import { AlertDetailRow } from './AlertDetailRow';
 
 import type { Alert } from '@linode/api-v4';
@@ -21,10 +21,10 @@ export const AlertDetailOverview = (props: OverviewProps) => {
   const { alert } = props;
 
   const {
-    created_by,
+    created_by: createdBy,
     description,
     label,
-    service_type,
+    service_type: serviceType,
     severity,
     status,
     type,
@@ -46,21 +46,6 @@ export const AlertDetailOverview = (props: OverviewProps) => {
     return <CircleProgress />;
   }
 
-  const getServiceTypeLabel = (serviceType: string) => {
-    // TODO: this can be moved to util
-    if (!serviceTypes) {
-      return serviceType;
-    }
-
-    for (const service of serviceTypes?.data) {
-      if (service.service_type === serviceType) {
-        return service.label;
-      }
-    }
-
-    return serviceType;
-  };
-
   return (
     <React.Fragment>
       <Typography
@@ -73,31 +58,32 @@ export const AlertDetailOverview = (props: OverviewProps) => {
       </Typography>
       <Grid alignItems="center" container spacing={2}>
         <AlertDetailRow label="Name" value={label} />
+        <AlertDetailRow label="Description" value={description} />
         <AlertDetailRow
           color={statusColorMap[status]}
           label="Status"
           value={convertStringToCamelCasesWithSpaces(status)}
         />
-        <AlertDetailRow label="Type" value={type} />
-        <AlertDetailRow label="Description" value={description} />
         <AlertDetailRow
           value={
             severity !== undefined && severity !== null
               ? severityMap[severity]
-              : severity || null
+              : severity
           }
           label="Severity"
         />
         <AlertDetailRow
+          label="Service"
+          value={getServiceTypeLabel(serviceType, serviceTypes)}
+        />
+        <AlertDetailRow
+          label="Type"
+          value={convertStringToCamelCasesWithSpaces(type)}
+        />
+        <AlertDetailRow label="Created By" value={createdBy} />
+        <AlertDetailRow
           label="Last Modified"
           value={formatTimestamp(updated)}
-        />
-        <AlertDetailRow label="Created By" value={created_by} />
-        <AlertDetailRow
-          value={
-            serviceTypes ? getServiceTypeLabel(service_type) : service_type
-          }
-          label="Service"
         />
       </Grid>
     </React.Fragment>

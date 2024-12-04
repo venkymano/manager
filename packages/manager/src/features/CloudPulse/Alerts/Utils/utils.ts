@@ -1,38 +1,53 @@
 import type { AlertDimensionsProp } from '../AlertsDetail/AlertDetailChips';
-import type { NotificationChannel } from '@linode/api-v4';
+import type { NotificationChannel, ServiceTypesList } from '@linode/api-v4';
 
+/**
+ * Converts seconds into a human-readable minutes and seconds format.
+ *
+ * @param seconds The seconds that need to be converted into minutes.
+ * @returns A string representing the time in minutes and seconds.
+ */
 export const convertSecondsToMinutes = (seconds: number): string => {
   if (seconds === 0) {
     return '0 minutes';
   }
+
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
 
-  // Construct the result string
-  const minuteString =
-    minutes > 0 ? `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}` : '';
-  const secondString =
-    remainingSeconds > 0
-      ? ` and ${remainingSeconds} ${
-          remainingSeconds === 1 ? 'second' : 'seconds'
-        }`
-      : '';
+  const minuteString = `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+  const secondString = `${remainingSeconds} ${
+    remainingSeconds === 1 ? 'second' : 'seconds'
+  }`;
 
-  return minuteString + secondString;
+  if (!minutes) {
+    return secondString;
+  }
+  if (!remainingSeconds) {
+    return minuteString;
+  }
+
+  return `${minuteString} and ${secondString}`;
 };
 
+/**
+ * @param timestamp The timestamp that needs to be converted
+ * @returns Formatted date string for a given timestamp, e.g., Nov 30, 2024, 12:42PM
+ */
 export const formatTimestamp = (timestamp: string): string => {
   const date = new Date(timestamp);
 
-  const options: Intl.DateTimeFormatOptions = {
-    day: 'numeric', // Numeric day (e.g., 20)
-    hour: 'numeric', // Numeric hour
-    hour12: true, // Use 12-hour clock
-    minute: 'numeric', // Numeric minutes
-    month: 'short', // Short month name (e.g., Nov)
-  };
+  // Intl.DateTimeFormat directly supports custom formatting
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    day: 'numeric',
+    hour: 'numeric',
+    hour12: true,
+    minute: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 
-  return date.toLocaleString('en-US', options);
+  return formatter.format(date);
 };
 
 export const getChipLabels = (
@@ -59,4 +74,26 @@ export const getChipLabels = (
       label: 'Webhook URL',
     };
   }
+};
+
+/**
+ * @param serviceType Service type for which the label needs to be displayed
+ * @param serviceTypes List of available service types in ACLP
+ * @returns The label for the given service type
+ */
+export const getServiceTypeLabel = (
+  serviceType: string,
+  serviceTypes: ServiceTypesList | undefined
+) => {
+  if (!serviceTypes) {
+    return serviceType;
+  }
+
+  for (const service of serviceTypes?.data) {
+    if (service.service_type === serviceType) {
+      return service.label;
+    }
+  }
+
+  return serviceType;
 };
