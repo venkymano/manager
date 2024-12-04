@@ -32,7 +32,15 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
   const renderTriggerCriteria = React.useMemo(
     () => (
       <Grid alignItems="center" container item sm={8} xs={12}>
-        <Typography variant="body1">All Criteria are met for</Typography>
+        <Chip
+          sx={{
+            backgroundColor: 'white',
+            marginLeft: theme.spacing(0.5),
+          }}
+          label={'All'}
+          variant="outlined"
+        />
+        <Typography variant="body1"> criteria are met for</Typography>
         <Chip
           sx={{
             backgroundColor: 'white',
