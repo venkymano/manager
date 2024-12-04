@@ -163,10 +163,10 @@ export const StyledPlaceholder = styled(Placeholder, {
   label: 'StyledPlaceholder',
 })(({ theme }) => ({
   h1: {
-    fontSize: '20px',
+    fontSize: theme.spacing(2.5),
   },
   h2: {
-    fontSize: '16px',
+    fontSize: theme.spacing(2),
   },
   svg: {
     color: 'lightgreen',
