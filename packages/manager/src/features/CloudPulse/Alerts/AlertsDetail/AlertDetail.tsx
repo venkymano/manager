@@ -15,11 +15,11 @@ import { AlertDetailNotification } from './AlertDetailNotification';
 import { AlertDetailOverview } from './AlertDetailOverview';
 
 interface RouteParams {
-  /*
+  /**
    * The id of the alert for which the data needs to be shown
    */
   alertId: string;
-  /*
+  /**
    * The service type like linode, dbaas etc., of the the alert for which the data needs to be shown
    */
   serviceType: string;
@@ -101,7 +101,7 @@ export const AlertDetail = () => {
         <Grid container flexWrap={flexWrap} gap={2} item>
           <StyledAlertsGrid
             item
-            maxHeight={theme.spacing(90.5)}
+            maxHeight={theme.spacing(98.125)}
             md={6}
             overflow={'auto'}
             xs={12}
@@ -110,7 +110,7 @@ export const AlertDetail = () => {
           </StyledAlertsGrid>
           <StyledAlertsGrid
             item
-            maxHeight={theme.spacing(90.5)}
+            maxHeight={theme.spacing(98.125)}
             md={6}
             overflow={'auto'}
             xs={12}
@@ -152,7 +152,7 @@ export const StyledAlertChip = styled(Chip, {
   borderRadius?: string;
 }>(({ borderRadius, theme }) => ({
   '& .MuiChip-label': {
-    padding: theme.spacing(2), // Add padding inside the label
+    marginRight: theme.spacing(1), // Add padding inside the label
   },
   backgroundColor: 'white',
   borderRadius: borderRadius || 0,

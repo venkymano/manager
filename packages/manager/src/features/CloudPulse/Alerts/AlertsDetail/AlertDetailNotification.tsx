@@ -49,21 +49,21 @@ export const AlertDetailNotification = (props: NotificationProps) => {
             <Grid container item key={value.id} spacing={2}>
               <AlertDetailRow
                 label="Type"
-                mdLabel={1}
-                mdValue={11}
+                mdLabel={2}
+                mdValue={10}
                 value={convertStringToCamelCasesWithSpaces(value.channel_type)}
               />
               <AlertDetailRow
                 label="Channel"
-                mdLabel={1}
-                mdValue={11}
+                mdLabel={2}
+                mdValue={10}
                 value={value.label}
               />
               <Grid item xs={12}>
                 <DisplayAlertChips
                   {...getChipLabels(value)}
-                  mdLabel={1}
-                  mdValue={11}
+                  mdLabel={2}
+                  mdValue={10}
                 />
               </Grid>
               <Grid item xs={12}>

@@ -65,17 +65,6 @@ export const getFilteredResources = (
   return data
     ?.filter((resource) => resourceIds.includes(String(resource.id)))
     .filter((resource) => {
-      if (searchText) {
-        const regionLabel =
-          regionsIdToLabelMap.get(resource.region ?? '')?.label ?? '';
-        return (
-          regionLabel.includes(searchText) ||
-          resource.label.includes(searchText)
-        );
-      }
-      return true;
-    })
-    .filter((resource) => {
       if (filteredRegions) {
         return filteredRegions.includes(resource.region ?? '');
       }
@@ -87,10 +76,22 @@ export const getFilteredResources = (
         checked: selectedResources
           ? selectedResources.includes(resource.id)
           : false, // check for selections and drive the resources
-        region:
-          regionsIdToLabelMap.get(resource.region ?? '')?.label ||
-          resource.label, // Ensure fallback to original label
+        region: resource.region
+          ? regionsIdToLabelMap.get(resource.region)
+            ? regionsIdToLabelMap.get(resource.region)?.label +
+              ` (${resource.region})`
+            : resource.region
+          : resource.region,
       };
+    })
+    .filter((resource) => {
+      if (searchText) {
+        return (
+          resource.region?.includes(searchText) ||
+          resource.label.includes(searchText)
+        );
+      }
+      return true;
     })
     .filter((resource) => (selectedOnly ? resource.checked : true));
 };

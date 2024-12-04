@@ -1,5 +1,6 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import React from 'react';
+import { ColorPalette } from 'src/components/ColorPalette/ColorPalette';
 
 interface AlertDetailRowProps {
   /*
@@ -40,10 +41,10 @@ export const AlertDetailRow = React.memo((props: AlertDetailRowProps) => {
         <Grid item md={mdValue} xs={12}>
           <Typography
             sx={{
-              color,
+              color: color ?? theme.color.offBlack,
             }}
             fontSize={theme.spacing(1.75)}
-            variant="body2"
+            variant="body1"
           >
             {value}
           </Typography>

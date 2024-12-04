@@ -1,4 +1,5 @@
-import { TableBody, TableHead } from '@mui/material';
+import { Box } from '@linode/ui';
+import { TableBody, TableHead, styled } from '@mui/material';
 import React from 'react';
 
 import { Checkbox } from 'src/components/Checkbox';
@@ -103,84 +104,86 @@ export const DisplayAlertResources = React.memo(
           page,
           pageSize,
         }) => (
-          <React.Fragment>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {isSelectionsNeeded && (
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        onClick={() =>
-                          handleSelectionChange(
-                            paginatedData.map((resource) => resource.id),
-                            !isAllPageSelected(paginatedData)
-                          )
-                        }
-                        sx={{
-                          padding: 0,
-                        }}
-                        checked={isAllPageSelected(paginatedData)}
-                      />
-                    </TableCell>
-                  )}
-                  <TableSortCell
-                    active={sorting.orderBy === 'label'}
-                    direction={sorting.order}
-                    handleClick={handleSort}
-                    label="label"
-                  >
-                    Resources
-                  </TableSortCell>
-                  <TableSortCell
-                    active={sorting.orderBy === 'region'}
-                    direction={sorting.order}
-                    handleClick={handleSort}
-                    label="region"
-                  >
-                    Region
-                  </TableSortCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {!isDataLoadingError &&
-                  paginatedData.map(({ checked, id, label, region }) => (
-                    <TableRow key={id}>
-                      {isSelectionsNeeded && (
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            onChange={() => {
-                              handleSelectionChange([id], !checked);
-                            }}
-                            sx={{
-                              padding: 0,
-                            }}
-                            checked={checked}
-                          />
-                        </TableCell>
-                      )}
-                      <TableCell>{label}</TableCell>
-                      <TableCell>{region}</TableCell>
-                    </TableRow>
-                  ))}
-                {isDataLoadingError && (
-                  <TableRowError
-                    colSpan={3}
-                    message={errorText ?? 'Table data is unavailable.'}
-                  />
+          <Table>
+            <TableHead>
+              <TableRow>
+                {isSelectionsNeeded && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      onClick={() =>
+                        handleSelectionChange(
+                          paginatedData.map((resource) => resource.id),
+                          !isAllPageSelected(paginatedData)
+                        )
+                      }
+                      sx={{
+                        padding: 0,
+                      }}
+                      checked={isAllPageSelected(paginatedData)}
+                    />
+                  </TableCell>
                 )}
-              </TableBody>
-            </Table>
-            {!isDataLoadingError && (
-              <PaginationFooter
-                count={count}
-                eventCategory="alerts_resources"
-                handlePageChange={handlePageChange}
-                handleSizeChange={handlePageSizeChange}
-                page={page}
-                pageSize={pageSize}
-              />
-            )}
-          </React.Fragment>
+                <TableSortCell
+                  active={sorting.orderBy === 'label'}
+                  direction={sorting.order}
+                  handleClick={handleSort}
+                  label="label"
+                >
+                  Resource
+                </TableSortCell>
+                <TableSortCell
+                  active={sorting.orderBy === 'region'}
+                  direction={sorting.order}
+                  handleClick={handleSort}
+                  label="region"
+                >
+                  Region
+                </TableSortCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {!isDataLoadingError &&
+                paginatedData.map(({ checked, id, label, region }) => (
+                  <TableRow key={id}>
+                    {isSelectionsNeeded && (
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          onChange={() => {
+                            handleSelectionChange([id], !checked);
+                          }}
+                          sx={{
+                            padding: 0,
+                          }}
+                          checked={checked}
+                        />
+                      </TableCell>
+                    )}
+                    <TableCell>{label}</TableCell>
+                    <TableCell>{region}</TableCell>
+                  </TableRow>
+                ))}
+              {isDataLoadingError && (
+                <TableRowError
+                  colSpan={3}
+                  message={errorText ?? 'Table data is unavailable.'}
+                />
+              )}
+              {!isDataLoadingError && (
+                <TableRow>
+                  <TableCell colSpan={3} height={'48px'}>
+                    <PaginationFooter
+                      count={count}
+                      eventCategory="alerts_resources"
+                      handlePageChange={handlePageChange}
+                      handleSizeChange={handlePageSizeChange}
+                      page={page}
+                      pageSize={pageSize}
+                    />
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         )}
       </Paginate>
     );

@@ -41,7 +41,7 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
           label={triggerOccurrences}
           variant="outlined"
         />
-        <Typography variant="body1">consecutive occurrence(s)</Typography>
+        <Typography variant="body1">consecutive occurrences.</Typography>
       </Grid>
     ),
     [theme, triggerOccurrences]

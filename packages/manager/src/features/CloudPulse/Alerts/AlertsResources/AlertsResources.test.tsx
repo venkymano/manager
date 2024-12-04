@@ -59,7 +59,7 @@ describe('AlertsRegionFilter component tests', () => {
     expect(getByText(linodes[0].label)).toBeInTheDocument();
 
     // **Search Input**
-    const searchInput = getByPlaceholderText('Search for resource');
+    const searchInput = getByPlaceholderText('Search for a Resource');
     await userEvent.type(searchInput, linodes[1].label);
 
     // Wait for search results to update
