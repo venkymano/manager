@@ -40,7 +40,7 @@ queryMocks.useRegionsQuery.mockReturnValue({
   isFetching: false,
 });
 
-describe('AlertsRegionFilter component tests', () => {
+describe('AlertResources component tests', () => {
   it('should handle search input, select all, and deselect all functionality', async () => {
     const {
       getByPlaceholderText,
