@@ -1,5 +1,5 @@
 import { Chip, CircleProgress } from '@linode/ui';
-import { Grid, styled, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, styled, useTheme } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -57,8 +57,6 @@ export const AlertDetail = () => {
   );
 
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const flexWrap = isSmallScreen ? 'wrap' : 'nowrap';
 
   if (isFetching) {
     return (
@@ -98,26 +96,27 @@ export const AlertDetail = () => {
     <React.Fragment>
       <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
       <Grid container gap={2}>
-        <Grid container flexWrap={flexWrap} gap={2} item>
-          <StyledAlertsGrid
-            item
-            maxHeight={theme.spacing(98.125)}
-            md={6}
-            overflow={'auto'}
-            xs={12}
-          >
-            <AlertDetailOverview alert={alertDetails} />
-          </StyledAlertsGrid>
-          <StyledAlertsGrid
-            item
-            maxHeight={theme.spacing(98.125)}
-            md={6}
-            overflow={'auto'}
-            xs={12}
-          >
-            <AlertDetailCriteria alert={alertDetails} />
-          </StyledAlertsGrid>
-        </Grid>
+        <StyledAlertsGrid
+          item
+          maxHeight={theme.spacing(98.125)}
+          md={6}
+          overflow={'auto'}
+          xs={12}
+        >
+          <AlertDetailOverview alert={alertDetails} />
+        </StyledAlertsGrid>
+        <StyledAlertsGrid
+          style={{
+            flex: 1,
+          }}
+          item
+          maxHeight={theme.spacing(98.125)}
+          md={6}
+          overflow={'auto'}
+          xs={12}
+        >
+          <AlertDetailCriteria alert={alertDetails} />
+        </StyledAlertsGrid>
         <StyledAlertsGrid item xs={12}>
           <AlertResources
             resourceIds={alertDetails?.resource_ids}
