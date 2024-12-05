@@ -35,7 +35,7 @@ export const operatorLabel = {
 };
 
 export const severityMap = {
-  0: 'Severe',
+  0: 'Critical',
   1: 'Medium',
   2: 'Low',
   3: 'Info',
