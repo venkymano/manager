@@ -87,8 +87,12 @@ export const getFilteredResources = (
     .filter((resource) => {
       if (searchText) {
         return (
-          resource.region?.includes(searchText) ||
-          resource.label.includes(searchText)
+          resource.region
+            ?.toLocaleLowerCase()
+            .includes(searchText.toLocaleLowerCase()) ||
+          resource.label
+            .toLocaleLowerCase()
+            .includes(searchText.toLocaleLowerCase())
         );
       }
       return true;

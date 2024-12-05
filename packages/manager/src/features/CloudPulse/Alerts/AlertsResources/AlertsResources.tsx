@@ -18,6 +18,7 @@ import {
 import { AlertsRegionFilter } from './AlertsRegionFilter';
 import { AlertsResourcesNotice } from './AlertsResourcesNotice';
 import { DisplayAlertResources } from './DisplayAlertResource';
+// import { DisplayAlertResourcesOrder } from './DisplayAlertResourceOrder';
 
 import type { Region } from '@linode/api-v4';
 
@@ -48,7 +49,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     Boolean(serviceType),
     serviceType,
     {},
-    {}
+    serviceType === 'dbaas' ? { platform: 'rdbms-default' } : {}
   );
 
   const [selectedResources, setSelectedResources] = React.useState<string[]>(
@@ -240,6 +241,24 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
               pageSize={pageSize}
               scrollToTitle={scrollToTitle}
             />
+
+            {/* <DisplayAlertResourcesOrder
+              filteredResources={
+                filteredResources ? [...filteredResources] : []
+              }
+              noDataText={
+                !(isError || isRegionsError) &&
+                !Boolean(filteredResources?.length)
+                  ? 'No Results found'
+                  : undefined
+              }
+              errorText={'Table data is unavailable. Please try again later'}
+              handleSelection={isSelectionsNeeded ? handleSelection : undefined}
+              isDataLoadingError={isError || isRegionsError}
+              isSelectionsNeeded={isSelectionsNeeded}
+              pageSize={pageSize}
+              scrollToTitle={scrollToTitle}
+            /> */}
           </Grid>
         </Grid>
       )}
