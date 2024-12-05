@@ -45,7 +45,7 @@ export const AlertDetailNotification = (props: NotificationProps) => {
       )}
       {!isError && (
         <Grid alignItems="center" container spacing={2}>
-          {channels.map((value) => (
+          {channels.map((value, index) => (
             <Grid container item key={value.id} spacing={2}>
               <AlertDetailRow
                 label="Type"
@@ -66,9 +66,11 @@ export const AlertDetailNotification = (props: NotificationProps) => {
                   mdValue={10}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <Divider />
-              </Grid>
+              {channels.length > 1 && index !== channels.length - 1 && (
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
+              )}
             </Grid>
           ))}
         </Grid>

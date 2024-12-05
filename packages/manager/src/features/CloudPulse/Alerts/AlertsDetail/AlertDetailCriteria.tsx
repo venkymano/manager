@@ -3,6 +3,7 @@ import { Grid, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
 import { convertSecondsToMinutes } from '../Utils/utils';
+import { StyledAlertChip } from './AlertDetail';
 import { DisplayAlertChips } from './AlertDetailChips';
 import { DisplayAlertMetricAndDimensions } from './DisplayAlertMetricAndDimensions';
 
@@ -32,24 +33,26 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
   const renderTriggerCriteria = React.useMemo(
     () => (
       <Grid alignItems="center" container item sm={8} xs={12}>
-        <Chip
-          sx={{
-            backgroundColor: 'white',
-            marginLeft: theme.spacing(0.5),
-          }}
+        <StyledAlertChip
+          borderRadius={theme.spacing(0.3)}
           label={'All'}
           variant="outlined"
         />
-        <Typography variant="body1"> criteria are met for</Typography>
-        <Chip
-          sx={{
-            backgroundColor: 'white',
-            marginLeft: theme.spacing(0.5),
-          }}
-          label={triggerOccurrences}
+        <Typography
+          color={theme.color.offBlack}
+          marginRight={0.5}
+          variant="body1"
+        >
+          criteria are met for
+        </Typography>
+        <StyledAlertChip
+          borderRadius={theme.spacing(0.3)}
+          label={` ${triggerOccurrences}`}
           variant="outlined"
         />
-        <Typography variant="body1">consecutive occurrences.</Typography>
+        <Typography color={theme.color.offBlack} variant="body1">
+          consecutive occurrences.
+        </Typography>
       </Grid>
     ),
     [theme, triggerOccurrences]

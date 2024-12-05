@@ -107,6 +107,5 @@ export const getServiceTypeLabel = (
 export const getAlertGridStyles = (theme: Theme) => ({
   backgroundColor:
     theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
-  overflow: 'auto',
   padding: theme.spacing(3),
 });

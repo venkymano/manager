@@ -44,6 +44,7 @@ export const AlertDetailRow = React.memo((props: AlertDetailRowProps) => {
               color: color ?? theme.color.offBlack,
             }}
             fontSize={theme.spacing(1.75)}
+            lineHeight={'1.5rem'}
             variant="body1"
           >
             {value}

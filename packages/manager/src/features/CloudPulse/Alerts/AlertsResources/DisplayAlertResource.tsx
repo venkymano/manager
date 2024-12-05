@@ -1,4 +1,4 @@
-import { TableBody, TableHead } from '@mui/material';
+import { TableBody, TableHead, useTheme } from '@mui/material';
 import React from 'react';
 
 import { Checkbox } from 'src/components/Checkbox';
@@ -29,6 +29,9 @@ export interface DisplayAlertResourceProp {
    */
   filteredResources: AlertInstances[] | undefined;
 
+  /**
+   * Callback for clicking on check box
+   */
   handleSelection?: (id: string[], isSelectAction: boolean) => void;
 
   isDataLoadingError: boolean;
@@ -39,10 +42,18 @@ export interface DisplayAlertResourceProp {
   isSelectionsNeeded?: boolean;
 
   /**
+   * If this is passed in case of filteredResources are empty
+   */
+  noDataText?: string;
+
+  /**
    * The pageSize needed in the table
    */
   pageSize: number;
 
+  /**
+   * Callback to scroll till to the top of the Resources title section
+   */
   scrollToTitle: () => void;
 }
 
@@ -54,11 +65,10 @@ export const DisplayAlertResources = React.memo(
       handleSelection,
       isDataLoadingError,
       isSelectionsNeeded = false,
+      noDataText,
       pageSize,
       scrollToTitle,
     } = props;
-
-    const pagination = usePagination(1);
 
     const [sorting, setSorting] = React.useState<{
       order: Order;
@@ -67,6 +77,8 @@ export const DisplayAlertResources = React.memo(
       order: 'asc',
       orderBy: 'label', // default order to be asc and orderBy will be label
     });
+
+    const theme = useTheme();
 
     // The sorted data based on the selection in the table
     const sortedData = React.useMemo(() => {
@@ -198,9 +210,9 @@ export const DisplayAlertResources = React.memo(
                   message={errorText ?? 'Table data is unavailable.'}
                 />
               )}
-              {!isDataLoadingError && (
+              {!isDataLoadingError && !noDataText && (
                 <TableRow>
-                  <TableCell colSpan={3} height={'48px'}>
+                  <TableCell colSpan={3} height={theme.spacing(6)}>
                     <PaginationFooter
                       handlePageChange={(pageNumber) => {
                         handlePageNumberChange(handlePageChange, pageNumber);
@@ -214,6 +226,17 @@ export const DisplayAlertResources = React.memo(
                       page={page}
                       pageSize={pageSize}
                     />
+                  </TableCell>
+                </TableRow>
+              )}
+              {paginatedData.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    align="center"
+                    colSpan={3}
+                    height={theme.spacing(6)}
+                  >
+                    {noDataText ?? 'No results found'}
                   </TableCell>
                 </TableRow>
               )}

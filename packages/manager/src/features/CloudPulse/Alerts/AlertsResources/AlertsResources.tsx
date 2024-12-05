@@ -180,6 +180,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
                 sx={{
                   maxHeight: theme.spacing(4.25),
                 }}
+                clearable
                 debounceTime={300}
                 hideLabel
                 isSearching={false}
@@ -188,7 +189,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
                 value={searchText ?? ''}
               />
             </Grid>
-            <Grid item md={3.5} xs={12}>
+            <Grid item md={4} xs={12}>
               <AlertsRegionFilter
                 handleSelectionChange={(value) => {
                   setFilteredRegions(value);
@@ -225,6 +226,12 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
           <Grid item xs={12}>
             {/* Pass filtered data */}
             <DisplayAlertResources
+              noDataText={
+                !(isError || isRegionsError) &&
+                !Boolean(filteredResources?.length)
+                  ? 'No Results found'
+                  : undefined
+              }
               errorText={'Table data is unavailable. Please try again later'}
               filteredResources={filteredResources}
               handleSelection={isSelectionsNeeded ? handleSelection : undefined}

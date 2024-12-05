@@ -102,7 +102,7 @@ export const AlertDetail = () => {
           maxHeight={theme.spacing(98.125)}
           md={6}
           overflow={'auto'}
-          style={getAlertGridStyles(theme)}
+          style={{ ...getAlertGridStyles(theme), flex: 1 }}
           xs={12}
         >
           <AlertDetailOverview alert={alertDetails} />
@@ -111,7 +111,8 @@ export const AlertDetail = () => {
           item
           maxHeight={theme.spacing(98.125)}
           md={6}
-          style={{ ...getAlertGridStyles(theme), flex: 1 }}
+          overflow={'auto'}
+          style={{ ...getAlertGridStyles(theme) }}
           xs={12}
         >
           <AlertDetailCriteria alert={alertDetails} />
@@ -146,6 +147,8 @@ export const StyledAlertChip = styled(Chip, {
   },
   backgroundColor: 'white',
   borderRadius: borderRadius || 0,
+  height: theme.spacing(3),
+  lineHeight: '1.5rem'
 }));
 
 export const StyledPlaceholder = styled(Placeholder, {
