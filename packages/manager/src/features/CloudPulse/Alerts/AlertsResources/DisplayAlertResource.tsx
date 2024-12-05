@@ -10,7 +10,6 @@ import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow/TableRow';
 import { TableRowError } from 'src/components/TableRowError/TableRowError';
 import { TableSortCell } from 'src/components/TableSortCell';
-import { usePagination } from 'src/hooks/usePagination';
 
 import type { Order } from 'src/hooks/useOrder';
 

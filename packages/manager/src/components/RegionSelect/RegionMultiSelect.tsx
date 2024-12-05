@@ -37,6 +37,7 @@ export const RegionMultiSelect = React.memo((props: RegionMultiSelectProps) => {
   const {
     SelectedRegionsList,
     currentCapability,
+    disableSelectAll = false,
     disabled,
     disabledRegions: disabledRegionsFromProps,
     errorText,
@@ -152,6 +153,7 @@ export const RegionMultiSelect = React.memo((props: RegionMultiSelectProps) => {
           clearOnBlur
           data-testid="region-select"
           disableClearable={!isClearable}
+          disableSelectAll={disableSelectAll}
           disabled={disabled}
           errorText={errorText}
           getOptionDisabled={(option) => Boolean(disabledRegions[option.id])}

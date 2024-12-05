@@ -40,6 +40,7 @@ export const AlertsRegionFilter = React.memo((props: AlertsRegionProps) => {
         hideLabel: true,
       }}
       currentCapability={undefined}
+      disableSelectAll
       isClearable={true}
       label="Select Regions"
       limitTags={1}
