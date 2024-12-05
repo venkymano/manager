@@ -1,4 +1,4 @@
-import { Chip, CircleProgress } from '@linode/ui';
+import { Box, Chip, CircleProgress } from '@linode/ui';
 import { Grid, styled, useTheme } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
@@ -10,7 +10,7 @@ import { Placeholder } from 'src/components/Placeholder/Placeholder';
 import { useAlertDefinitionQuery } from 'src/queries/cloudpulse/alerts';
 
 import { AlertResources } from '../AlertsResources/AlertsResources';
-import { getAlertGridStyles } from '../Utils/utils';
+import { getAlertBoxStyles } from '../Utils/utils';
 import { AlertDetailCriteria } from './AlertDetailCriteria';
 import { AlertDetailNotification } from './AlertDetailNotification';
 import { AlertDetailOverview } from './AlertDetailOverview';
@@ -96,41 +96,41 @@ export const AlertDetail = () => {
   return (
     <React.Fragment>
       <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
-      <Grid container gap={2}>
-        <Grid
-          item
-          maxHeight={theme.spacing(98.125)}
-          md={6}
-          overflow={'auto'}
-          style={{ ...getAlertGridStyles(theme), flex: 1 }}
-          xs={12}
-        >
-          <AlertDetailOverview alert={alertDetails} />
-        </Grid>
-        <Grid
-          item
-          maxHeight={theme.spacing(98.125)}
-          md={6}
-          overflow={'auto'}
-          style={{ ...getAlertGridStyles(theme) }}
-          xs={12}
-        >
-          <AlertDetailCriteria alert={alertDetails} />
-        </Grid>
-        <Grid item style={getAlertGridStyles(theme)} xs={12}>
+      <Box display="flex" flexDirection="column" gap={2}>
+        <Box display="flex" flexDirection={{ md: 'row', xs: 'column' }} gap={2}>
+          <Box
+            flexBasis="100%"
+            maxHeight={theme.spacing(98.125)}
+            sx={{ ...getAlertBoxStyles(theme), overflow: 'auto' }}
+          >
+            <AlertDetailOverview alert={alertDetails} />
+          </Box>
+          <Box
+            sx={{
+              ...getAlertBoxStyles(theme),
+              overflow: 'auto',
+            }}
+            flexBasis="100%"
+            maxHeight={theme.spacing(98.125)}
+          >
+            <AlertDetailCriteria alert={alertDetails} />
+          </Box>
+        </Box>
+
+        <Box sx={getAlertBoxStyles(theme)}>
           <AlertResources
             resourceIds={alertDetails?.resource_ids}
             serviceType={alertDetails?.service_type}
           />
-        </Grid>
-        <Grid item style={getAlertGridStyles(theme)} xs={12}>
+        </Box>
+        <Box sx={getAlertBoxStyles(theme)}>
           <AlertDetailNotification
             channelIds={alertDetails.channels.map((channel) =>
               Number(channel.id)
             )}
           />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </React.Fragment>
   );
 };
@@ -148,7 +148,7 @@ export const StyledAlertChip = styled(Chip, {
   backgroundColor: 'white',
   borderRadius: borderRadius || 0,
   height: theme.spacing(3),
-  lineHeight: '1.5rem'
+  lineHeight: '1.5rem',
 }));
 
 export const StyledPlaceholder = styled(Placeholder, {

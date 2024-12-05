@@ -104,7 +104,7 @@ export const getServiceTypeLabel = (
  * @param theme mui theme
  * @returns The style needed for grids in alerts
  */
-export const getAlertGridStyles = (theme: Theme) => ({
+export const getAlertBoxStyles = (theme: Theme) => ({
   backgroundColor:
     theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
   padding: theme.spacing(3),
