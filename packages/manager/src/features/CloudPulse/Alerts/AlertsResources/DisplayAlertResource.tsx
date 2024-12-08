@@ -1,4 +1,3 @@
-import { Box } from '@linode/ui';
 import { TableBody, TableHead, useTheme } from '@mui/material';
 import React from 'react';
 
@@ -34,6 +33,9 @@ export interface DisplayAlertResourceProp {
    */
   handleSelection?: (id: string[], isSelectAction: boolean) => void;
 
+  /**
+   * When a api call fails or any error occurs while loading the data, this property can be passes true
+   */
   isDataLoadingError: boolean;
 
   /**
@@ -167,6 +169,8 @@ export const DisplayAlertResources = React.memo(
                       handleSort(orderBy, order, handlePageChange);
                     }}
                     active={sorting.orderBy === 'label'}
+                    data-qa-sortid="resource"
+                    data-testid="resource"
                     direction={sorting.order}
                     label="label"
                   >
@@ -177,6 +181,8 @@ export const DisplayAlertResources = React.memo(
                       handleSort(orderBy, order, handlePageChange);
                     }}
                     active={sorting.orderBy === 'region'}
+                    data-qa-sortid="region"
+                    data-testid="region"
                     direction={sorting.order}
                     label="region"
                   >

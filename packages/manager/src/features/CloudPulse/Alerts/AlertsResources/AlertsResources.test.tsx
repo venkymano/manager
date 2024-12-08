@@ -22,10 +22,11 @@ const queryMocks = vi.hoisted(() => ({
   useResourcesQuery: vi.fn(),
 }));
 
-const linodes = linodeFactory.buildList(3);
-const regions = regionFactory.buildList(1).map((region, index) => ({
-  ...region,
-  id: index < 3 ? linodes[index].region : region.id,
+const regions = regionFactory.buildList(3);
+
+const linodes = linodeFactory.buildList(3).map((linode, index) => ({
+  ...linode,
+  region: index < 3 ? regions[index].id : linode.region,
 }));
 
 queryMocks.useResourcesQuery.mockReturnValue({
@@ -41,10 +42,11 @@ queryMocks.useRegionsQuery.mockReturnValue({
 });
 
 describe('AlertResources component tests', () => {
-  it('should handle search input, select all, and deselect all functionality', async () => {
+  it('should handle search input, region filter functionality', async () => {
     const {
       getByPlaceholderText,
       getByRole,
+      getByTestId,
       getByText,
       queryByText,
     } = renderWithTheme(
@@ -55,10 +57,7 @@ describe('AlertResources component tests', () => {
       />
     );
 
-    // **Initial State Validation**
-    expect(getByText(linodes[0].label)).toBeInTheDocument();
-
-    // **Search Input**
+    // Search Input
     const searchInput = getByPlaceholderText('Search for a Resource');
     await userEvent.type(searchInput, linodes[1].label);
 
@@ -68,26 +67,17 @@ describe('AlertResources component tests', () => {
       expect(getByText(linodes[1].label)).toBeInTheDocument();
     });
 
-    // **Clear Search Input**
+    // Clear Search Input**
     await userEvent.clear(searchInput);
     await waitFor(() => {
       expect(getByText(linodes[0].label)).toBeInTheDocument();
       expect(getByText(linodes[1].label)).toBeInTheDocument();
     });
 
-    // **Deselect All**
-    await userEvent.click(getByRole('button', { name: 'Open' }));
-    await userEvent.click(getByRole('option', { name: 'Deselect All' }));
-    await userEvent.click(getByRole('button', { name: 'Close' }));
-
-    // Validate no items are visible
-    expect(queryByText(linodes[0].label)).not.toBeInTheDocument();
-    expect(queryByText(linodes[1].label)).not.toBeInTheDocument();
-
-    // **Search with Invalid Text**
+    // Search with Invalid Text**
     await userEvent.type(searchInput, 'dummy');
     await userEvent.click(getByRole('button', { name: 'Open' }));
-    await userEvent.click(getByRole('option', { name: 'Select All' }));
+    await userEvent.click(getByTestId(regions[0].id));
     await userEvent.click(getByRole('button', { name: 'Close' }));
 
     // Validate no items are visible due to mismatched search text
@@ -96,11 +86,11 @@ describe('AlertResources component tests', () => {
       expect(queryByText(linodes[1].label)).not.toBeInTheDocument();
     });
 
-    // **Clear Search Input**
+    // Clear Search Input**
     await userEvent.clear(searchInput);
     await waitFor(() => {
       expect(getByText(linodes[0].label)).toBeInTheDocument();
-      expect(getByText(linodes[1].label)).toBeInTheDocument();
+      expect(queryByText(linodes[1].label)).not.toBeInTheDocument(); // here region filter is afraid
     });
   });
 });

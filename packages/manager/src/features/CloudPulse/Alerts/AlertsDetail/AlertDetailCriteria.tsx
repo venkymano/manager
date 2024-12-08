@@ -1,4 +1,3 @@
-import { Chip } from '@linode/ui';
 import { Grid, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
@@ -32,7 +31,7 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
   // Memoized trigger criteria rendering
   const renderTriggerCriteria = React.useMemo(
     () => (
-      <Grid alignItems="center" container item sm={8} xs={12}>
+      <Grid alignItems="center" container item md={8} xs={12}>
         <StyledAlertChip
           borderRadius={theme.spacing(0.3)}
           label={'All'}

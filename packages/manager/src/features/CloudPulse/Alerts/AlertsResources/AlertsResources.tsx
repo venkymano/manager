@@ -171,7 +171,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       )}
 
       {(resourceIds.length > 0 || isError || isRegionsError) && (
-        <Grid container spacing={3} xs={12}>
+        <Grid container spacing={3}>
           <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
             <Grid item md={3} xs={12}>
               <DebouncedSearchTextField
