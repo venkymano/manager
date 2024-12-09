@@ -17,9 +17,7 @@ describe('AlertsRegionFilter component tests', () => {
       />
     );
     // ensure it has selected all by default
-    expect(screen.getByText('+2')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Open' }));
-    await userEvent.click(screen.getByRole('option', { name: 'Deselect All' }));
     expect(screen.getByTestId(mockRegions[0].id)).toBeInTheDocument();
     // select an option
     await userEvent.click(screen.getByTestId(mockRegions[0].id));

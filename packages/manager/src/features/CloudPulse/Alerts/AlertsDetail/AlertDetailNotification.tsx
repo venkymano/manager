@@ -31,9 +31,6 @@ export const AlertDetailNotification = (props: NotificationProps) => {
     return <CircleProgress />;
   }
 
-  if (!channels?.length) {
-    return <NullComponent />;
-  }
 
   return (
     <React.Fragment>
@@ -41,38 +38,42 @@ export const AlertDetailNotification = (props: NotificationProps) => {
         Notification Channels
       </Typography>
       {isError && (
-        <ErrorState errorText="Failed to load notification channels" />
+        <ErrorState errorText="Failed to load notification channels." />
       )}
       {!isError && (
+        
         <Grid alignItems="center" container spacing={2}>
-          {channels.map((value, index) => (
-            <Grid container item key={value.id} spacing={2}>
-              <AlertDetailRow
-                label="Type"
-                mdLabel={2}
-                mdValue={10}
-                value={convertStringToCamelCasesWithSpaces(value.channel_type)}
-              />
-              <AlertDetailRow
-                label="Channel"
-                mdLabel={2}
-                mdValue={10}
-                value={value.label}
-              />
-              <Grid item xs={12}>
-                <DisplayAlertChips
-                  {...getChipLabels(value)}
+          {channels &&
+            channels.map((value, index) => (
+              <Grid container item key={value.id} spacing={2}>
+                <AlertDetailRow
+                  value={convertStringToCamelCasesWithSpaces(
+                    value.channel_type
+                  )}
+                  label="Type"
                   mdLabel={2}
                   mdValue={10}
                 />
-              </Grid>
-              {channels.length > 1 && index !== channels.length - 1 && (
+                <AlertDetailRow
+                  label="Channel"
+                  mdLabel={2}
+                  mdValue={10}
+                  value={value.label}
+                />
                 <Grid item xs={12}>
-                  <Divider />
+                  <DisplayAlertChips
+                    {...getChipLabels(value)}
+                    mdLabel={2}
+                    mdValue={10}
+                  />
                 </Grid>
-              )}
-            </Grid>
-          ))}
+                {channels.length > 1 && index !== channels.length - 1 && (
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                )}
+              </Grid>
+            ))}
         </Grid>
       )}
     </React.Fragment>

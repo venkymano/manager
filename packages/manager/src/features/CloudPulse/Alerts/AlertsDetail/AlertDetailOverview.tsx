@@ -9,7 +9,7 @@ import { severityMap } from '../constants';
 import { formatTimestamp, getServiceTypeLabel } from '../Utils/utils';
 import { AlertDetailRow } from './AlertDetailRow';
 
-import type { Alert } from '@linode/api-v4';
+import type { Alert, AlertStatusType } from '@linode/api-v4';
 
 interface OverviewProps {
   /*
@@ -35,7 +35,7 @@ export const AlertDetailOverview = (props: OverviewProps) => {
 
   const theme = useTheme();
 
-  const statusColorMap = {
+  const statusColorMap: Record<AlertStatusType, string> = {
     disabled: theme.color.grey1,
     enabled: theme.color.green,
     failed: theme.color.red,

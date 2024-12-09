@@ -62,7 +62,7 @@ beforeEach(() => {
     isFetching: false,
   });
   queryMocks.useAlertNotificationChannelsQuery.mockReturnValue({
-    data: makeResourcePage(notificationChannels),
+    data: notificationChannels,
     isError: false,
     isFetching: false,
   });
@@ -70,11 +70,11 @@ beforeEach(() => {
 
 describe('AlertDetail component tests', () => {
   it('should render the alert detail component successfully on proper inputs', async () => {
-    const { getAllByText, getByText } = renderWithTheme(<AlertDetail />);
+    const { getByText } = renderWithTheme(<AlertDetail />);
     await waitFor(() => {
       expect(getByText('Overview')).toBeInTheDocument();
       expect(getByText('Criteria')).toBeInTheDocument();
-      expect(getAllByText('Resources').length).toBe(2);
+      expect(getByText('Resources')).toBeInTheDocument();
       expect(getByText('Notification Channels')).toBeInTheDocument();
     });
   });
@@ -87,17 +87,19 @@ describe('AlertDetail component tests', () => {
       isFetching: false,
     });
 
-    const { getByText, queryAllByText, queryByText } = renderWithTheme(
-      <AlertDetail />
-    );
+    const { getByText, queryByText } = renderWithTheme(<AlertDetail />);
 
     // Assert error message is displayed
-    expect(getByText('Error loading alert details.')).toBeInTheDocument();
+    expect(
+      getByText(
+        'An error occurred while loading the definitions. Please try again later.'
+      )
+    ).toBeInTheDocument();
 
     // Assert other sections do not render
     expect(queryByText('Overview')).not.toBeInTheDocument();
     expect(queryByText('Criteria')).not.toBeInTheDocument();
-    expect(queryAllByText('Resources').length).toBe(0);
+    expect(queryByText('Resources')).not.toBeInTheDocument();
     expect(queryByText('Notification Channels')).not.toBeInTheDocument();
   });
 });

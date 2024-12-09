@@ -75,7 +75,7 @@ export const AlertDetail = () => {
         <Grid item xs={12}>
           <ErrorState
             errorText={
-              'An error occurred while loading the definitions. Please try again later'
+              'An error occurred while loading the definitions. Please try again later.'
             }
           />
         </Grid>
@@ -142,10 +142,10 @@ export const StyledAlertChip = styled(Chip, {
   borderRadius?: string;
 }>(({ borderRadius, theme }) => ({
   '& .MuiChip-label': {
-    color: theme.color.offBlack,
+    color: theme.tokens.color.Neutrals.Black,
     marginRight: theme.spacing(1), // Add padding inside the label
   },
-  backgroundColor: 'white',
+  backgroundColor: theme.tokens.color.Neutrals.White,
   borderRadius: borderRadius || 0,
   height: theme.spacing(3),
   lineHeight: '1.5rem',

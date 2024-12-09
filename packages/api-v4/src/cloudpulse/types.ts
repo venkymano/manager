@@ -3,7 +3,11 @@ type MetricAggregationType = 'avg' | 'sum' | 'min' | 'max' | 'count';
 type MetricOperatorType = 'eq' | 'gt' | 'lt' | 'gte' | 'lte';
 type DimensionFilterOperatorType = 'eq' | 'neq' | 'startswith' | 'endswith';
 export type AlertDefinitionType = 'system' | 'user';
-export type AlertStatusType = 'enabled' | 'disabled';
+export type AlertStatusType =
+  | 'enabled'
+  | 'disabled'
+  | 'failed'
+  | 'provisioning';
 export type NotificationStatus = 'Enabled' | 'Disabled';
 export type ChannelTypes = 'email' | 'slack' | 'pagerduty' | 'webhook';
 export type AlertNotificationType = 'default' | 'custom';

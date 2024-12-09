@@ -25,7 +25,7 @@ vi.mock('src/queries/cloudpulse/alerts', () => ({
 }));
 
 queryMocks.useAlertNotificationChannelsQuery.mockReturnValue({
-  data: makeResourcePage(notificationChannels),
+  data: notificationChannels,
   isError: false,
   isFetching: false,
 });
@@ -57,7 +57,7 @@ describe('AlertDetailNotification component tests', () => {
 
     expect(getByText('Notification Channels')).toBeInTheDocument();
     expect(
-      getByText('Failed to load notification channels')
+      getByText('Failed to load notification channels.')
     ).toBeInTheDocument();
   });
 });
