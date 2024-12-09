@@ -37,7 +37,7 @@ export const getAlertTypeToActionsList = (
         : undefined,
     },
   ],
-  // for now there is custom and default alert types, may be in future more alert types can be added
+  // for now there is system and user alert types, may be in future more alert types can be added
   user: [
     {
       disabled: false,

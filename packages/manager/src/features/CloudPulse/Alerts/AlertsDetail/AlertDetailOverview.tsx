@@ -35,7 +35,7 @@ export const AlertDetailOverview = (props: OverviewProps) => {
 
   const theme = useTheme();
 
-  const statusColorMap = {
+  const statusColorMap: Record<string, string> = {
     disabled: theme.color.grey1,
     enabled: theme.color.green,
     failed: theme.color.red,
