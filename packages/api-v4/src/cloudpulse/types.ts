@@ -3,8 +3,12 @@ export type MetricAggregationType = 'avg' | 'sum' | 'min' | 'max' | 'count';
 export type MetricOperatorType = 'eq' | 'gt' | 'lt' | 'gte' | 'lte';
 export type AlertServiceType = 'linode' | 'dbaas';
 type DimensionFilterOperatorType = 'eq' | 'neq' | 'startswith' | 'endswith';
-export type AlertDefinitionType = 'default' | 'custom';
-export type AlertStatusType = 'enabled' | 'disabled';
+export type AlertDefinitionType = 'system' | 'user';
+export type AlertStatusType =
+  | 'enabled'
+  | 'disabled'
+  | 'failed'
+  | 'provisioning';
 export interface Dashboard {
   id: number;
   label: string;

@@ -164,7 +164,9 @@ export const AlertListing = (props: AlertListingProps) => {
     }
   };
   const handleDetails = (alert: Alert) => {
-    history.push(`${location.pathname}/detail/${alert.id}`);
+    history.push(
+      `${location.pathname}/detail/${alert.service_type}/${alert.id}`
+    );
   };
   return (
     <>

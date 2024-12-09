@@ -21,3 +21,33 @@ export const engineTypeOptions: Item<string, string>[] = [
     value: 'postgresql',
   },
 ];
+
+export const aggregationTypes = {
+  avg: 'Average',
+  count: 'Count',
+  max: 'Maximum',
+  min: 'Minimum',
+  sum: 'Sum',
+};
+
+export const operators = {
+  eq: '=',
+  gt: '>',
+  gte: '>=',
+  lt: '<',
+  lte: '<=',
+};
+
+export const operatorLabel = {
+  endswith: 'ends with',
+  eq: 'equals',
+  neq: 'not equals',
+  startswith: 'starts with',
+};
+
+export const severityMap = {
+  0: 'Severe',
+  1: 'Medium',
+  2: 'Low',
+  3: 'Info',
+};

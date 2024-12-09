@@ -30,9 +30,9 @@ export const useAlertDefinitionsQuery = (params?: Params, filter?: Filter) => {
   });
 };
 
-export const useAlertDefinitionQuery = (alertId: number) => {
+export const useAlertDefinitionQuery = (alertId: number, serviceType: string) => {
   return useQuery<Alert, APIError[]>({
-    ...queryFactory.alertById(alertId),
+    ...queryFactory.alertById(alertId, serviceType),
     enabled: alertId !== undefined,
   });
 };

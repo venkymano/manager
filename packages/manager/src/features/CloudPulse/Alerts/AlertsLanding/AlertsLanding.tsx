@@ -26,7 +26,10 @@ export const AlertsLanding = React.memo(() => {
     () => [
       {
         isEnabled: Boolean(flags.aclpAlerting?.alertDefinitions),
-        tab: { routeName: `${url}/definitions`, title: 'Definitions' },
+        tab: {
+          routeName: `${url}/definitions`,
+          title: 'Definitions',
+        },
       },
     ],
     [url, flags.aclpAlerting]

@@ -40,7 +40,7 @@ export const CloudPulseTabs = () => {
         isEnabled: Boolean(
           flags.aclpAlerting?.alertDefinitions ||
             flags.aclpAlerting?.recentActivity ||
-            flags.aclpAlerting?.notificationChannels
+            flags.aclpAlerting?.notificationChannels || true
         ),
         tab: {
           routeName: `${url}/alerts`,
