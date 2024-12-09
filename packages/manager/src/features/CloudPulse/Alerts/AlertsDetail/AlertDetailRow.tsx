@@ -39,7 +39,7 @@ export const AlertDetailRow = React.memo((props: AlertDetailRowProps) => {
       <Grid item md={mdValue} xs={12}>
         <Typography
           sx={{
-            color: color ?? theme.tokens.color.Neutrals.Black,
+            color: color ?? theme.color.offBlack
           }}
           fontSize={theme.spacing(1.75)}
           lineHeight={'1.5rem'}
