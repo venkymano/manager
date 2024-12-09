@@ -12,12 +12,12 @@ import { Params, Filter, ResourcePage } from 'src/types';
 
 export const createAlertDefinition = (
   data: CreateAlertDefinitionPayload,
-  service_type: AlertServiceType
+  serviceType: AlertServiceType
 ) =>
   Request<Alert>(
     setURL(
       `${API_ROOT}/monitor/services/${encodeURIComponent(
-        service_type!
+        serviceType!
       )}/alert-definitions`
     ),
     setMethod('POST'),

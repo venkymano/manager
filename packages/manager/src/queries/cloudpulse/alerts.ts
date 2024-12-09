@@ -14,10 +14,10 @@ import type {
 } from '@linode/api-v4/lib/types';
 import { queryFactory } from './queries';
 
-export const useCreateAlertDefinition = (service_type: AlertServiceType) => {
+export const useCreateAlertDefinition = (serviceType: AlertServiceType) => {
   const queryClient = useQueryClient();
   return useMutation<Alert, APIError[], CreateAlertDefinitionPayload>({
-    mutationFn: (data) => createAlertDefinition(data, service_type),
+    mutationFn: (data) => createAlertDefinition(data, serviceType),
     onSuccess() {
       queryClient.invalidateQueries(queryFactory.alerts);
     },
