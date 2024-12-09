@@ -37,7 +37,7 @@ export const AlertDetailNotification = (props: NotificationProps) => {
 
   return (
     <React.Fragment>
-      <Typography gutterBottom marginBottom={2} variant="h2">
+      <Typography marginBottom={2} variant="h2">
         Notification Channels
       </Typography>
       {isError && (

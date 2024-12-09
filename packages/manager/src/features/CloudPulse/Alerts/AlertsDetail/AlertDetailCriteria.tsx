@@ -59,12 +59,7 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
 
   return (
     <React.Fragment>
-      <Typography
-        fontSize={theme.spacing(2.25)}
-        gutterBottom
-        marginBottom={2}
-        variant="h2"
-      >
+      <Typography fontSize={theme.spacing(2.25)} marginBottom={2} variant="h2">
         Criteria
       </Typography>
       <Grid alignItems="center" container spacing={2}>

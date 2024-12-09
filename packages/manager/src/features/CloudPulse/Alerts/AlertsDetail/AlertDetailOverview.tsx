@@ -48,12 +48,7 @@ export const AlertDetailOverview = (props: OverviewProps) => {
 
   return (
     <React.Fragment>
-      <Typography
-        fontSize={theme.spacing(2.25)}
-        gutterBottom
-        marginBottom={2}
-        variant="h2"
-      >
+      <Typography fontSize={theme.spacing(2.25)} marginBottom={2} variant="h2">
         Overview
       </Typography>
       <Grid alignItems="center" container spacing={2}>

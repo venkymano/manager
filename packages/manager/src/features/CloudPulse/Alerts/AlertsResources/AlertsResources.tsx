@@ -153,7 +153,6 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     <React.Fragment>
       <Typography
         fontSize={theme.spacing(2.25)}
-        gutterBottom
         marginBottom={2}
         ref={titleRef}
         variant="h2"
