@@ -1,20 +1,28 @@
 import * as React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
+import { AlertDetail } from '../AlertsDetail/AlertDetail';
+import { AlertListing } from '../AlertsListing/AlertListing';
 import { CreateAlertDefinition } from '../CreateAlert/CreateAlertDefinition';
-import { AlertListingLanding } from './AlertListingLanding';
 
 export const AlertDefinitionLanding = () => {
   return (
     <Switch>
       <Route
-        component={() => <AlertListingLanding />}
+        component={AlertListing}
+        exact
         path="/monitor/alerts/definitions"
       />
       <Route
-        component={() => <CreateAlertDefinition />}
+        component={CreateAlertDefinition}
         path="/monitor/alerts/definitions/create"
       />
+      <Route
+        exact
+        path="/monitor/alerts/definitions/detail/:serviceType/:alertId"
+      >
+        <AlertDetail />
+      </Route>
     </Switch>
   );
 };

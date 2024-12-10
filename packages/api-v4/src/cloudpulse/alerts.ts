@@ -7,22 +7,23 @@ import Request, {
   setXFilter,
 } from '../request';
 import { Alert, AlertServiceType, CreateAlertDefinitionPayload } from './types';
-import { BETA_API_ROOT as API_ROOT } from 'src/constants';
-import { Params, Filter, ResourcePage } from 'src/types';
+import { BETA_API_ROOT as API_ROOT } from '../constants';
+import { Params, Filter, ResourcePage } from '../types';
 
 export const createAlertDefinition = (
   data: CreateAlertDefinitionPayload,
-  service_type: AlertServiceType
+  serviceType: AlertServiceType
 ) =>
   Request<Alert>(
     setURL(
       `${API_ROOT}/monitor/services/${encodeURIComponent(
-        service_type!
+        serviceType!
       )}/alert-definitions`
     ),
     setMethod('POST'),
     setData(data, createAlertDefinitionSchema)
   );
+
 export const getAlertDefinitions = (params?: Params, filters?: Filter) =>
   Request<ResourcePage<Alert>>(
     setURL(`${API_ROOT}/monitor/alert-definitions`),

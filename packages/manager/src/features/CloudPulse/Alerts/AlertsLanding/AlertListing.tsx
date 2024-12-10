@@ -1,9 +1,9 @@
+import { Autocomplete } from '@linode/ui';
 import { Grid } from '@mui/material';
 import _ from 'lodash';
 import React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 import { DebouncedSearchTextField } from 'src/components/DebouncedSearchTextField';
 import { Table } from 'src/components/Table';
 import { TableBody } from 'src/components/TableBody';
@@ -13,7 +13,6 @@ import { TableRow } from 'src/components/TableRow';
 import { TableSortCell } from 'src/components/TableSortCell';
 import { useOrder } from 'src/hooks/useOrder';
 import { usePagination } from 'src/hooks/usePagination';
-import { useAlertDefinitionsQuery } from 'src/queries/cloudpulse/alerts';
 
 import { AlertTableRow } from './AlertTableRow';
 import { DeleteAlertDialogue } from './DeleteAlertDialogue';
@@ -280,7 +279,7 @@ export const AlertListing = (props: AlertListingProps) => {
               >
                 Created by
               </TableSortCell>
-              <TableCell></TableCell>
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
