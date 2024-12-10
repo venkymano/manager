@@ -39,7 +39,7 @@ export const RenderAlertMetricsAndDimensions = React.memo(
         <React.Fragment key={idx}>
           <Grid item xs={12}>
             <DisplayAlertChips
-              chips={[
+              values={[
                 aggregationType
                   ? aggregationTypes[aggregationType]
                   : aggregationType,
@@ -53,7 +53,7 @@ export const RenderAlertMetricsAndDimensions = React.memo(
           </Grid>
           <Grid item xs={12}>
             <DisplayAlertChips
-              chips={dimensionFilters.map(
+              values={dimensionFilters.map(
                 ({ dimension_label: dimensionLabel, operator, value }) => [
                   dimensionLabel,
                   operator,

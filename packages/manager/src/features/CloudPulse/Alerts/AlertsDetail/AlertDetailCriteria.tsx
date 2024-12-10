@@ -35,7 +35,7 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
       <Grid alignItems="center" container item md={8} xs={12}>
         <StyledAlertChip
           borderRadius={theme.spacing(0.3)}
-          label={'All'}
+          label="All"
           variant="outlined"
         />
         <Typography
@@ -47,7 +47,7 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
         </Typography>
         <StyledAlertChip
           borderRadius={theme.spacing(0.3)}
-          label={` ${triggerOccurrences}`}
+          label={triggerOccurrences}
           variant="outlined"
         />
         <Typography color={theme.color.offBlack} variant="body1">
@@ -68,16 +68,16 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
           <RenderAlertMetricsAndDimensions ruleCriteria={ruleCriteria} />
           <Grid item xs={12}>
             <DisplayAlertChips // label chip for polling interval
-              chips={[convertSecondsToMinutes(pollingIntervalSeconds)]}
+              values={[convertSecondsToMinutes(pollingIntervalSeconds)]}
               isJoin
-              label={'Polling Interval'}
+              label="Polling Interval"
             />
           </Grid>
           <Grid item xs={12}>
             <DisplayAlertChips // label chip for evaluation period
-              chips={[convertSecondsToMinutes(evaluationPeriod)]}
+              values={[convertSecondsToMinutes(evaluationPeriod)]}
               isJoin
-              label={'Evaluation Periods'}
+              label="Evaluation Periods"
             />
           </Grid>
           <Grid item sm={4} xs={12}>

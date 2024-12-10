@@ -6,10 +6,6 @@ import { StyledAlertChip } from './AlertDetail';
 
 export interface AlertDimensionsProp {
   /*
-   * The chips that needs to be displayed
-   */
-  chips: Array<string> | Array<string[]>;
-  /*
    * Controls whether we need to display the chips one by one or join and display
    */
   isJoin?: boolean;
@@ -20,20 +16,24 @@ export interface AlertDimensionsProp {
   /*
    * Controls the size of the chip label from medium to larger screens
    */
-  mdLabel?: number;
+  labelWidth?: number;
   /*
    * Controls the size of the chip value from medium to larger screens
    */
-  mdValue?: number;
+  valueWidth?: number;
+  /*
+   * The chips that needs to be displayed
+   */
+  values: Array<string> | Array<string[]>;
 }
 
 export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
   const {
-    chips: values,
-    isJoin = false,
+    isJoin,
     label,
-    mdLabel = 4,
-    mdValue = 8,
+    labelWidth: mdLabel = 4,
+    valueWidth: mdValue = 8,
+    values: values,
   } = props;
 
   const iterables: string[][] =
@@ -47,7 +47,7 @@ export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
    * @param length The length of the iteration so far
    * @returns The border radius to be applied on chips based on the parameters
    */
-  const getBorderRadius = (isJoin: boolean, index: number, length: number) => {
+  const getBorderRadius = (index: number, length: number) => {
     if (!isJoin || length === 1) {
       return theme.spacing(0.3);
     }
@@ -84,7 +84,7 @@ export const DisplayAlertChips = React.memo((props: AlertDimensionsProp) => {
                   marginLeft={isJoin && index > 0 ? -1 : 0}
                 >
                   <StyledAlertChip
-                    borderRadius={getBorderRadius(isJoin, index, value.length)}
+                    borderRadius={getBorderRadius(index, value.length)}
                     label={label}
                     variant="outlined"
                   />
