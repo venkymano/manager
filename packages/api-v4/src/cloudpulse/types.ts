@@ -159,6 +159,7 @@ export interface MetricCriteria {
   metric: string;
   aggregation_type: MetricAggregationType;
   operator: MetricOperatorType;
+  value: number;
   dimension_filters: DimensionFilter[];
 }
 
