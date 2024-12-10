@@ -13,15 +13,67 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
   id: Factory.each((i) => i),
   label: Factory.each((id) => `Alert-${id}`),
   rule_criteria: {
-    rules: [],
+    rules: [
+      {
+        aggregation_type: 'avg',
+        dimension_filters: [
+          {
+            dimension_label: 'Test',
+            operator: 'eq',
+            value: '40',
+          },
+        ],
+        metric: 'CPU Usage',
+        operator: 'gt',
+        value: 60,
+      },
+      {
+        aggregation_type: 'avg',
+        dimension_filters: [
+          {
+            dimension_label: 'OperatingSystem',
+            operator: 'eq',
+            value: 'MacOS',
+          },
+          {
+            dimension_label: 'OperatingSystem',
+            operator: 'eq',
+            value: 'Windows',
+          },
+          {
+            dimension_label: 'Test',
+            operator: 'neq',
+            value: '40',
+          },
+          {
+            dimension_label: 'OperatingSystem',
+            operator: 'eq',
+            value: 'MacOS',
+          },
+          {
+            dimension_label: 'OperatingSystem',
+            operator: 'eq',
+            value: 'Windows',
+          },
+          {
+            dimension_label: 'Test',
+            operator: 'neq',
+            value: '40',
+          },
+        ],
+        metric: 'CPU Usage',
+        operator: 'gt',
+        value: 50,
+      },
+    ],
   },
-  service_type: Factory.each((i) => pickRandom(['linode', 'dbaas'])),
+  service_type: Factory.each(() => pickRandom(['linode', 'dbaas'])),
   severity: 1,
   status: 'enabled',
   triggerCondition: {
-    evaluation_period_seconds: 0,
-    polling_interval_seconds: 0,
-    trigger_occurrences: 0,
+    evaluation_period_seconds: 20,
+    polling_interval_seconds: 30,
+    trigger_occurrences: 2,
   },
   type: Factory.each((i) => pickRandom(['system', 'user'])),
   updated: new Date().toISOString(),

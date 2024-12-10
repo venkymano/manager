@@ -1,6 +1,5 @@
 import {
   getAlertDefinitionById,
-  getAlertDefinitions,
   getCloudPulseServiceTypes,
   getDashboardById,
   getDashboards,

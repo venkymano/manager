@@ -70,3 +70,14 @@ export const getServiceTypeLabel = (
 
   return serviceType;
 };
+
+/**
+ *
+ * @param theme mui theme
+ * @returns The style needed for grids in alerts
+ */
+export const getAlertBoxStyles = (theme: Theme) => ({
+  backgroundColor:
+    theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
+  padding: theme.spacing(3),
+});
