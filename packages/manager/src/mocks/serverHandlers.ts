@@ -2346,7 +2346,7 @@ export const handlers = [
   http.post(
     '*/monitor/services/:service_type/alert-definitions',
     async ({ request }) => {
-      const types: AlertDefinitionType[] = ['custom', 'default'];
+      const types: AlertDefinitionType[] = ['system', 'user'];
       const status: AlertStatusType[] = ['enabled', 'disabled'];
       const severity: AlertSeverityType[] = [0, 1, 2, 3];
       const users = ['user1', 'user2', 'user3'];
