@@ -1,4 +1,4 @@
-import { Chip, CircleProgress } from '@linode/ui';
+import { Box, Chip, CircleProgress } from '@linode/ui';
 import { Grid, styled, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
@@ -9,9 +9,11 @@ import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Placeholder } from 'src/components/Placeholder/Placeholder';
 import { useAlertDefinitionQuery } from 'src/queries/cloudpulse/alerts';
 
+import { AlertDetailCriteria } from './AlertDetailCriteria';
 import { AlertDetailOverview } from './AlertDetailOverview';
 
 import type { BreadcrumbProps } from 'src/components/Breadcrumb/Breadcrumb';
+import { getAlertBoxStyles } from '../Utils/utils';
 
 interface RouteParams {
   /*
@@ -102,25 +104,30 @@ export const AlertDetail = () => {
   return (
     <React.Fragment>
       <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
-      <Grid container gap={2}>
-        <Grid container flexWrap={flexWrap} gap={2} item>
-          <StyledAlertsGrid item maxHeight={theme.spacing(90.5)} md={6} xs={12}>
+      <Box display="flex" flexDirection="column" gap={2}>
+        <Box display="flex" flexDirection={{ md: 'row', xs: 'column' }} gap={2}>
+          <Box
+            flexBasis="100%"
+            maxHeight={theme.spacing(98.125)}
+            sx={{ ...getAlertBoxStyles(theme), overflow: 'auto' }}
+          >
             <AlertDetailOverview alert={alertDetails} />
-          </StyledAlertsGrid>
-        </Grid>
-      </Grid>
+          </Box>
+          <Box
+            sx={{
+              ...getAlertBoxStyles(theme),
+              overflow: 'auto',
+            }}
+            flexBasis="100%"
+            maxHeight={theme.spacing(98.125)}
+          >
+            <AlertDetailCriteria alert={alertDetails} />
+          </Box>
+        </Box>
+      </Box>
     </React.Fragment>
   );
 };
-
-export const StyledAlertsGrid = styled(Grid, { label: 'StyledAlertsGrid' })(
-  ({ theme }) => ({
-    backgroundColor:
-      theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
-    overflow: 'auto',
-    padding: theme.spacing(3),
-  })
-);
 
 export const StyledAlertChip = styled(Chip, {
   label: 'StyledAlertChip',
@@ -129,16 +136,26 @@ export const StyledAlertChip = styled(Chip, {
   borderRadius?: string;
 }>(({ borderRadius, theme }) => ({
   '& .MuiChip-label': {
-    padding: theme.spacing(2), // Add padding inside the label
+    color: theme.tokens.color.Neutrals.Black,
+    marginRight: theme.spacing(1), // Add padding inside the label
   },
-  backgroundColor: 'white',
+  backgroundColor: theme.tokens.color.Neutrals.White,
   borderRadius: borderRadius || 0,
+  height: theme.spacing(3),
+  lineHeight: '1.5rem',
 }));
 
 export const StyledPlaceholder = styled(Placeholder, {
   label: 'StyledPlaceholder',
 })(({ theme }) => ({
+  h1: {
+    fontSize: theme.spacing(2.5),
+  },
+  h2: {
+    fontSize: theme.spacing(2),
+  },
   svg: {
-    maxHeight: theme.spacing(12.5),
+    color: 'lightgreen',
+    maxHeight: theme.spacing(10.5),
   },
 }));

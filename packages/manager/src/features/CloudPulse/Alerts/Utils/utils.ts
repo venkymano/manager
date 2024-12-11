@@ -1,4 +1,5 @@
 import type { ServiceTypesList } from '@linode/api-v4';
+import { Theme } from '@mui/material';
 
 /**
  * Converts seconds into a human-readable minutes and seconds format.
@@ -70,3 +71,14 @@ export const getServiceTypeLabel = (
 
   return serviceType;
 };
+
+/**
+ *
+ * @param theme mui theme
+ * @returns The style needed for box in alerts
+ */
+export const getAlertBoxStyles = (theme: Theme) => ({
+  backgroundColor:
+    theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
+  padding: theme.spacing(3),
+});
