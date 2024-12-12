@@ -84,6 +84,10 @@ export const getAlertBoxStyles = (theme: Theme) => ({
   padding: theme.spacing(3),
 });
 
+/**
+ * @param value The notification channel object for which we need the chip labels
+ * @returns The chip label and values which needs to be displayed
+ */
 export const getChipLabels = (
   value: NotificationChannel
 ): AlertDimensionsProp => {

@@ -53,8 +53,8 @@ export const AlertDetailNotification = (props: NotificationProps) => {
                 <AlertDetailRow
                   label="Channel"
                   labelWidth={2}
-                  valueWidth={10}
                   value={value.label}
+                  valueWidth={10}
                 />
                 <Grid item xs={12}>
                   <DisplayAlertChips
