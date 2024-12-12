@@ -13,19 +13,25 @@ interface AlertDetailRowProps {
   /*
    * Controls the size of the typography label from medium to larger screens
    */
-  mdLabel?: number;
-  /*
-   * Controls the size of the typography value from medium to larger screens
-   */
-  mdValue?: number;
+  labelWidth?: number;
   /*
    * The typography value to be displayed
    */
   value: null | string;
+  /*
+   * Controls the size of the typography value from medium to larger screens
+   */
+  valueWidth?: number;
 }
 
 export const AlertDetailRow = React.memo((props: AlertDetailRowProps) => {
-  const { color, label, mdLabel = 4, mdValue = 8, value } = props;
+  const {
+    color,
+    label,
+    labelWidth: mdLabel = 4,
+    value,
+    valueWidth: mdValue = 8,
+  } = props;
 
   const theme = useTheme();
 

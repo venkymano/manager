@@ -14,6 +14,7 @@ import { AlertDetailOverview } from './AlertDetailOverview';
 
 import type { BreadcrumbProps } from 'src/components/Breadcrumb/Breadcrumb';
 import { getAlertBoxStyles } from '../Utils/utils';
+import { AlertDetailNotification } from './AlertDetailNotification';
 
 interface RouteParams {
   /*
@@ -123,6 +124,13 @@ export const AlertDetail = () => {
           >
             <AlertDetailCriteria alert={alertDetails} />
           </Box>
+        </Box>
+        <Box sx={getAlertBoxStyles(theme)}>
+          <AlertDetailNotification
+            channelIds={alertDetails.channels.map((channel) =>
+              Number(channel.id)
+            )}
+          />
         </Box>
       </Box>
     </React.Fragment>

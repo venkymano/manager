@@ -1,5 +1,6 @@
-import type { ServiceTypesList } from '@linode/api-v4';
-import { Theme } from '@mui/material';
+import type { AlertDimensionsProp } from '../AlertsDetail/AlertDetailChips';
+import type { NotificationChannel, ServiceTypesList } from '@linode/api-v4';
+import type { Theme } from '@mui/material';
 
 /**
  * Converts seconds into a human-readable minutes and seconds format.
@@ -82,3 +83,29 @@ export const getAlertBoxStyles = (theme: Theme) => ({
     theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
   padding: theme.spacing(3),
 });
+
+export const getChipLabels = (
+  value: NotificationChannel
+): AlertDimensionsProp => {
+  if (value.channel_type === 'email') {
+    return {
+      label: 'To',
+      values: value.content.channel_type.email_addresses,
+    };
+  } else if (value.channel_type === 'slack') {
+    return {
+      label: 'Slack Webhook URL',
+      values: [value.content.channel_type.slack_webhook_url],
+    };
+  } else if (value.channel_type === 'pagerduty') {
+    return {
+      label: 'Service API Key',
+      values: [value.content.channel_type.service_api_key],
+    };
+  } else {
+    return {
+      label: 'Webhook URL',
+      values: [value.content.channel_type.webhook_url],
+    };
+  }
+};
