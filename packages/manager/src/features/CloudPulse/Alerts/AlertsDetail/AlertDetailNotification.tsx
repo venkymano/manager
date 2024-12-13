@@ -63,11 +63,12 @@ export const AlertDetailNotification = (props: NotificationProps) => {
                     valueWidth={10}
                   />
                 </Grid>
-                {channels.length > 1 && index !== channels.length - 1 && (
-                  <Grid item xs={12}>
-                    <Divider />
-                  </Grid>
-                )}
+                {channels.length > 1 &&
+                  index !== channels.length - 1 && ( // divider not needed for 1st and last row
+                    <Grid item xs={12}>
+                      <Divider />
+                    </Grid>
+                  )}
               </Grid>
             ))}
         </Grid>
