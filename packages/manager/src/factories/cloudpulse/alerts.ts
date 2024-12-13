@@ -69,13 +69,13 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
   },
   service_type: Factory.each(() => pickRandom(['linode', 'dbaas'])),
   severity: 1,
-  status: 'enabled',
+  status: Factory.each(() => pickRandom(['enabled', 'disabled'])),
   triggerCondition: {
     evaluation_period_seconds: 20,
     polling_interval_seconds: 30,
     trigger_occurrences: 2,
   },
-  type: Factory.each((i) => pickRandom(['system', 'user'])),
+  type: Factory.each(() => pickRandom(['system', 'user'])),
   updated: new Date().toISOString(),
   updated_by: 'user1',
 });
