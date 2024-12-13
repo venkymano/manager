@@ -1,5 +1,5 @@
 import { Box, Chip, CircleProgress } from '@linode/ui';
-import { Grid, styled, useMediaQuery, useTheme } from '@mui/material';
+import { styled, useTheme } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
