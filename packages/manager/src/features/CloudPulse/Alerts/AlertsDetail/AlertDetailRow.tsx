@@ -52,7 +52,13 @@ export const AlertDetailRow = React.memo((props: AlertDetailRowProps) => {
               status="other"
             />
           )}
-          <Typography fontSize={theme.spacing(1.75)} variant="body2">
+          <Typography
+            sx={{
+              color: theme.color.offBlack,
+            }}
+            fontSize={theme.spacing(1.75)}
+            variant="body2"
+          >
             {value}
           </Typography>
         </Grid>
