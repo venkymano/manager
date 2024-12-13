@@ -88,28 +88,36 @@ export const getAlertBoxStyles = (theme: Theme) => ({
  * @param value The notification channel object for which we need the chip labels
  * @returns The chip label and values which needs to be displayed
  */
+/**
+ * @param value The notification channel object for which we need the chip labels
+ * @returns The chip label and values which need to be displayed
+ */
 export const getChipLabels = (
   value: NotificationChannel
 ): AlertDimensionsProp => {
-  if (value.channel_type === 'email') {
-    return {
-      label: 'To',
-      values: value.content.channel_type.email_addresses,
-    };
-  } else if (value.channel_type === 'slack') {
-    return {
-      label: 'Slack Webhook URL',
-      values: [value.content.channel_type.slack_webhook_url],
-    };
-  } else if (value.channel_type === 'pagerduty') {
-    return {
-      label: 'Service API Key',
-      values: [value.content.channel_type.service_api_key],
-    };
-  } else {
-    return {
-      label: 'Webhook URL',
-      values: [value.content.channel_type.webhook_url],
-    };
+  const { channel_type, content } = value;
+
+  switch (channel_type) {
+    case 'email':
+      return {
+        label: 'To',
+        values: content.channel_type.email_addresses ?? [],
+      };
+    case 'slack':
+      return {
+        label: 'Slack Webhook URL',
+        values: [content.channel_type.slack_webhook_url ?? ''],
+      };
+    case 'pagerduty':
+      return {
+        label: 'Service API Key',
+        values: [content.channel_type.service_api_key ?? ''],
+      };
+    case 'webhook':
+    default:
+      return {
+        label: 'Webhook URL',
+        values: [content.channel_type.webhook_url ?? ''],
+      };
   }
 };
