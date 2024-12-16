@@ -86,10 +86,6 @@ export const getAlertBoxStyles = (theme: Theme) => ({
 
 /**
  * @param value The notification channel object for which we need the chip labels
- * @returns The chip label and values which needs to be displayed
- */
-/**
- * @param value The notification channel object for which we need the chip labels
  * @returns The chip label and values which need to be displayed
  */
 export const getChipLabels = (
