@@ -7,8 +7,9 @@ import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow';
 import { capitalize } from 'src/utilities/capitalize';
 
-import { ActionHandlers, AlertActionMenu } from './AlertActionMenu';
+import { AlertActionMenu } from './AlertActionMenu';
 
+import type { ActionHandlers } from './AlertActionMenu';
 import type { Alert } from '@linode/api-v4';
 
 interface Props {
@@ -44,9 +45,6 @@ export const AlertTableRow = (props: Props) => {
       </TableCell>
       <TableCell>{created_by}</TableCell>
       <TableCell actionCell>
-        {/* handlers are supposed to be passed to this AlertActionMenu,
-        it is dependent on other feature and will added as that feature in the next PR
-        */}
         <AlertActionMenu alertType={alert.type} handlers={handlers} />
       </TableCell>
     </TableRow>

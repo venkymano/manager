@@ -1,5 +1,6 @@
-import type { ServiceTypesList } from '@linode/api-v4';
-import { Theme } from '@mui/material';
+import type { AlertDimensionsProp } from '../AlertsDetail/AlertDetailChips';
+import type { NotificationChannel, ServiceTypesList } from '@linode/api-v4';
+import type { Theme } from '@mui/material';
 
 /**
  * Converts seconds into a human-readable minutes and seconds format.
@@ -82,3 +83,37 @@ export const getAlertBoxStyles = (theme: Theme) => ({
     theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
   padding: theme.spacing(3),
 });
+
+/**
+ * @param value The notification channel object for which we need the chip labels
+ * @returns The chip label and values which need to be displayed
+ */
+export const getChipLabels = (
+  value: NotificationChannel
+): AlertDimensionsProp => {
+  const { channel_type, content } = value;
+
+  switch (channel_type) {
+    case 'email':
+      return {
+        label: 'To',
+        values: content.channel_type.email_addresses ?? [],
+      };
+    case 'slack':
+      return {
+        label: 'Slack Webhook URL',
+        values: [content.channel_type.slack_webhook_url ?? ''],
+      };
+    case 'pagerduty':
+      return {
+        label: 'Service API Key',
+        values: [content.channel_type.service_api_key ?? ''],
+      };
+    case 'webhook':
+    default:
+      return {
+        label: 'Webhook URL',
+        values: [content.channel_type.webhook_url ?? ''],
+      };
+  }
+};

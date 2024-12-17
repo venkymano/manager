@@ -36,10 +36,10 @@ export const AlertDetailOverview = (props: OverviewProps) => {
   const theme = useTheme();
 
   const statusColorMap: Record<string, string> = {
-    disabled: theme.color.grey1,
-    enabled: theme.color.green,
-    failed: theme.color.red,
-    provisioning: theme.color.orange,
+    disabled: theme.color.grey8,
+    enabled: theme.palette.success.dark,
+    failed: theme.palette.error.dark,
+    provisioning: theme.palette.warning.dark,
   };
 
   if (isFetching) {
@@ -60,8 +60,8 @@ export const AlertDetailOverview = (props: OverviewProps) => {
         <AlertDetailRow label="Name" value={label} />
         <AlertDetailRow label="Description" value={description} />
         <AlertDetailRow
-          color={statusColorMap[status]}
           label="Status"
+          statusColor={statusColorMap[status]}
           value={convertStringToCamelCasesWithSpaces(status)}
         />
         <AlertDetailRow

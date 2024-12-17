@@ -1,5 +1,5 @@
 import { Box, Chip, CircleProgress } from '@linode/ui';
-import { Grid, styled, useMediaQuery, useTheme } from '@mui/material';
+import { styled, useTheme } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -9,11 +9,12 @@ import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { Placeholder } from 'src/components/Placeholder/Placeholder';
 import { useAlertDefinitionQuery } from 'src/queries/cloudpulse/alerts';
 
+import { getAlertBoxStyles } from '../Utils/utils';
 import { AlertDetailCriteria } from './AlertDetailCriteria';
+import { AlertDetailNotification } from './AlertDetailNotification';
 import { AlertDetailOverview } from './AlertDetailOverview';
 
 import type { BreadcrumbProps } from 'src/components/Breadcrumb/Breadcrumb';
-import { getAlertBoxStyles } from '../Utils/utils';
 
 interface RouteParams {
   /*
@@ -51,18 +52,14 @@ export const AlertDetail = () => {
   }, [alertId, serviceType]);
 
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const flexWrap = isSmallScreen ? 'wrap' : 'nowrap';
 
   if (isFetching) {
     return (
       <>
         <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
-        <Grid alignItems={'center'} container height={theme.spacing(75)}>
-          <Grid item xs={12}>
-            <CircleProgress />
-          </Grid>
-        </Grid>
+        <Box alignContent="center" height={theme.spacing(75)}>
+          <CircleProgress />
+        </Box>
       </>
     );
   }
@@ -71,15 +68,13 @@ export const AlertDetail = () => {
     return (
       <>
         <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
-        <Grid alignItems={'center'} container height={theme.spacing(75)}>
-          <Grid item xs={12}>
-            <ErrorState
-              errorText={
-                'An error occurred while loading the definitions. Please try again later'
-              }
-            />
-          </Grid>
-        </Grid>
+        <Box alignContent="center" height={theme.spacing(75)}>
+          <ErrorState
+            errorText={
+              'An error occurred while loading the definitions. Please try again later.'
+            }
+          />
+        </Box>
       </>
     );
   }
@@ -88,15 +83,13 @@ export const AlertDetail = () => {
     return (
       <>
         <Breadcrumb crumbOverrides={crumbOverrides} pathname={pathname} />
-        <Grid alignItems={'center'} container height={theme.spacing(75)}>
-          <Grid item xs={12}>
-            <StyledPlaceholder
-              icon={EntityIcon}
-              isEntity
-              title="No Data to display."
-            />
-          </Grid>
-        </Grid>
+        <Box alignContent="center" height={theme.spacing(75)}>
+          <StyledPlaceholder
+            icon={EntityIcon}
+            isEntity
+            title="No Data to display."
+          />
+        </Box>
       </>
     );
   }
@@ -123,6 +116,13 @@ export const AlertDetail = () => {
           >
             <AlertDetailCriteria alert={alertDetails} />
           </Box>
+        </Box>
+        <Box sx={getAlertBoxStyles(theme)}>
+          <AlertDetailNotification
+            channelIds={alertDetails.channels.map((channel) =>
+              Number(channel.id)
+            )}
+          />
         </Box>
       </Box>
     </React.Fragment>

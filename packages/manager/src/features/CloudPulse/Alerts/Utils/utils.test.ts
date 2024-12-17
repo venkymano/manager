@@ -1,10 +1,14 @@
 import { serviceTypesFactory } from 'src/factories';
+import { notificationChannelFactory } from 'src/factories/cloudpulse/channels';
 
 import {
   convertSecondsToMinutes,
   formatTimestamp,
+  getChipLabels,
   getServiceTypeLabel,
 } from './utils';
+
+import type { NotificationChannel } from '@linode/api-v4';
 
 it('test convertSecondsToMinutes method', () => {
   expect(convertSecondsToMinutes(0)).toBe('0 minutes');
@@ -34,4 +38,36 @@ it('test formatTimestamp method', () => {
   ).toBe(services[2].label);
   expect(getServiceTypeLabel('test', { data: services })).toBe('test');
   expect(getServiceTypeLabel('', { data: services })).toBe('');
+});
+
+it('test getChipLabels function', () => {
+  let value: NotificationChannel = notificationChannelFactory.build({
+    channel_type: 'email',
+    content: {
+      channel_type: {
+        email_addresses: ['test@example.com'],
+      },
+    },
+  });
+
+  let result = getChipLabels(value);
+  expect(result).toEqual({
+    label: 'To',
+    values: ['test@example.com'],
+  });
+
+  value = notificationChannelFactory.build({
+    channel_type: 'slack',
+    content: {
+      channel_type: {
+        slack_webhook_url: 'https://slack.com/webhook',
+      },
+    },
+  });
+
+  result = getChipLabels(value);
+  expect(result).toEqual({
+    label: 'Slack Webhook URL',
+    values: ['https://slack.com/webhook'],
+  });
 });

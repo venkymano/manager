@@ -1,11 +1,9 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
+import { StatusIcon } from 'src/components/StatusIcon/StatusIcon';
+
 interface AlertDetailRowProps {
-  /*
-   * The color of the text that needs to be displayed
-   */
-  color?: string;
   /*
    * The typography label under which the value will be displayed
    */
@@ -13,34 +11,50 @@ interface AlertDetailRowProps {
   /*
    * Controls the size of the typography label from medium to larger screens
    */
-  mdLabel?: number;
+  labelWidth?: number;
   /*
-   * Controls the size of the typography value from medium to larger screens
+   * The color of the status icon that needs to be displayed
    */
-  mdValue?: number;
+  statusColor?: string;
   /*
    * The typography value to be displayed
    */
   value: null | string;
+  /*
+   * Controls the size of the typography value from medium to larger screens
+   */
+  valueWidth?: number;
 }
 
 export const AlertDetailRow = React.memo((props: AlertDetailRowProps) => {
-  const { color, label, mdLabel = 4, mdValue = 8, value } = props;
+  const { label, labelWidth = 4, statusColor, value, valueWidth = 8 } = props;
 
   const theme = useTheme();
 
   return (
     <Grid item xs={12}>
       <Grid container>
-        <Grid item sm={mdLabel} xs={12}>
+        <Grid item sm={labelWidth} xs={12}>
           <Typography fontSize={theme.spacing(1.75)} variant="h2">
             {label}:
           </Typography>
         </Grid>
-        <Grid item sm={mdValue} xs={12}>
+        <Grid display="flex" item sm={valueWidth} xs={12}>
+          {statusColor && ( // if the status color is passed, we will display a status icon with color needed
+            <StatusIcon
+              sx={{
+                backgroundColor: statusColor, // here the background color is controlled by alerting component since there can be more statuses than active, inactive and other
+              }}
+              marginTop={theme.spacing(0.7)}
+              maxHeight={theme.spacing(1)}
+              maxWidth={theme.spacing(1)}
+              pulse={false}
+              status="other"
+            />
+          )}
           <Typography
             sx={{
-              color: color ?? theme.color.offBlack,
+              color: theme.color.offBlack,
             }}
             fontSize={theme.spacing(1.75)}
             variant="body2"

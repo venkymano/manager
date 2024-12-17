@@ -107,6 +107,7 @@ import { getStorage } from 'src/utilities/storage';
 const getRandomWholeNumber = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1) + min);
 
+import { notificationChannelFactory } from 'src/factories/cloudpulse/channels';
 import { pickRandom } from 'src/utilities/random';
 
 import type {
@@ -2377,7 +2378,7 @@ export const handlers = [
         return HttpResponse.json(
           alertFactory.build({
             id: Number(params.id),
-            service_type: params.serviceType === 'linode'? 'linode' : 'dbaas',
+            service_type: params.serviceType === 'linode' ? 'linode' : 'dbaas',
           })
         );
       }
@@ -2399,6 +2400,11 @@ export const handlers = [
     };
 
     return HttpResponse.json(response);
+  }),
+  http.get('*/monitor/alert-channels', () => {
+    return HttpResponse.json(
+      makeResourcePage(notificationChannelFactory.buildList(3))
+    );
   }),
   http.get('*/monitor/services/:serviceType/dashboards', ({ params }) => {
     const response = {
