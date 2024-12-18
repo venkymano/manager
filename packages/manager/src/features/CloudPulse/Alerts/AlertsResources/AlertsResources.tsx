@@ -18,27 +18,42 @@ import {
 import { AlertsRegionFilter } from './AlertsRegionFilter';
 import { AlertsResourcesNotice } from './AlertsResourcesNotice';
 import { DisplayAlertResources } from './DisplayAlertResource';
-// import { DisplayAlertResourcesOrder } from './DisplayAlertResourceOrder';
 
 import type { Region } from '@linode/api-v4';
 
 export interface AlertResourcesProp {
-  /*
+  /**
+   * The label of the alert
+   */
+  alertLabel?: string;
+  /**
+   * Callback for publishing the selected resources
+   */
+  handleResourcesSelection?: (resources: string[]) => void;
+  /**
    * This controls whether we need to show the checkbox in case of editing the resources
    */
   isSelectionsNeeded?: boolean;
-  /*
+
+  /**
    * The set of resource ids to be displayed
    */
   resourceIds: string[];
-  /*
+
+  /**
    * The service type associated with the alerts like dbaas, linode etc.,
    */
   serviceType: string;
 }
 
 export const AlertResources = React.memo((props: AlertResourcesProp) => {
-  const { isSelectionsNeeded = false, resourceIds, serviceType } = props;
+  const {
+    alertLabel,
+    handleResourcesSelection,
+    isSelectionsNeeded = false,
+    resourceIds,
+    serviceType,
+  } = props;
 
   const [searchText, setSearchText] = React.useState<string>();
 
@@ -66,6 +81,12 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     isFetching: isRegionsFetching,
   } = useRegionsQuery();
 
+  React.useEffect(() => {
+    if (handleResourcesSelection) {
+      handleResourcesSelection(selectedResources);
+    }
+  }, [selectedResources, handleResourcesSelection]);
+
   const handleSelection = React.useCallback(
     (ids: string[], isSelectionAction: boolean) => {
       const onlySelected = isSelectionAction
@@ -92,6 +113,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     return getFilteredResources({
       data,
       filteredRegions,
+      isAdditionOrDeletionNeeded: isSelectionsNeeded,
       regionsIdToLabelMap,
       resourceIds,
       searchText,
@@ -106,6 +128,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     regionsIdToLabelMap,
     selectedResources,
     selectedOnly,
+    isSelectionsNeeded,
   ]);
 
   const handleAllSelection = React.useCallback(() => {
@@ -157,7 +180,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
         ref={titleRef}
         variant="h2"
       >
-        Resources
+        {isSelectionsNeeded && alertLabel ? alertLabel : 'Resources'}
       </Typography>
       {!isError && isRegionsError && resourceIds.length === 0 && (
         <StyledPlaceholder
@@ -171,6 +194,15 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
 
       {(resourceIds.length > 0 || isError || isRegionsError) && (
         <Grid container spacing={3}>
+          {isSelectionsNeeded && (
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                You can enable/disable alerts for resources you have access to.
+                Some resources linked to this definition may be hidden due to
+                your access restrictions.
+              </Typography>
+            </Grid>
+          )}
           <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
             <Grid item md={3} xs={12}>
               <DebouncedSearchTextField
@@ -223,41 +255,27 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
             </Grid>
           )}
 
-          <Grid item xs={12}>
+          <Grid container item rowGap={3} xs={12}>
             {/* Pass filtered data */}
-            <DisplayAlertResources
-              noDataText={
-                !(isError || isRegionsError) &&
-                !Boolean(filteredResources?.length)
-                  ? 'No Results found'
-                  : undefined
-              }
-              errorText={'Table data is unavailable. Please try again later'}
-              filteredResources={filteredResources}
-              handleSelection={isSelectionsNeeded ? handleSelection : undefined}
-              isDataLoadingError={isError || isRegionsError}
-              isSelectionsNeeded={isSelectionsNeeded}
-              pageSize={pageSize}
-              scrollToTitle={scrollToTitle}
-            />
-
-            {/* <DisplayAlertResourcesOrder
-              filteredResources={
-                filteredResources ? [...filteredResources] : []
-              }
-              noDataText={
-                !(isError || isRegionsError) &&
-                !Boolean(filteredResources?.length)
-                  ? 'No Results found'
-                  : undefined
-              }
-              errorText={'Table data is unavailable. Please try again later'}
-              handleSelection={isSelectionsNeeded ? handleSelection : undefined}
-              isDataLoadingError={isError || isRegionsError}
-              isSelectionsNeeded={isSelectionsNeeded}
-              pageSize={pageSize}
-              scrollToTitle={scrollToTitle}
-            /> */}
+            <Grid item xs={12}>
+              <DisplayAlertResources
+                handleSelection={
+                  isSelectionsNeeded ? handleSelection : undefined
+                }
+                noDataText={
+                  !(isError || isRegionsError) &&
+                  !Boolean(filteredResources?.length)
+                    ? 'No Results found'
+                    : undefined
+                }
+                errorText={'Table data is unavailable. Please try again later'}
+                filteredResources={filteredResources}
+                isDataLoadingError={isError || isRegionsError}
+                isSelectionsNeeded={isSelectionsNeeded}
+                pageSize={pageSize}
+                scrollToTitle={scrollToTitle}
+              />
+            </Grid>
           </Grid>
         </Grid>
       )}

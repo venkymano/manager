@@ -9,6 +9,7 @@ import Request, {
 import {
   Alert,
   CreateAlertDefinitionPayload,
+  EditAlertResourcesPayload,
   NotificationChannel,
 } from './types';
 import { BETA_API_ROOT as API_ROOT } from 'src/constants';
@@ -19,6 +20,21 @@ export const createAlertDefinition = (data: CreateAlertDefinitionPayload) =>
     setURL(`${API_ROOT}/monitor/alert-definitions`),
     setMethod('POST'),
     setData(data, createAlertDefinitionSchema)
+  );
+
+export const editAlertDefinition = (
+  data: EditAlertResourcesPayload,
+  serviceType: string,
+  alertId: number
+) =>
+  Request<Alert>(
+    setURL(
+      `${API_ROOT}/monitor/services/${encodeURIComponent(
+        serviceType
+      )}/alert-definitions/${encodeURIComponent(alertId)}`
+    ),
+    setMethod('PUT'),
+    setData(data)
   );
 
 export const getAlertDefinitions = (params?: Params, filters?: Filter) =>

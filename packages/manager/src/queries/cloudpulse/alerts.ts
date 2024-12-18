@@ -1,4 +1,7 @@
-import { createAlertDefinition } from '@linode/api-v4/lib/cloudpulse';
+import {
+  createAlertDefinition,
+  editAlertDefinition,
+} from '@linode/api-v4/lib/cloudpulse';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { queryFactory } from './queries';
@@ -6,6 +9,7 @@ import { queryFactory } from './queries';
 import type {
   Alert,
   CreateAlertDefinitionPayload,
+  EditAlertResourcesPayload,
   NotificationChannel,
 } from '@linode/api-v4/lib/cloudpulse';
 import type {
@@ -39,7 +43,6 @@ export const useAlertDefinitionQuery = (
 ) => {
   return useQuery<Alert, APIError[]>({
     ...queryFactory.alerts(alertId, serviceType),
-    enabled: alertId !== undefined,
   });
 };
 
@@ -49,5 +52,18 @@ export const useAlertNotificationChannelsQuery = (
 ) => {
   return useQuery<NotificationChannel[], APIError[]>({
     ...queryFactory.notificationChannels._ctx.all(params, filter),
+  });
+};
+
+export const useEditAlertDefinitionResources = (
+  serviceType: string,
+  alertId: number
+) => {
+  const queryClient = useQueryClient();
+  return useMutation<Alert, APIError[], EditAlertResourcesPayload>({
+    mutationFn: (data) => editAlertDefinition(data, serviceType, alertId),
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: [aclpQueryKey] });
+    },
   });
 };

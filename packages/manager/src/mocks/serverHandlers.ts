@@ -124,6 +124,7 @@ import type {
   User,
   VolumeStatus,
 } from '@linode/api-v4';
+import { waitFor } from '@testing-library/dom';
 
 export const makeResourcePage = <T>(
   e: T[],
@@ -2366,6 +2367,11 @@ export const handlers = [
       return HttpResponse.json({}, { status: 404 });
     }
   ),
+  http.put('*/monitor/services/:serviceType/alert-definitions/:id', () => {
+    sleep(2000);
+    // return HttpResponse.json({});
+    return HttpResponse.error();
+  }),
   http.get('*/monitor/alert-channels', () => {
     return HttpResponse.json(
       makeResourcePage(notificationChannelFactory.buildList(3))

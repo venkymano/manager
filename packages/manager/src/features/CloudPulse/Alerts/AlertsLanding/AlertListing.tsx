@@ -104,6 +104,10 @@ export const AlertListing = (props: AlertListingProps) => {
     setIsDeleteDialogOpen(true);
   };
 
+  const handleEdit = (alert: Alert) => {
+    history.push(`${location.pathname}/edit/${alert.service_type}/${alert.id}`);
+  };
+
   // eslint-disable-next-line no-console
   const fetchResults = () => console.log('API Called with this:', searchText);
 
@@ -288,6 +292,7 @@ export const AlertListing = (props: AlertListingProps) => {
                 handlers={{
                   handleDelete: () => handleDelete(alert),
                   handleDetails: () => handleDetails(alert),
+                  handleEdit: () => handleEdit(alert),
                 }}
                 alert={alert}
                 key={alert.id}

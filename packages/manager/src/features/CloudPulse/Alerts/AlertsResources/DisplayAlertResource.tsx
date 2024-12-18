@@ -1,6 +1,7 @@
 import { TableBody, TableHead, useTheme } from '@mui/material';
 import React from 'react';
 
+import ToggleOn from 'src/assets/icons/toggleOn.svg';
 import { Checkbox } from 'src/components/Checkbox';
 import { sortData } from 'src/components/OrderBy';
 import Paginate from 'src/components/Paginate';
@@ -134,6 +135,13 @@ export const DisplayAlertResources = React.memo(
       );
     };
 
+    const isSomeSelected = (paginatedData: AlertInstances[]): boolean => {
+      return (
+        Boolean(paginatedData?.length) &&
+        paginatedData.some((resource) => resource.checked)
+      );
+    };
+
     return (
       <Paginate data={sortedData ?? []} pageSize={pageSize}>
         {({
@@ -151,6 +159,10 @@ export const DisplayAlertResources = React.memo(
                   {isSelectionsNeeded && (
                     <TableCell padding="checkbox">
                       <Checkbox
+                        indeterminate={
+                          isSomeSelected(paginatedData) &&
+                          !isAllPageSelected(paginatedData)
+                        }
                         onClick={() =>
                           handleSelectionChange(
                             paginatedData.map((resource) => resource.id),

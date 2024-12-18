@@ -158,6 +158,11 @@ export interface CreateAlertDefinitionPayload {
   triggerCondition: TriggerCondition;
   channel_ids: number[];
 }
+
+export interface EditAlertResourcesPayload {
+  resource_ids?: string[];
+}
+
 export interface CreateAlertDefinitionForm
   extends CreateAlertDefinitionPayload {
   region: string;

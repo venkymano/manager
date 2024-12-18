@@ -26,11 +26,11 @@ export const getAlertTypeToActionsList = (
     },
     {
       disabled: false,
-      onClick: onClickHandlers.handleDelete,
-      title: 'Delete',
+      onClick: onClickHandlers.handleEdit,
+      title: 'Edit',
       tooltip: false
         ? getRestrictedResourceText({
-            action: 'delete',
+            action: 'edit',
             isSingular: true,
             resourceType: 'Alerts',
           })

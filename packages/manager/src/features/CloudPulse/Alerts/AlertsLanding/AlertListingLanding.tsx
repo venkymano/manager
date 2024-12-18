@@ -6,6 +6,7 @@ import { useAlertDefinitionsQuery } from 'src/queries/cloudpulse/alerts';
 import { AlertDetail } from '../AlertsDetail/AlertDetail';
 // import { AlertDetail } from './AlertDetail';
 import { AlertListing } from './AlertListing';
+import { EditAlertResources } from '../EditAlert/EditAlertResources';
 
 export const AlertListingLanding = () => {
   const { data: alerts, isError, isLoading } = useAlertDefinitionsQuery();
@@ -19,6 +20,12 @@ export const AlertListingLanding = () => {
         path="/monitor/cloudpulse/alerts/definitions/detail/:serviceType/:alertId"
       >
         <AlertDetail />
+      </Route>
+      <Route
+        exact
+        path="/monitor/cloudpulse/alerts/definitions/edit/:serviceType/:alertId"
+      >
+        <EditAlertResources />
       </Route>
     </Switch>
   );
