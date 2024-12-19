@@ -11,6 +11,7 @@ import type { ActionHandlers } from './AlertActionMenu';
 const handlers: ActionHandlers = {
   handleDelete: vi.fn(),
   handleDetails: vi.fn(),
+  handleEdit: vi.fn(),
 };
 
 const alertLabel = 'Action menu for Alert';

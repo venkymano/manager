@@ -3,7 +3,6 @@ import { Divider, Grid } from '@mui/material';
 import React from 'react';
 
 import { ErrorState } from 'src/components/ErrorState/ErrorState';
-import NullComponent from 'src/components/NullComponent';
 import { Typography } from 'src/components/Typography';
 import { useAlertNotificationChannelsQuery } from 'src/queries/cloudpulse/alerts';
 

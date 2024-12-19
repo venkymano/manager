@@ -6,7 +6,6 @@ import {
   getDashboards,
   getJWEToken,
   getMetricDefinitionsByServiceType,
-  getNotificationChannels,
 } from '@linode/api-v4';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
@@ -14,6 +13,7 @@ import { databaseQueries } from '../databases/databases';
 import { getAllLinodesRequest } from '../linodes/requests';
 import { volumeQueries } from '../volumes/volumes';
 import { fetchCloudPulseMetrics } from './metrics';
+import { getAllNotificationChannels } from './requests';
 
 import type {
   CloudPulseMetricsRequest,
@@ -21,7 +21,6 @@ import type {
   JWETokenPayLoad,
   Params,
 } from '@linode/api-v4';
-import { getAllNotificationChannels } from './requests';
 
 const key = 'Clousepulse';
 

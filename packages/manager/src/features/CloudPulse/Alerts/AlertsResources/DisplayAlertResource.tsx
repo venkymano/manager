@@ -1,7 +1,6 @@
 import { TableBody, TableHead, useTheme } from '@mui/material';
 import React from 'react';
 
-import ToggleOn from 'src/assets/icons/toggleOn.svg';
 import { Checkbox } from 'src/components/Checkbox';
 import { sortData } from 'src/components/OrderBy';
 import Paginate from 'src/components/Paginate';

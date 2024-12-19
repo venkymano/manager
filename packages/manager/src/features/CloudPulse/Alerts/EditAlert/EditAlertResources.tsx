@@ -1,22 +1,25 @@
-import { Box, Button } from '@linode/ui';
+import { Box, Button, CircleProgress } from '@linode/ui';
 import { useTheme } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
+import EntityIcon from 'src/assets/icons/entityIcons/alert.svg';
 import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
 import { Breadcrumb } from 'src/components/Breadcrumb/Breadcrumb';
 import { ConfirmationDialog } from 'src/components/ConfirmationDialog/ConfirmationDialog';
-import NullComponent from 'src/components/NullComponent';
+import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import {
   useAlertDefinitionQuery,
   useEditAlertDefinitionResources,
 } from 'src/queries/cloudpulse/alerts';
 
+import { StyledPlaceholder } from '../AlertsDetail/AlertDetail';
 import { AlertResources } from '../AlertsResources/AlertsResources';
 import { getAlertBoxStyles } from '../Utils/utils';
 
 import type { AlertRouteParams } from '../AlertsDetail/AlertDetail';
+import type { ActionPanelProps } from 'src/components/ActionsPanel/ActionsPanel';
 
 export const EditAlertResources = () => {
   const { alertId, serviceType } = useParams<AlertRouteParams>();
@@ -38,7 +41,7 @@ export const EditAlertResources = () => {
     reset: resetEditAlert,
   } = useEditAlertDefinitionResources(serviceType, Number(alertId));
 
-  const generateCrumbOverrides = () => {
+  const { newPathname, overrides } = React.useMemo(() => {
     const overrides = [
       {
         label: 'Definitions',
@@ -53,13 +56,7 @@ export const EditAlertResources = () => {
     ];
 
     return { newPathname: '/Definitions/Edit', overrides };
-  };
-
-  const { newPathname, overrides } = React.useMemo(
-    () => generateCrumbOverrides(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  }, [serviceType, alertId]);
 
   const selectedResourcesRef = React.useRef<string[]>([]);
 
@@ -67,27 +64,53 @@ export const EditAlertResources = () => {
     false
   );
 
-  if (isError) {
-    return <NullComponent />;
+  if (isFetching) {
+    return (
+      <>
+        <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
+        <Box alignContent="center" height={theme.spacing(75)}>
+          <CircleProgress />
+        </Box>
+      </>
+    );
   }
 
-  if (isFetching) {
-    return <NullComponent />;
+  if (isError) {
+    return (
+      <>
+        <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
+        <Box alignContent="center" height={theme.spacing(75)}>
+          <ErrorState
+            errorText={
+              'An error occurred while loading the alerts definitions and resources. Please try again later.'
+            }
+          />
+        </Box>
+      </>
+    );
   }
 
   if (!alertDetails) {
-    return <NullComponent />;
+    return (
+      <>
+        <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
+        <Box alignContent="center" height={theme.spacing(75)}>
+          <StyledPlaceholder icon={EntityIcon} title="No Data to display." />
+        </Box>
+      </>
+    );
   }
 
   const handleResourcesSelection = (resourceIds: string[]) => {
     selectedResourcesRef.current = resourceIds; // here we just keep track of it, on save we will update it
   };
 
-  const saveResources = async () => {
+  const saveResources = () => {
     setShowConfirmation(false);
-    await editAlert({
+    editAlert({
       resource_ids: selectedResourcesRef.current,
     }).then(() => {
+      // on success land on the alert definition list page and show a success snackbar
       history.push('/monitor/cloudpulse/alerts/definitions');
       enqueueSnackbar('Alert resources successfully updated.', {
         anchorOrigin: {
@@ -103,9 +126,12 @@ export const EditAlertResources = () => {
     });
   };
 
-  const handleDialogOpenClose = () => {
-    window.scrollTo({ behavior: 'smooth', top: 0 }); // Scroll to the top
-    setShowConfirmation(!showConfirmation);
+  const saveConfirmationActionProps: ActionPanelProps = {
+    primaryButtonProps: { label: 'Confirm', onClick: saveResources },
+    secondaryButtonProps: {
+      label: 'Cancel',
+      onClick: () => setShowConfirmation(false),
+    },
   };
 
   if (isEditAlertError) {
@@ -120,7 +146,7 @@ export const EditAlertResources = () => {
       },
       variant: 'error',
     });
-    resetEditAlert();
+    resetEditAlert(); // reset the mutate use hook states
   }
 
   return (
@@ -128,13 +154,12 @@ export const EditAlertResources = () => {
       <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
       <Box
         sx={{
-          backgroundColor:
-            theme.name === 'light' ? theme.color.grey5 : theme.color.grey9,
+          display: 'flex',
+          flexDirection: 'column',
+          ...getAlertBoxStyles(theme),
         }}
-        display="flex"
-        flexDirection="column"
       >
-        <Box sx={getAlertBoxStyles}>
+        <Box>
           <AlertResources
             alertLabel={alertDetails.label}
             handleResourcesSelection={handleResourcesSelection}
@@ -143,26 +168,27 @@ export const EditAlertResources = () => {
             serviceType={alertDetails.service_type}
           />
         </Box>
-        <Box alignSelf={'flex-end'} m={3} mt={0}>
-          <Button buttonType="primary" onClick={handleDialogOpenClose}>
+        <Box alignSelf={'flex-end'} m={3} mb={0}>
+          <Button
+            onClick={() => {
+              window.scrollTo({
+                behavior: 'instant',
+                top: 0,
+              });
+              setShowConfirmation(true);
+            }}
+            buttonType="primary"
+          >
             Save
           </Button>
         </Box>
         <ConfirmationDialog
-          actions={
-            <ActionsPanel
-              secondaryButtonProps={{
-                label: 'Cancel',
-                onClick: handleDialogOpenClose,
-              }}
-              primaryButtonProps={{ label: 'Confirm', onClick: saveResources }}
-            />
-          }
+          actions={<ActionsPanel {...saveConfirmationActionProps} />}
           onClose={() => setShowConfirmation(!showConfirmation)}
           open={showConfirmation}
           title="Confirm alert updates"
         >
-          You have changes the resource settings for your alert.
+          You have changed the resource settings for your alert.
           <br /> This also updates your alert definition.
         </ConfirmationDialog>
       </Box>

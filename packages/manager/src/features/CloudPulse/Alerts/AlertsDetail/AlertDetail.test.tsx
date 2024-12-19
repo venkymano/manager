@@ -3,7 +3,6 @@ import React from 'react';
 
 import { alertFactory, linodeFactory, regionFactory } from 'src/factories';
 import { notificationChannelFactory } from 'src/factories/cloudpulse/channels';
-import { makeResourcePage } from 'src/mocks/serverHandlers';
 import { renderWithTheme } from 'src/utilities/testHelpers';
 
 import { AlertDetail } from './AlertDetail';
