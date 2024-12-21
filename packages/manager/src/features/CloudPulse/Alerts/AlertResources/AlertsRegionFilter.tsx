@@ -40,9 +40,9 @@ export const AlertsRegionFilter = React.memo((props: AlertsRegionProps) => {
       textFieldProps={{
         hideLabel: true,
       }}
-      currentCapability={undefined}
+      currentCapability={undefined} // this is a required property
       disableSelectAll
-      isClearable={true}
+      isClearable
       label="Select Regions"
       limitTags={1}
       placeholder={Boolean(selectedRegion?.length) ? '' : 'Select Regions'}

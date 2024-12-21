@@ -13,8 +13,17 @@ import { TableSortCell } from 'src/components/TableSortCell';
 import type { Order } from 'src/hooks/useOrder';
 
 export interface AlertInstances {
+  /**
+   * The id of the alert
+   */
   id: string;
+  /**
+   * The label of the alert
+   */
   label: string;
+  /**
+   * The region associated with the alert
+   */
   region?: string;
 }
 
@@ -93,7 +102,7 @@ export const DisplayAlertResources = React.memo(
           order,
           orderBy,
         });
-        handlePageChange(1); // move to first page
+        handlePageChange(1); // move to first page on sort change
         scrollToTitle(); // scroll to title
       },
       [scrollToTitle]
@@ -101,7 +110,7 @@ export const DisplayAlertResources = React.memo(
 
     const handlePageNumberChange = React.useCallback(
       (handlePageChange: (page: number) => void, pageNumber: number) => {
-        handlePageChange(pageNumber); // move to first page
+        handlePageChange(pageNumber); // move to requested page number
         scrollToTitle(); // scroll to title
       },
       [scrollToTitle]
@@ -168,7 +177,7 @@ export const DisplayAlertResources = React.memo(
                       colSpan={3}
                       height={theme.spacing(6)}
                     >
-                      {noDataText ?? 'No results found'}
+                      {noDataText ?? 'No results found.'}
                     </TableCell>
                   </TableRow>
                 )}
