@@ -25,7 +25,7 @@ export interface AlertActionMenuProps {
    */
   alertType: AlertDefinitionType;
   /*
-   * Handlers for alert actions like delete, show details etc.,
+   * Handlers for alert actions like Delete, Show Details etc.
    */
   handlers: ActionHandlers;
 }
