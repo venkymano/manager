@@ -1,11 +1,9 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
+import { StatusIcon } from 'src/components/StatusIcon/StatusIcon';
+
 interface AlertDetailRowProps {
-  /*
-   * The color of the text that needs to be displayed
-   */
-  color?: string;
   /*
    * The typography label under which the value will be displayed
    */
@@ -19,13 +17,17 @@ interface AlertDetailRowProps {
    */
   mdValue?: number;
   /*
+   * The color of the text that needs to be displayed
+   */
+  statusColor?: string;
+  /*
    * The typography value to be displayed
    */
   value: null | string;
 }
 
 export const AlertDetailRow = React.memo((props: AlertDetailRowProps) => {
-  const { color, label, mdLabel = 4, mdValue = 8, value } = props;
+  const { label, mdLabel = 4, mdValue = 8, statusColor, value } = props;
 
   const theme = useTheme();
 
@@ -36,14 +38,26 @@ export const AlertDetailRow = React.memo((props: AlertDetailRowProps) => {
           {label}:
         </Typography>
       </Grid>
-      <Grid item md={mdValue} xs={12}>
+      <Grid display="flex" item md={mdValue} xs={12}>
+        {statusColor && ( // if the status color is passed, we will display a status icon with color needed
+          <StatusIcon
+            sx={{
+              backgroundColor: statusColor, // here the background color is controlled by alerting component since there can be more statuses than active, inactive and other
+            }}
+            marginTop={theme.spacing(1)}
+            maxHeight={theme.spacing(1)}
+            maxWidth={theme.spacing(1)}
+            pulse={false}
+            status="other"
+          />
+        )}
         <Typography
           sx={{
-            color: color ?? theme.color.offBlack
+            color: theme.color.offBlack,
           }}
           fontSize={theme.spacing(1.75)}
           lineHeight={'1.5rem'}
-          variant="body1"
+          variant="body2"
         >
           {value}
         </Typography>
