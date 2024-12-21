@@ -29,7 +29,7 @@ export interface AlertResourcesProp {
   /**
    * Callback for publishing the selected resources
    */
-  handleResourcesSelection?: (resources: string[]) => void;
+  handleResourcesSelection?: (resources: number[]) => void;
   /**
    * This controls whether we need to show the checkbox in case of editing the resources
    */
@@ -67,8 +67,8 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     serviceType === 'dbaas' ? { platform: 'rdbms-default' } : {}
   );
 
-  const [selectedResources, setSelectedResources] = React.useState<string[]>(
-    []
+  const [selectedResources, setSelectedResources] = React.useState<number[]>(
+    isSelectionsNeeded ? resourceIds.map((id) => Number(id)) : []
   );
 
   const [selectedOnly, setSelectedOnly] = React.useState<boolean>(false);
@@ -88,7 +88,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   }, [selectedResources, handleResourcesSelection]);
 
   const handleSelection = React.useCallback(
-    (ids: string[], isSelectionAction: boolean) => {
+    (ids: number[], isSelectionAction: boolean) => {
       const onlySelected = isSelectionAction
         ? selectedResources
         : selectedResources.filter((resource) => !ids.includes(resource));
@@ -142,7 +142,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       setSelectedResources([]);
     } else {
       // Select all
-      setSelectedResources([...data.map((resource) => resource.id)]);
+      setSelectedResources([...data.map((resource) => Number(resource.id))]);
     }
   }, [data, selectedResources]);
 

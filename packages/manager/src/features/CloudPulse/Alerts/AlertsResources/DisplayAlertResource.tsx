@@ -31,7 +31,7 @@ export interface DisplayAlertResourceProp {
   /**
    * Callback for clicking on check box
    */
-  handleSelection?: (id: string[], isSelectAction: boolean) => void;
+  handleSelection?: (id: number[], isSelectAction: boolean) => void;
 
   /**
    * When a api call fails or any error occurs while loading the data, this property can be passes true
@@ -119,7 +119,7 @@ export const DisplayAlertResources = React.memo(
     );
 
     const handleSelectionChange = React.useCallback(
-      (id: string[], isSelectionAction: boolean) => {
+      (id: number[], isSelectionAction: boolean) => {
         if (handleSelection) {
           handleSelection(id, isSelectionAction);
         }
@@ -164,7 +164,9 @@ export const DisplayAlertResources = React.memo(
                         }
                         onClick={() =>
                           handleSelectionChange(
-                            paginatedData.map((resource) => resource.id),
+                            paginatedData.map((resource) =>
+                              Number(resource.id)
+                            ),
                             !isAllPageSelected(paginatedData)
                           )
                         }
@@ -209,7 +211,7 @@ export const DisplayAlertResources = React.memo(
                         <TableCell padding="checkbox">
                           <Checkbox
                             onChange={() => {
-                              handleSelectionChange([id], !checked);
+                              handleSelectionChange([Number(id)], !checked);
                             }}
                             sx={{
                               padding: 0,

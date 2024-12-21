@@ -77,7 +77,7 @@ it('test getFilteredResources method', () => {
     }).map((region) => region.id),
     regionsIdToLabelMap,
     resourceIds: ['1', '2'],
-    selectedResources: ['1'],
+    selectedResources: [1],
   });
 
   expect(result).toBeDefined();
@@ -94,7 +94,7 @@ it('test getFilteredResources method', () => {
     regionsIdToLabelMap,
     resourceIds: ['1', '2'],
     searchText: data[1].label,
-    selectedResources: ['1'],
+    selectedResources: [1],
   });
 
   expect(result).toBeDefined();
@@ -111,7 +111,7 @@ it('test getFilteredResources method', () => {
     regionsIdToLabelMap,
     resourceIds: ['1', '2'],
     searchText: data[1].label,
-    selectedResources: ['1'],
+    selectedResources: [1],
   });
 
   expect(result).toBeDefined();
@@ -128,7 +128,7 @@ it('test getFilteredResources method', () => {
     regionsIdToLabelMap,
     resourceIds: ['1', '2'],
     searchText: regionsIdToLabelMap.get(data[2].region ?? '')?.label, // different region
-    selectedResources: ['1'],
+    selectedResources: [1],
   });
 
   expect(result).toBeDefined();

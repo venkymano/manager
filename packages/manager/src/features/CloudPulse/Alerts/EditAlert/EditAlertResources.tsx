@@ -58,7 +58,7 @@ export const EditAlertResources = () => {
     return { newPathname: '/Definitions/Edit', overrides };
   }, [serviceType, alertId]);
 
-  const selectedResourcesRef = React.useRef<string[]>([]);
+  const selectedResourcesRef = React.useRef<number[]>([]);
 
   const [showConfirmation, setShowConfirmation] = React.useState<boolean>(
     false
@@ -101,14 +101,14 @@ export const EditAlertResources = () => {
     );
   }
 
-  const handleResourcesSelection = (resourceIds: string[]) => {
+  const handleResourcesSelection = (resourceIds: number[]) => {
     selectedResourcesRef.current = resourceIds; // here we just keep track of it, on save we will update it
   };
 
   const saveResources = () => {
     setShowConfirmation(false);
     editAlert({
-      resource_ids: selectedResourcesRef.current,
+      resource_ids: selectedResourcesRef.current.map((id) => String(id)),
     }).then(() => {
       // on success land on the alert definition list page and show a success snackbar
       history.push('/monitor/cloudpulse/alerts/definitions');
