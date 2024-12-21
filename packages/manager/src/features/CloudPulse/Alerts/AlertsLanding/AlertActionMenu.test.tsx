@@ -28,7 +28,7 @@ describe('AlertActionMenu component tests', () => {
 
     // Use waitFor if necessary
     await waitFor(() => {
-      expect(screen.getByText('Delete')).toBeInTheDocument();
+      expect(screen.getByText('Edit')).toBeInTheDocument();
     });
   });
 
