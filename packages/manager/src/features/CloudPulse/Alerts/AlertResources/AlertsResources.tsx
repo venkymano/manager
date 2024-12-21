@@ -20,7 +20,7 @@ import type { Region } from '@linode/api-v4';
 
 export interface AlertResourcesProp {
   /**
-   * The label of the alert
+   * The label of the alert to be displayed
    */
   alertLabel?: string;
   /**
@@ -29,12 +29,12 @@ export interface AlertResourcesProp {
   handleResourcesSelection?: (resources: string[]) => void;
 
   /**
-   * The set of resource ids to be displayed
+   * The set of resource ids associated with the alerts, that needs to be displayed
    */
   resourceIds: string[];
 
   /**
-   * The service type associated with the alerts like dbaas, linode etc.,
+   * The service type associated with the alerts like DBaaS, Linode etc.,
    */
   serviceType: string;
 }
@@ -47,7 +47,11 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   const [filteredRegions, setFilteredRegions] = React.useState<string[]>();
   const pageSize = 25;
 
-  const { data, isError, isFetching } = useResourcesQuery(
+  const {
+    data: resources,
+    isError: isResourcesError,
+    isFetching: isResourcesFetching,
+  } = useResourcesQuery(
     Boolean(serviceType),
     serviceType,
     {},
@@ -73,28 +77,34 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
    */
   const filteredResources = React.useMemo(() => {
     return getFilteredResources({
-      data,
+      data: resources,
       filteredRegions,
       regionsIdToLabelMap,
       resourceIds,
       searchText,
     });
-  }, [data, resourceIds, searchText, filteredRegions, regionsIdToLabelMap]);
+  }, [
+    resources,
+    resourceIds,
+    searchText,
+    filteredRegions,
+    regionsIdToLabelMap,
+  ]);
 
   /**
    * Holds the regions associated with the resources from list of regions
    */
   const regionOptions: Region[] = React.useMemo(() => {
     return getRegionOptions({
-      data,
+      data: resources,
       regionsIdToLabelMap,
       resourceIds,
     });
-  }, [data, resourceIds, regionsIdToLabelMap]);
+  }, [resources, resourceIds, regionsIdToLabelMap]);
 
   const titleRef = React.useRef<HTMLDivElement>(null); // when the page size, page number of table changes lets scroll until the title of this component
 
-  if (isFetching || isRegionsFetching) {
+  if (isResourcesFetching || isRegionsFetching) {
     return <CircleProgress />;
   }
 
@@ -117,7 +127,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       >
         {alertLabel ?? 'Resources'}
       </Typography>
-      {!isError && isRegionsError && resourceIds.length === 0 && (
+      {!isResourcesError && !isRegionsError && resourceIds.length === 0 && (
         <StyledPlaceholder
           title={
             'No resources are currently assigned to this alert definition.'
@@ -127,7 +137,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
         />
       )}
 
-      {(resourceIds.length > 0 || isError || isRegionsError) && (
+      {resourceIds.length > 0 && (
         <Grid container spacing={3}>
           <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
             <Grid item md={3} xs={12}>
@@ -162,14 +172,14 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
             <Grid item xs={12}>
               <DisplayAlertResources
                 noDataText={
-                  !(isError || isRegionsError) &&
+                  !(isResourcesError || isRegionsError) &&
                   !Boolean(filteredResources?.length)
                     ? 'No Results found'
                     : undefined
                 }
                 errorText={'Table data is unavailable. Please try again later'}
                 filteredResources={filteredResources}
-                isDataLoadingError={isError || isRegionsError}
+                isDataLoadingError={isResourcesError || isRegionsError}
                 pageSize={pageSize}
                 scrollToTitle={scrollToTitle}
               />

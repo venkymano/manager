@@ -5,13 +5,14 @@ import { RegionMultiSelect } from 'src/components/RegionSelect/RegionMultiSelect
 import type { Region } from '@linode/api-v4';
 
 export interface AlertsRegionProps {
+  /**
+   * Callback for publishing the ids of the selected regions
+   */
   handleSelectionChange: (regions: string[]) => void;
+  /**
+   * The regions to be displayed according to the resources associated with alerts
+   */
   regionOptions: Region[];
-}
-
-export interface AlertsRegionOption {
-  id: string;
-  label: string;
 }
 
 export const AlertsRegionFilter = React.memo((props: AlertsRegionProps) => {
@@ -22,9 +23,9 @@ export const AlertsRegionFilter = React.memo((props: AlertsRegionProps) => {
     <RegionMultiSelect
       onChange={(ids: string[]) => {
         if (!ids || ids.length === 0) {
-          handleSelectionChange(regionOptions.map(({ id }) => id));
+          handleSelectionChange(regionOptions.map(({ id }) => id)); // publish all ids, no selection here is all selection
         } else {
-          handleSelectionChange(ids);
+          handleSelectionChange(ids); // publish only selected ids
         }
 
         setSelectedRegion(

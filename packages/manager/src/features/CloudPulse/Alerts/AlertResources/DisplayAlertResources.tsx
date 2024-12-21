@@ -19,6 +19,9 @@ export interface AlertInstances {
 }
 
 export interface DisplayAlertResourceProp {
+  /**
+   * When passed, this error text will be displayed in the table
+   */
   errorText: string;
 
   /**
@@ -27,17 +30,17 @@ export interface DisplayAlertResourceProp {
   filteredResources: AlertInstances[] | undefined;
 
   /**
-   * When a api call fails or any error occurs while loading the data, this property can be passes true
+   * Indicates, there is an error in loading the data, if it is passed true, error message will be displayed
    */
   isDataLoadingError: boolean;
 
   /**
-   * If this is passed in case of filteredResources are empty
+   * This is passed if there is no resources associated with the alerts
    */
   noDataText?: string;
 
   /**
-   * The pageSize needed in the table
+   * The size of the page needed in the table
    */
   pageSize: number;
 
