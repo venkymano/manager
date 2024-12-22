@@ -55,8 +55,8 @@ export const AlertDetailOverview = (props: OverviewProps) => {
         <AlertDetailRow label="Name" value={label} />
         <AlertDetailRow label="Description" value={description} />
         <AlertDetailRow
-          statusColor={statusColorMap[status]}
           label="Status"
+          statusColor={statusColorMap[status]}
           value={convertStringToCamelCasesWithSpaces(status)}
         />
         <AlertDetailRow

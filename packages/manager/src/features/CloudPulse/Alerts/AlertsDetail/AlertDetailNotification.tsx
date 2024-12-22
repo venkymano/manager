@@ -30,7 +30,6 @@ export const AlertDetailNotification = (props: NotificationProps) => {
     return <CircleProgress />;
   }
 
-
   return (
     <React.Fragment>
       <Typography marginBottom={2} variant="h2">
@@ -40,7 +39,6 @@ export const AlertDetailNotification = (props: NotificationProps) => {
         <ErrorState errorText="Failed to load notification channels." />
       )}
       {!isError && (
-        
         <Grid alignItems="center" container spacing={2}>
           {channels &&
             channels.map((value, index) => (
