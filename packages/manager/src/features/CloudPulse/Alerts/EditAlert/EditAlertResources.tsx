@@ -127,7 +127,11 @@ export const EditAlertResources = () => {
   };
 
   const saveConfirmationActionProps: ActionPanelProps = {
-    primaryButtonProps: { label: 'Confirm', onClick: saveResources },
+    primaryButtonProps: {
+      'data-testid': 'editconfirmation',
+      label: 'Confirm',
+      onClick: saveResources,
+    },
     secondaryButtonProps: {
       label: 'Cancel',
       onClick: () => setShowConfirmation(false),
@@ -178,6 +182,7 @@ export const EditAlertResources = () => {
               setShowConfirmation(true);
             }}
             buttonType="primary"
+            data-testid="saveresources"
           >
             Save
           </Button>

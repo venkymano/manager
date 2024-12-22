@@ -192,93 +192,90 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
         />
       )}
 
-      {(resourceIds.length > 0 || isError || isRegionsError) && (
-        <Grid container spacing={3}>
+      <Grid container spacing={3}>
+        {isSelectionsNeeded && (
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              You can enable/disable alerts for resources you have access to.
+              Some resources linked to this definition may be hidden due to your
+              access restrictions.
+            </Typography>
+          </Grid>
+        )}
+        <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
+          <Grid item md={3} xs={12}>
+            <DebouncedSearchTextField
+              onSearch={(value) => {
+                setSearchText(value);
+              }}
+              sx={{
+                maxHeight: theme.spacing(4.25),
+              }}
+              clearable
+              debounceTime={300}
+              hideLabel
+              isSearching={false}
+              label="Search for a Resource"
+              placeholder="Search for a Resource"
+              value={searchText ?? ''}
+            />
+          </Grid>
+          <Grid item md={4} xs={12}>
+            <AlertsRegionFilter
+              handleSelectionChange={(value) => {
+                setFilteredRegions(value);
+              }}
+              regionOptions={regionOptions ?? []}
+            />
+          </Grid>
           {isSelectionsNeeded && (
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                You can enable/disable alerts for resources you have access to.
-                Some resources linked to this definition may be hidden due to
-                your access restrictions.
-              </Typography>
-            </Grid>
-          )}
-          <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
-            <Grid item md={3} xs={12}>
-              <DebouncedSearchTextField
-                onSearch={(value) => {
-                  setSearchText(value);
-                }}
+            <Grid item lg={4} xs={12}>
+              <Checkbox
                 sx={{
                   maxHeight: theme.spacing(4.25),
+                  pt: theme.spacing(1),
                 }}
-                clearable
-                debounceTime={300}
-                hideLabel
-                isSearching={false}
-                label="Search for a Resource"
-                placeholder="Search for a Resource"
-                value={searchText ?? ''}
-              />
-            </Grid>
-            <Grid item md={4} xs={12}>
-              <AlertsRegionFilter
-                handleSelectionChange={(value) => {
-                  setFilteredRegions(value);
-                }}
-                regionOptions={regionOptions ?? []}
-              />
-            </Grid>
-            {isSelectionsNeeded && (
-              <Grid item lg={4} xs={12}>
-                <Checkbox
-                  sx={{
-                    maxHeight: theme.spacing(4.25),
-                    pt: theme.spacing(1),
-                  }}
-                  checked={selectedOnly}
-                  onClick={() => setSelectedOnly(!selectedOnly)}
-                  text={'Show Selected Only'}
-                  value={'Show Selected'}
-                />
-              </Grid>
-            )}
-          </Grid>
-
-          {isSelectionsNeeded && !(isError || isRegionsError) && (
-            <Grid item xs={12}>
-              <AlertsResourcesNotice
-                handleSelectionChange={handleAllSelection}
-                selectedResources={selectedResources.length}
-                totalResources={data?.length ?? 0}
+                checked={selectedOnly}
+                data-testid="show_selected_only"
+                onClick={() => setSelectedOnly(!selectedOnly)}
+                text={'Show Selected Only'}
+                value={'Show Selected'}
               />
             </Grid>
           )}
+        </Grid>
 
-          <Grid container item rowGap={3} xs={12}>
-            {/* Pass filtered data */}
-            <Grid item xs={12}>
-              <DisplayAlertResources
-                handleSelection={
-                  isSelectionsNeeded ? handleSelection : undefined
-                }
-                noDataText={
-                  !(isError || isRegionsError) &&
-                  !Boolean(filteredResources?.length)
-                    ? 'No Results found'
-                    : undefined
-                }
-                errorText={'Table data is unavailable. Please try again later'}
-                filteredResources={filteredResources}
-                isDataLoadingError={isError || isRegionsError}
-                isSelectionsNeeded={isSelectionsNeeded}
-                pageSize={pageSize}
-                scrollToTitle={scrollToTitle}
-              />
-            </Grid>
+        {isSelectionsNeeded && !(isError || isRegionsError) && (
+          <Grid item xs={12}>
+            <AlertsResourcesNotice
+              handleSelectionChange={handleAllSelection}
+              selectedResources={selectedResources.length}
+              totalResources={data?.length ?? 0}
+            />
+          </Grid>
+        )}
+
+        <Grid container item rowGap={3} xs={12}>
+          {/* Pass filtered data */}
+          <Grid item xs={12}>
+            <DisplayAlertResources
+              noDataText={
+                !(isError || isRegionsError) &&
+                !Boolean(filteredResources?.length)
+                  ? 'No Results found'
+                  : undefined
+              }
+              errorText={'Table data is unavailable. Please try again later'}
+              filteredResources={filteredResources}
+              handleSelection={isSelectionsNeeded ? handleSelection : undefined}
+              isDataLoadingError={isError || isRegionsError}
+              isSelectionsNeeded={isSelectionsNeeded}
+              pageSize={pageSize}
+              scrollToTitle={scrollToTitle}
+            />
           </Grid>
         </Grid>
-      )}
+      </Grid>
     </React.Fragment>
   );
 });

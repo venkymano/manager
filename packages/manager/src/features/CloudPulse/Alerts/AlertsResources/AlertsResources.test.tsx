@@ -93,4 +93,34 @@ describe('AlertResources component tests', () => {
       expect(queryByText(linodes[1].label)).not.toBeInTheDocument(); // here region filter is afraid
     });
   });
+
+  it('should handle selections correctly', async () => {
+    const handleCheckBoxChange = vi.fn();
+
+    const { getByTestId } = renderWithTheme(
+      <AlertResources
+        handleResourcesSelection={handleCheckBoxChange}
+        isSelectionsNeeded
+        resourceIds={[]}
+        serviceType="linode"
+      />
+    );
+
+    const selectAllCheckBox = getByTestId('select_all_in_page_1');
+
+    expect(selectAllCheckBox).toBeInTheDocument();
+
+    await userEvent.click(selectAllCheckBox);
+
+    expect(handleCheckBoxChange).toHaveBeenLastCalledWith([1, 2, 3]); // select ids 1,2,3 present in 1st page
+    // click again
+    await userEvent.click(selectAllCheckBox);
+
+    expect(handleCheckBoxChange).toHaveBeenLastCalledWith([]); // all ids are unselected
+
+    // click an item
+    const itemToSelect = getByTestId('select_item_1'); // select an item
+    await userEvent.click(itemToSelect);
+    expect(handleCheckBoxChange).toHaveBeenLastCalledWith([1]); // published with selected item
+  });
 });
