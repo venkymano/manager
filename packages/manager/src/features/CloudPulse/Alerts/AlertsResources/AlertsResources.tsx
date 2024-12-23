@@ -234,6 +234,9 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
                 sx={{
                   maxHeight: theme.spacing(4.25),
                   pt: theme.spacing(1),
+                  svg: {
+                    backgroundColor: theme.color.white,
+                  },
                 }}
                 checked={selectedOnly}
                 data-testid="show_selected_only"

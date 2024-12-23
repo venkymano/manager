@@ -175,11 +175,23 @@ export const EditAlertResources = () => {
         <Box alignSelf={'flex-end'} m={3} mb={0}>
           <Button
             onClick={() => {
+              history.push('/monitor/cloudpulse/alerts/definitions');
+            }}
+            data-testid="cancelsaveresources"
+            variant="text"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
               window.scrollTo({
                 behavior: 'instant',
                 top: 0,
               });
               setShowConfirmation(true);
+            }}
+            sx={{
+              ml: 1,
             }}
             buttonType="primary"
             data-testid="saveresources"
