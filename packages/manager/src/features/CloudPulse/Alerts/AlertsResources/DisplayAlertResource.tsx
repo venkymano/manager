@@ -204,7 +204,7 @@ export const DisplayAlertResources = React.memo(
                   </TableSortCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody data-testid="alert_resources_region">
                 {!isDataLoadingError &&
                   paginatedData.map(({ checked, id, label, region }) => (
                     <TableRow key={id}>

@@ -41,6 +41,11 @@ queryMocks.useRegionsQuery.mockReturnValue({
   isFetching: false,
 });
 
+beforeAll(() => {
+  window.scroll = vi.fn();
+  window.scrollTo = vi.fn();
+});
+
 describe('AlertResources component tests', () => {
   it('should handle search input, region filter functionality', async () => {
     const {
@@ -92,6 +97,61 @@ describe('AlertResources component tests', () => {
       expect(getByText(linodes[0].label)).toBeInTheDocument();
       expect(queryByText(linodes[1].label)).not.toBeInTheDocument(); // here region filter is afraid
     });
+  });
+
+  it.only('should handle sorting correctly', async () => {
+    const { getByTestId } = renderWithTheme(
+      <AlertResources resourceIds={['1', '2', '3']} serviceType="linode" />
+    );
+
+    const table = getByTestId('alert_resources_region'); // get the table
+    const resourceColumn = getByTestId('resource');
+
+    await userEvent.click(resourceColumn);
+
+    let rows = Array.from(table.querySelectorAll('tr'));
+
+    expect(
+      rows
+        .map((row) => row.textContent)
+        .every((text, index) =>
+          text?.includes(linodes[linodes.length - 1 - index].label)
+        )
+    ).toBe(true);
+
+    await userEvent.click(resourceColumn); // again reverse the sorting
+
+    rows = Array.from(table.querySelectorAll('tr'));
+
+    expect(
+      rows
+        .map((row) => row.textContent)
+        .every((text, index) => text?.includes(linodes[index].label))
+    ).toBe(true);
+
+    const regionColumn = getByTestId('region');
+
+    await userEvent.click(regionColumn); // sort ascending for region
+
+    rows = Array.from(table.querySelectorAll('tr')); // refetch
+
+    expect(
+      rows
+        .map((row) => row.textContent)
+        .every((text, index) =>
+          text?.includes(linodes[linodes.length - 1 - index].region)
+        )
+    ).toBe(true);
+
+    await userEvent.click(regionColumn);
+
+    rows = Array.from(table.querySelectorAll('tr')); // reverse the sorting
+
+    expect(
+      rows
+        .map((row) => row.textContent)
+        .every((text, index) => text?.includes(linodes[index].region)) // validation
+    ).toBe(true);
   });
 
   it('should handle selections correctly', async () => {
