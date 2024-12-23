@@ -12,7 +12,7 @@ import { TableSortCell } from 'src/components/TableSortCell';
 
 import type { Order } from 'src/hooks/useOrder';
 
-export interface AlertInstances {
+export interface AlertInstance {
   /**
    * The id of the alert
    */
@@ -36,7 +36,7 @@ export interface DisplayAlertResourceProp {
   /**
    * The resources that needs to be displayed
    */
-  filteredResources: AlertInstances[] | undefined;
+  filteredResources: AlertInstance[] | undefined;
 
   /**
    * Indicates, there is an error in loading the data, if it is passed true, error message will be displayed
@@ -85,7 +85,7 @@ export const DisplayAlertResources = React.memo(
       return sortData(
         sorting.orderBy,
         sorting.order
-      )(filteredResources ?? []) as AlertInstances[];
+      )(filteredResources ?? []) as AlertInstance[];
     }, [filteredResources, sorting]);
 
     const handleSort = React.useCallback(

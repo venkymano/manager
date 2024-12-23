@@ -118,13 +118,13 @@ export const AlertDetail = () => {
             <AlertDetailCriteria alert={alertDetails} />
           </Box>
         </Box>
-        <Box sx={getAlertBoxStyles(theme)}>
+        <Box sx={getAlertBoxStyles}>
           <AlertResources
             resourceIds={alertDetails.entity_ids}
             serviceType={alertDetails.service_type}
           />
         </Box>
-        <Box sx={getAlertBoxStyles(theme)}>
+        <Box sx={getAlertBoxStyles}>
           <AlertDetailNotification
             channelIds={alertDetails.channels.map((channel) =>
               Number(channel.id)

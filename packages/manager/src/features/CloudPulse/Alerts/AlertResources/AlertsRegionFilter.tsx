@@ -22,7 +22,7 @@ export const AlertsRegionFilter = React.memo((props: AlertsRegionProps) => {
   return (
     <RegionMultiSelect
       onChange={(ids: string[]) => {
-        if (!ids || ids.length === 0) {
+        if (!Boolean(ids?.length)) {
           handleSelectionChange(regionOptions.map(({ id }) => id)); // publish all ids, no selection here is all selection
         } else {
           handleSelectionChange(ids); // publish only selected ids
