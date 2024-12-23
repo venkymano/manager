@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
+import { createMemoryHistory } from 'history';
 import React from 'react';
+import { Router } from 'react-router-dom';
 
 import { alertFactory, linodeFactory, regionFactory } from 'src/factories';
 import { renderWithTheme } from 'src/utilities/testHelpers';
@@ -45,6 +47,7 @@ beforeAll(() => {
 
 // Shared Setup
 beforeEach(() => {
+  vi.clearAllMocks();
   queryMocks.useAlertDefinitionQuery.mockReturnValue({
     data: alertDetails,
     isError: false,
@@ -71,7 +74,16 @@ describe('EditAlertResources component tests', () => {
     const mutateAsyncSpy = queryMocks.useEditAlertDefinitionResources()
       .mutateAsync;
 
-    const { getByTestId } = renderWithTheme(<EditAlertResources />);
+    const push = vi.fn();
+    const history = createMemoryHistory(); // Create a memory history for testing
+    history.push = push;
+    history.push('/monitor/cloudpulse/alerts/definitions/edit/linode/1');
+
+    const { getByTestId } = renderWithTheme(
+      <Router history={history}>
+        <EditAlertResources />
+      </Router>
+    );
 
     expect(getByTestId('saveresources')).toBeInTheDocument();
     // click and save
@@ -87,6 +99,20 @@ describe('EditAlertResources component tests', () => {
     expect(mutateAsyncSpy).toHaveBeenLastCalledWith({
       resource_ids: Array.from({ length: 20 }, (_, i) => (i + 1).toString()),
     });
+
+    expect(push).toHaveBeenLastCalledWith(
+      '/monitor/cloudpulse/alerts/definitions'
+    ); // after confirmation history updates to list page
+
+    // click on cancel
+    await userEvent.click(getByTestId('cancelsaveresources'));
+
+    expect(push.mock.calls.length).toBe(3); // 3 calls on landing edit page, on confirmation, on cancel click
+
+    expect(push).toHaveBeenLastCalledWith(
+      // after cancel click history updates to list page
+      '/monitor/cloudpulse/alerts/definitions'
+    );
   });
 
   it('Edit alert resources alert details error and loading path', () => {
