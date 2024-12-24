@@ -6,6 +6,7 @@ import React from 'react';
 import {
   AreaChart as _AreaChart,
   Area,
+  Brush,
   CartesianGrid,
   Legend,
   ResponsiveContainer,
@@ -192,6 +193,33 @@ export const AreaChart = (props: AreaChartProps) => {
   } = props;
 
   const theme = useTheme();
+  const [xDomain, setXDomain] = React.useState<[number, number]>([
+    data[0].timestamp,
+    data[data.length - 1].timestamp,
+  ]);
+
+  const [chartData, setChartData] = React.useState(data);
+
+  const handleZoom = (event: React.WheelEvent) => {
+    event.preventDefault();
+    const zoomFactor = 0.1; // Adjust this value for faster/slower zoom
+    const range = xDomain[1] - xDomain[0];
+    const midpoint = xDomain[0] + range / 2;
+
+    if (event.deltaY < 0) {
+      // Zoom in
+      setXDomain([
+        midpoint - (range * (1 - zoomFactor)) / 2,
+        midpoint + (range * (1 - zoomFactor)) / 2,
+      ]);
+    } else if (event.deltaY > 0) {
+      // Zoom out
+      setXDomain([
+        midpoint - (range * (1 + zoomFactor)) / 2,
+        midpoint + (range * (1 + zoomFactor)) / 2,
+      ]);
+    }
+  };
 
   const [activeSeries, setActiveSeries] = React.useState<Array<string>>([]);
   const handleLegendClick = (dataKey: string) => {
@@ -206,6 +234,27 @@ export const AreaChart = (props: AreaChartProps) => {
     return DateTime.fromMillis(timestamp, { zone: timezone }).toFormat(
       xAxis.tickFormat
     );
+  };
+
+  const handleBrushChange = (e: any) => {
+    if (e && e.startIndex !== undefined && e.endIndex !== undefined) {
+      // const startTimestamp = chartData[e.startIndex].timestamp;
+      // const endTimestamp = chartData[e.endIndex].timestamp;
+      // setXDomain([startTimestamp, endTimestamp]);
+      // const chartDataObj:any = [];
+      // let idx = 0;
+      // for(let i=0; i<chartData.length; i++) {
+      //   if(i>=e.startIndex && i<=e.endIndex) {
+      //     chartDataObj[idx++] = chartData[i];
+      //   }
+      // }
+
+      // setChartData(chartDataObj);
+    }
+  };
+
+  const resetZoom = () => {
+    setXDomain([0, chartData.length - 1]);
   };
 
   const CustomTooltip = ({
@@ -267,9 +316,9 @@ export const AreaChart = (props: AreaChartProps) => {
   };
 
   return (
-    <>
+    <div onWheel={handleZoom}>
       <ResponsiveContainer height={height} width={width}>
-        <_AreaChart aria-label={ariaLabel} data={data} margin={margin}>
+        <_AreaChart aria-label={ariaLabel} data={chartData} margin={margin}>
           <CartesianGrid
             stroke={theme.color.grey7}
             strokeDasharray="3 3"
@@ -278,11 +327,11 @@ export const AreaChart = (props: AreaChartProps) => {
           <XAxis
             ticks={
               xAxisTickCount
-                ? generate12HourTicks(data, timezone, xAxisTickCount)
+                ? generate12HourTicks(chartData, timezone, xAxisTickCount)
                 : []
             }
             dataKey="timestamp"
-            domain={['dataMin', 'dataMax']}
+            domain={xDomain}
             interval={xAxisTickCount ? 0 : 'preserveEnd'}
             minTickGap={xAxis.tickGap}
             scale="time"
@@ -342,6 +391,12 @@ export const AreaChart = (props: AreaChartProps) => {
               type="monotone"
             />
           ))}
+          <Brush
+            dataKey="name"
+            height={30}
+            stroke="#8884d8"
+            onChange={handleBrushChange}
+          />
         </_AreaChart>
       </ResponsiveContainer>
       <AccessibleAreaChart
@@ -351,7 +406,7 @@ export const AreaChart = (props: AreaChartProps) => {
         timezone={timezone}
         unit={unit}
       />
-    </>
+    </div>
   );
 };
 
