@@ -229,7 +229,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
             />
           </Grid>
           {isSelectionsNeeded && (
-            <Grid item lg={4} xs={12}>
+            <Grid item lg={4} ml={2} xs={12}>
               <Checkbox
                 sx={{
                   maxHeight: theme.spacing(4.25),
