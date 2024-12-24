@@ -196,7 +196,7 @@ export const EditAlertResources = () => {
             buttonType="primary"
             data-testid="saveresources"
           >
-            Save
+            Save Selection
           </Button>
         </Box>
         <ConfirmationDialog
