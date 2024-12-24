@@ -198,7 +198,15 @@ export const AreaChart = (props: AreaChartProps) => {
     data[data.length - 1].timestamp,
   ]);
 
-  const [chartData, setChartData] = React.useState(data);
+  const [chartData, setChartData] = React.useState<any[]>(data);
+  const [brushRange, setBrushRange] = React.useState<{ start: number; end: number } | null>({ start: data[0].timestamp, end: data[data.length - 1].timestamp });
+  const [brushSize, setBrushSize] = React.useState<number>(data.length);
+
+  // When data changes, reset chartData and adjust the brush size accordingly
+  React.useEffect(() => {
+    setChartData(data);
+    setBrushSize(data.length);
+  }, [data]);
 
   const handleZoom = (event: React.WheelEvent) => {
     event.preventDefault();
@@ -236,25 +244,37 @@ export const AreaChart = (props: AreaChartProps) => {
     );
   };
 
+  // Handle the brush change and adjust the displayed chart data
   const handleBrushChange = (e: any) => {
     if (e && e.startIndex !== undefined && e.endIndex !== undefined) {
-      // const startTimestamp = chartData[e.startIndex].timestamp;
-      // const endTimestamp = chartData[e.endIndex].timestamp;
-      // setXDomain([startTimestamp, endTimestamp]);
-      // const chartDataObj:any = [];
-      // let idx = 0;
-      // for(let i=0; i<chartData.length; i++) {
-      //   if(i>=e.startIndex && i<=e.endIndex) {
-      //     chartDataObj[idx++] = chartData[i];
-      //   }
-      // }
+      const newStartIndex = e.startIndex;
+      const newEndIndex = e.endIndex;
 
-      // setChartData(chartDataObj);
+      // Update the brush range
+      const startTimestamp = data[newStartIndex].timestamp;
+      const endTimestamp = data[newEndIndex].timestamp;
+
+      if (startTimestamp && endTimestamp) {
+        setBrushRange({ start: startTimestamp, end: endTimestamp });
+
+        // Slice the chartData based on the brush range
+        const newChartData = data.slice(newStartIndex, newEndIndex + 1);
+        setChartData(newChartData);
+      }
     }
   };
 
-  const resetZoom = () => {
-    setXDomain([0, chartData.length - 1]);
+  const maintainBrushSize = (dataLength: number) => {
+    // Maintain the original brush size, no matter the number of data points
+    return chartData.slice(0, brushSize); // Always slice to the original brush size
+  };
+
+  const fixedChartData = maintainBrushSize(chartData.length);
+
+  // Reset to original data state (restore chartData and brush size)
+  const resetToOriginalState = () => {
+    setChartData(data);
+    setBrushRange({ start: data[0].timestamp, end: data[data.length - 1].timestamp });
   };
 
   const CustomTooltip = ({
@@ -317,8 +337,9 @@ export const AreaChart = (props: AreaChartProps) => {
 
   return (
     <div onWheel={handleZoom}>
+      <button onClick={resetToOriginalState}>Reset</button>
       <ResponsiveContainer height={height} width={width}>
-        <_AreaChart aria-label={ariaLabel} data={chartData} margin={margin}>
+        <_AreaChart aria-label={ariaLabel} data={fixedChartData} margin={margin}>
           <CartesianGrid
             stroke={theme.color.grey7}
             strokeDasharray="3 3"
@@ -331,7 +352,7 @@ export const AreaChart = (props: AreaChartProps) => {
                 : []
             }
             dataKey="timestamp"
-            domain={xDomain}
+            domain={[data[0].timestamp, data[data.length - 1].timestamp]}
             interval={xAxisTickCount ? 0 : 'preserveEnd'}
             minTickGap={xAxis.tickGap}
             scale="time"
@@ -392,10 +413,12 @@ export const AreaChart = (props: AreaChartProps) => {
             />
           ))}
           <Brush
-            dataKey="name"
+            dataKey="timestamp"
             height={30}
             stroke="#8884d8"
             onChange={handleBrushChange}
+            startIndex={brushRange ? data.findIndex(item => item.timestamp === brushRange.start) : 0}
+            endIndex={brushRange ? data.findIndex(item => item.timestamp === brushRange.end) : chartData.length - 1}
           />
         </_AreaChart>
       </ResponsiveContainer>
