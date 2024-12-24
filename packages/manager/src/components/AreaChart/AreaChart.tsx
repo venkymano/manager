@@ -193,20 +193,11 @@ export const AreaChart = (props: AreaChartProps) => {
   } = props;
 
   const theme = useTheme();
-  const [xDomain, setXDomain] = React.useState<[number, number]>([
-    data[0].timestamp,
-    data[data.length - 1].timestamp,
-  ]);
+  const [xDomain, setXDomain] = React.useState<[number, number]>(
+    data && data.length>0 ? [data[0].timestamp, data[data.length - 1].timestamp] : [0,0]
+  );
 
   const [chartData, setChartData] = React.useState<any[]>(data);
-  const [brushRange, setBrushRange] = React.useState<{ start: number; end: number } | null>({ start: data[0].timestamp, end: data[data.length - 1].timestamp });
-  const [brushSize, setBrushSize] = React.useState<number>(data.length);
-
-  // When data changes, reset chartData and adjust the brush size accordingly
-  React.useEffect(() => {
-    setChartData(data);
-    setBrushSize(data.length);
-  }, [data]);
 
   const handleZoom = (event: React.WheelEvent) => {
     event.preventDefault();
@@ -254,27 +245,17 @@ export const AreaChart = (props: AreaChartProps) => {
       const startTimestamp = data[newStartIndex].timestamp;
       const endTimestamp = data[newEndIndex].timestamp;
 
-      if (startTimestamp && endTimestamp) {
-        setBrushRange({ start: startTimestamp, end: endTimestamp });
-
+      if (
+        startTimestamp &&
+        endTimestamp &&
+        !(xDomain[0] === startTimestamp && xDomain[1] === endTimestamp)
+      ) {
         // Slice the chartData based on the brush range
         const newChartData = data.slice(newStartIndex, newEndIndex + 1);
+        setXDomain([startTimestamp, endTimestamp]);
         setChartData(newChartData);
       }
     }
-  };
-
-  const maintainBrushSize = (dataLength: number) => {
-    // Maintain the original brush size, no matter the number of data points
-    return chartData.slice(0, brushSize); // Always slice to the original brush size
-  };
-
-  const fixedChartData = maintainBrushSize(chartData.length);
-
-  // Reset to original data state (restore chartData and brush size)
-  const resetToOriginalState = () => {
-    setChartData(data);
-    setBrushRange({ start: data[0].timestamp, end: data[data.length - 1].timestamp });
   };
 
   const CustomTooltip = ({
@@ -337,9 +318,8 @@ export const AreaChart = (props: AreaChartProps) => {
 
   return (
     <div onWheel={handleZoom}>
-      <button onClick={resetToOriginalState}>Reset</button>
       <ResponsiveContainer height={height} width={width}>
-        <_AreaChart aria-label={ariaLabel} data={fixedChartData} margin={margin}>
+        <_AreaChart aria-label={ariaLabel} data={data} margin={margin}>
           <CartesianGrid
             stroke={theme.color.grey7}
             strokeDasharray="3 3"
@@ -352,7 +332,7 @@ export const AreaChart = (props: AreaChartProps) => {
                 : []
             }
             dataKey="timestamp"
-            domain={[data[0].timestamp, data[data.length - 1].timestamp]}
+            domain={xDomain}
             interval={xAxisTickCount ? 0 : 'preserveEnd'}
             minTickGap={xAxis.tickGap}
             scale="time"
@@ -413,12 +393,10 @@ export const AreaChart = (props: AreaChartProps) => {
             />
           ))}
           <Brush
-            dataKey="timestamp"
+            dataKey="name"
             height={30}
-            stroke="#8884d8"
             onChange={handleBrushChange}
-            startIndex={brushRange ? data.findIndex(item => item.timestamp === brushRange.start) : 0}
-            endIndex={brushRange ? data.findIndex(item => item.timestamp === brushRange.end) : chartData.length - 1}
+            stroke="#8884d8"
           />
         </_AreaChart>
       </ResponsiveContainer>
