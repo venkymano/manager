@@ -2369,8 +2369,7 @@ export const handlers = [
   ),
   http.put('*/monitor/services/:serviceType/alert-definitions/:id', () => {
     sleep(2000);
-    // return HttpResponse.json({});
-    return HttpResponse.error();
+    return HttpResponse.json({});
   }),
   http.get('*/monitor/alert-channels', () => {
     return HttpResponse.json(
