@@ -36,6 +36,9 @@ export const AlertsRegionFilter = React.memo((props: AlertsRegionProps) => {
           placement: 'bottom',
         },
       }}
+      sx={{
+        width: '250px',
+      }}
       textFieldProps={{
         hideLabel: true,
       }}

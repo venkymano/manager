@@ -1,4 +1,4 @@
-import { CircleProgress } from '@linode/ui';
+import { Box, CircleProgress } from '@linode/ui';
 import { Grid, styled, useTheme } from '@mui/material';
 import React from 'react';
 
@@ -202,51 +202,47 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
             </Typography>
           </Grid>
         )}
-        <Grid columnSpacing={1} container item rowSpacing={3} xs={12}>
-          <Grid item md={3} xs={12}>
-            <DebouncedSearchTextField
-              onSearch={(value) => {
-                setSearchText(value);
-              }}
+        <Box columnGap={3} display="flex" flexDirection="row" ml={3} mt={3}>
+          <DebouncedSearchTextField
+            onSearch={(value) => {
+              setSearchText(value);
+            }}
+            sx={{
+              maxHeight: theme.spacing(4.25),
+              p: 0,
+              width: '250px',
+            }}
+            clearable
+            debounceTime={300}
+            hideLabel
+            isSearching={false}
+            label="Search for resource"
+            placeholder="Search for resource"
+            value={searchText ?? ''}
+          />
+          <AlertsRegionFilter
+            handleSelectionChange={(value) => {
+              setFilteredRegions(value);
+            }}
+            regionOptions={regionOptions ?? []}
+          />
+          {isSelectionsNeeded && (
+            <Checkbox
               sx={{
                 maxHeight: theme.spacing(4.25),
+                pt: theme.spacing(1),
+                svg: {
+                  backgroundColor: theme.color.white,
+                },
               }}
-              clearable
-              debounceTime={300}
-              hideLabel
-              isSearching={false}
-              label="Search for a Resource"
-              placeholder="Search for a Resource"
-              value={searchText ?? ''}
+              checked={selectedOnly}
+              data-testid="show_selected_only"
+              onClick={() => setSelectedOnly(!selectedOnly)}
+              text={'Show Selected Only'}
+              value={'Show Selected'}
             />
-          </Grid>
-          <Grid item md={4} xs={12}>
-            <AlertsRegionFilter
-              handleSelectionChange={(value) => {
-                setFilteredRegions(value);
-              }}
-              regionOptions={regionOptions ?? []}
-            />
-          </Grid>
-          {isSelectionsNeeded && (
-            <Grid item lg={4} ml={2} xs={12}>
-              <Checkbox
-                sx={{
-                  maxHeight: theme.spacing(4.25),
-                  pt: theme.spacing(1),
-                  svg: {
-                    backgroundColor: theme.color.white,
-                  },
-                }}
-                checked={selectedOnly}
-                data-testid="show_selected_only"
-                onClick={() => setSelectedOnly(!selectedOnly)}
-                text={'Show Selected Only'}
-                value={'Show Selected'}
-              />
-            </Grid>
           )}
-        </Grid>
+        </Box>
 
         {isSelectionsNeeded && !(isError || isRegionsError) && (
           <Grid item xs={12}>

@@ -21,7 +21,7 @@ export const AlertsResourcesNotice = React.memo(
         variant="info"
       >
         <b>
-          {selectedResources} out of {totalResources} resources are selected{' '}
+          {selectedResources} of {totalResources} resources are selected{' '}
         </b>
         {selectedResources !== totalResources && (
           <StyledButton

@@ -201,6 +201,7 @@ export const EditAlertResources = () => {
         </Box>
         <ConfirmationDialog
           actions={<ActionsPanel {...saveConfirmationActionProps} />}
+          fullWidth
           onClose={() => setShowConfirmation(!showConfirmation)}
           open={showConfirmation}
           title="Confirm alert updates"
