@@ -1,4 +1,4 @@
-import { Paper } from '@linode/ui';
+import { Button, Paper } from '@linode/ui';
 import { Box, Grid, Stack, Typography, useTheme } from '@mui/material';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -323,6 +323,9 @@ export const CloudPulseWidget = (props: CloudPulseWidgetProperties) => {
                   handleZoomToggle={handleZoomToggle}
                   zoomIn={widget?.size === 12}
                 />
+              </Box>
+              <Box>
+                <Button buttonType="primary">Reset Zoom</Button>
               </Box>
             </Stack>
           </Stack>

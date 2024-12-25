@@ -167,6 +167,8 @@ export interface AreaChartProps {
    * y-axis properties
    */
   yAxisProps?: YAxisProps;
+
+  resetZoom?: boolean;
 }
 
 export const AreaChart = (props: AreaChartProps) => {
@@ -194,7 +196,9 @@ export const AreaChart = (props: AreaChartProps) => {
 
   const theme = useTheme();
   const [xDomain, setXDomain] = React.useState<[number, number]>(
-    data && data.length>0 ? [data[0].timestamp, data[data.length - 1].timestamp] : [0,0]
+    data && data.length > 0
+      ? [data[0].timestamp, data[data.length - 1].timestamp]
+      : [0, 0]
   );
 
   const [chartData, setChartData] = React.useState<any[]>(data);
@@ -393,10 +397,13 @@ export const AreaChart = (props: AreaChartProps) => {
             />
           ))}
           <Brush
-            dataKey="name"
-            height={30}
+            dataKey="timestamp"
+            fill="rgba(76, 175, 80, 0.2)" // Light green semi-transparent background
+            height={10} // Increase the height for a better visual
             onChange={handleBrushChange}
-            stroke="#8884d8"
+            stroke="#4CAF50" // Stylish green stroke
+            tickFormatter={xAxisTickFormatter}
+            travellerWidth={15} // Wider handles
           />
         </_AreaChart>
       </ResponsiveContainer>
@@ -417,3 +424,31 @@ const StyledTooltipPaper = styled(Paper, {
   border: `1px solid ${theme.color.border2}`,
   padding: theme.spacing(1),
 }));
+
+// const StylishBrush = ({ data, handleBrushChange, xAxisTickFormatter }) => {
+//   return (
+//     <Brush
+//       dataKey="timestamp"
+//       endIndex={data.length - 1} // Ensure full range is included
+//       fill="rgba(76, 175, 80, 0.2)" // Light green semi-transparent background
+//       height={40} // Increase the height for a better visual
+//       onChange={handleBrushChange}
+//       startIndex={0} // Set initial visible range
+//       stroke="#4CAF50" // Stylish green stroke
+//       tickFormatter={xAxisTickFormatter} // Format the displayed timestamps
+//       travellerWidth={12} // Wider handles
+//     >
+//       <text
+//         style={{
+//           fill: '#4CAF50',
+//           fontSize: 12,
+//           fontWeight: 600,
+//         }}
+//         x={0}
+//         y={20}
+//       >
+//         Drag to filter the range
+//       </text>
+//     </Brush>
+//   );
+// };
