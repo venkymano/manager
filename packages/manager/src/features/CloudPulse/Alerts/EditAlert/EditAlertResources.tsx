@@ -58,11 +58,26 @@ export const EditAlertResources = () => {
     return { newPathname: '/Definitions/Edit', overrides };
   }, [serviceType, alertId]);
 
-  const selectedResourcesRef = React.useRef<number[]>([]);
-
   const [showConfirmation, setShowConfirmation] = React.useState<boolean>(
     false
   );
+
+  const [selectedResources, setSelectedResources] = React.useState<number[]>(
+    []
+  );
+
+  const isSameResourcesSelected = React.useMemo((): boolean => {
+    if (
+      !alertDetails ||
+      !alertDetails?.resource_ids ||
+      selectedResources.length !== alertDetails?.resource_ids.length
+    ) {
+      return false;
+    }
+    return selectedResources.every((resource) =>
+      alertDetails?.resource_ids.includes(String(resource))
+    );
+  }, [alertDetails, selectedResources]);
 
   if (isFetching) {
     return (
@@ -102,13 +117,13 @@ export const EditAlertResources = () => {
   }
 
   const handleResourcesSelection = (resourceIds: number[]) => {
-    selectedResourcesRef.current = resourceIds; // here we just keep track of it, on save we will update it
+    setSelectedResources(resourceIds) // here we just keep track of it, on save we will update it
   };
 
   const saveResources = () => {
     setShowConfirmation(false);
     editAlert({
-      resource_ids: selectedResourcesRef.current.map((id) => String(id)),
+      resource_ids: selectedResources.map((id) => String(id)),
     }).then(() => {
       // on success land on the alert definition list page and show a success snackbar
       history.push('/monitor/cloudpulse/alerts/definitions');
@@ -196,6 +211,7 @@ export const EditAlertResources = () => {
             }}
             buttonType="primary"
             data-testid="saveresources"
+            disabled={isSameResourcesSelected}
           >
             Save selection
           </Button>

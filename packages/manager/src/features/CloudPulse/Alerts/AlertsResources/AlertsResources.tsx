@@ -239,6 +239,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
               }}
               checked={selectedOnly}
               data-testid="show_selected_only"
+              disabled={!Boolean(selectedResources.length)}
               onClick={() => setSelectedOnly(!selectedOnly)}
               text={'Show Selected Only'}
               value={'Show Selected'}
