@@ -192,6 +192,7 @@ export const EditAlertResources = () => {
             }}
             sx={{
               ml: 1,
+              textTransform: 'none',
             }}
             buttonType="primary"
             data-testid="saveresources"

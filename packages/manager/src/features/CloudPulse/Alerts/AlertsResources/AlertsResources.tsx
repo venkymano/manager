@@ -203,29 +203,31 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
           </Grid>
         )}
         <Box columnGap={3} display="flex" flexDirection="row" ml={3} mt={3}>
-          <DebouncedSearchTextField
-            onSearch={(value) => {
-              setSearchText(value);
-            }}
-            sx={{
-              maxHeight: theme.spacing(4.25),
-              p: 0,
-              width: '250px',
-            }}
-            clearable
-            debounceTime={300}
-            hideLabel
-            isSearching={false}
-            label="Search for resource"
-            placeholder="Search for resource"
-            value={searchText ?? ''}
-          />
-          <AlertsRegionFilter
-            handleSelectionChange={(value) => {
-              setFilteredRegions(value);
-            }}
-            regionOptions={regionOptions ?? []}
-          />
+          <Box columnGap={1} display={'flex'} flexDirection={'row'}>
+            <DebouncedSearchTextField
+              onSearch={(value) => {
+                setSearchText(value);
+              }}
+              sx={{
+                maxHeight: theme.spacing(4.25),
+                p: 0,
+                width: theme.spacing(37.5),
+              }}
+              clearable
+              debounceTime={300}
+              hideLabel
+              isSearching={false}
+              label="Search for resource"
+              placeholder="Search for a Resource or a Region"
+              value={searchText ?? ''}
+            />
+            <AlertsRegionFilter
+              handleSelectionChange={(value) => {
+                setFilteredRegions(value);
+              }}
+              regionOptions={regionOptions ?? []}
+            />
+          </Box>
           {isSelectionsNeeded && (
             <Checkbox
               sx={{
@@ -261,7 +263,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
               noDataText={
                 !(isError || isRegionsError) &&
                 !Boolean(filteredResources?.length)
-                  ? 'No Results found'
+                  ? 'No data to display.'
                   : undefined
               }
               errorText={'Table data is unavailable. Please try again later'}

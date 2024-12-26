@@ -239,7 +239,7 @@ export const DisplayAlertResources = React.memo(
                       colSpan={3}
                       height={theme.spacing(6)}
                     >
-                      {noDataText ?? 'No results found'}
+                      {noDataText ?? 'No data to display.'}
                     </TableCell>
                   </TableRow>
                 )}

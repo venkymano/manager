@@ -25,6 +25,9 @@ export const AlertsResourcesNotice = React.memo(
         </b>
         {selectedResources !== totalResources && (
           <StyledButton
+            sx={{
+              textTransform: 'none',
+            }}
             aria-label="Select All Resources"
             onClick={handleSelectionChange}
             variant="text"
@@ -34,6 +37,9 @@ export const AlertsResourcesNotice = React.memo(
         )}
         {selectedResources === totalResources && (
           <StyledButton
+            sx={{
+              textTransform: 'none',
+            }}
             aria-label="Unselect All Resources"
             onClick={handleSelectionChange}
             variant="text"
