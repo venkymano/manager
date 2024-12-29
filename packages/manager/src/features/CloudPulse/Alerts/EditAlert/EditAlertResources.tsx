@@ -117,7 +117,7 @@ export const EditAlertResources = () => {
   }
 
   const handleResourcesSelection = (resourceIds: number[]) => {
-    setSelectedResources(resourceIds) // here we just keep track of it, on save we will update it
+    setSelectedResources(resourceIds); // here we just keep track of it, on save we will update it
   };
 
   const saveResources = () => {
