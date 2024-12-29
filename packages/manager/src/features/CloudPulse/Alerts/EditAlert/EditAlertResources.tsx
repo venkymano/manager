@@ -207,13 +207,12 @@ export const EditAlertResources = () => {
             }}
             sx={{
               ml: 1,
-              textTransform: 'none',
             }}
             buttonType="primary"
             data-testid="saveresources"
             disabled={isSameResourcesSelected}
           >
-            Save selection
+            Save
           </Button>
         </Box>
         <ConfirmationDialog
