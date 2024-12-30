@@ -356,7 +356,7 @@ export const MainContent = () => {
                             <Route component={Databases} path="/databases" />
                           )}
                           <Route component={VPC} path="/vpcs" />
-                          {isACLPEnabled && (
+                          {true && (
                             <Route
                               component={CloudPulse}
                               path="/monitor/cloudpulse"

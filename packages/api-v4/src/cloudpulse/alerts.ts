@@ -5,6 +5,7 @@ import Request, {
   setData,
   setParams,
   setXFilter,
+  // setHeaders,
 } from '../request';
 import {
   Alert,
@@ -14,6 +15,8 @@ import {
 } from './types';
 import { BETA_API_ROOT as API_ROOT } from 'src/constants';
 import { Params, Filter, ResourcePage } from 'src/types';
+
+// const API_ROOT = 'http://blr-lhvk5r.bangalore.corp.akamai.com:9001/v4beta';
 
 export const createAlertDefinition = (data: CreateAlertDefinitionPayload) =>
   Request<Alert>(
@@ -42,7 +45,10 @@ export const getAlertDefinitions = (params?: Params, filters?: Filter) =>
     setURL(`${API_ROOT}/monitor/alert-definitions`),
     setMethod('GET'),
     setParams(params),
-    setXFilter(filters)
+    setXFilter(filters),
+    // setHeaders({
+    //   Authorization: 'Bearer vagrant',
+    // })
   );
 
 export const getAlertDefinitionById = (alertId: number, serviceType: string) =>
@@ -52,7 +58,10 @@ export const getAlertDefinitionById = (alertId: number, serviceType: string) =>
         serviceType
       )}/alert-definitions/${encodeURIComponent(alertId)}`
     ),
-    setMethod('GET')
+    setMethod('GET'),
+    // setHeaders({
+    //   Authorization: 'Bearer vagrant',
+    // })
   );
 
 export const getNotificationChannels = (params?: Params, filters?: Filter) =>

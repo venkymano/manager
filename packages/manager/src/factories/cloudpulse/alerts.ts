@@ -4,7 +4,7 @@ import { pickRandom } from 'src/utilities/random';
 import type { Alert } from '@linode/api-v4';
 
 export const alertFactory = Factory.Sync.makeFactory<Alert>({
-  channels: [
+  'alert-channels': [
     {
       id: 'Test',
       label: 'Test',
@@ -32,7 +32,7 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
         ],
         metric: 'CPU Usage',
         operator: 'gt',
-        value: 60,
+        threshold: 60,
       },
       {
         aggregation_type: 'avg',
@@ -86,14 +86,14 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
         ],
         metric: 'CPU Usage',
         operator: 'gt',
-        value: 50,
+        threshold: 50,
       },
     ],
   },
   service_type: Factory.each(() => pickRandom(['linode', 'dbaas'])),
   severity: Factory.each(() => pickRandom([0, 1, 2, 3])),
   status: Factory.each(() => pickRandom(['enabled', 'disabled'])),
-  triggerCondition: {
+  trigger_conditions: {
     evaluation_period_seconds: 600,
     polling_interval_seconds: 60,
     trigger_occurrences: 60,

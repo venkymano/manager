@@ -173,7 +173,7 @@ export interface MetricCriteria {
   metric: string;
   aggregation_type: MetricAggregationType | '';
   operator: MetricOperatorType | '';
-  value: number;
+  threshold: number;
   dimension_filters: DimensionFilter[];
 }
 
@@ -200,8 +200,8 @@ export interface Alert {
   rule_criteria: {
     rules: MetricCriteria[];
   };
-  triggerCondition: TriggerCondition;
-  channels: {
+  trigger_conditions: TriggerCondition;
+  'alert-channels': {
     id: string;
     label: string;
     url: string;

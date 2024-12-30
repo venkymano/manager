@@ -24,7 +24,7 @@ describe('AlertDetailCriteria component tests', () => {
     const {
       evaluation_period_seconds,
       polling_interval_seconds,
-    } = alert.triggerCondition;
+    } = alert.trigger_conditions;
     expect(
       getByText(convertSecondsToMinutes(polling_interval_seconds))
     ).toBeInTheDocument();
@@ -49,7 +49,7 @@ describe('AlertDetailCriteria component tests', () => {
     const {
       evaluation_period_seconds,
       polling_interval_seconds,
-    } = alert.triggerCondition;
+    } = alert.trigger_conditions;
     expect(
       getByText(convertSecondsToMinutes(polling_interval_seconds))
     ).toBeInTheDocument();

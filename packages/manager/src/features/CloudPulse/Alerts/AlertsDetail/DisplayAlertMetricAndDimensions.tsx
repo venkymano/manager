@@ -27,7 +27,7 @@ export const DisplayAlertMetricAndDimensions = React.memo(
 
     return ruleCriteria.rules.map(
       (
-        { aggregation_type, dimension_filters, metric, operator, value },
+        { aggregation_type, dimension_filters, metric, operator, threshold },
         idx
       ) => (
         <React.Fragment key={idx}>
@@ -39,7 +39,7 @@ export const DisplayAlertMetricAndDimensions = React.memo(
                   : aggregation_type,
                 metric,
                 operator ? operators[operator] : operator,
-                String(value),
+                String(threshold),
               ]}
               isJoin
               label={'Metric Threshold'}

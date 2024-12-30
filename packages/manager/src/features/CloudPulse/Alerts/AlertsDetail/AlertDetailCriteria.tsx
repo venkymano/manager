@@ -22,7 +22,7 @@ export const AlertDetailCriteria = React.memo((props: CriteriaProps) => {
     evaluation_period_seconds: evaluationPeriod,
     polling_interval_seconds: pollingIntervalSeconds,
     trigger_occurrences: triggerOccurrences,
-  } = alert.triggerCondition;
+  } = alert.trigger_conditions;
 
   const { rule_criteria: ruleCriteria = { rules: [] } } = alert;
 

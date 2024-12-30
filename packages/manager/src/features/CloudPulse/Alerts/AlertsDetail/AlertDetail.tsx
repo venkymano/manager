@@ -117,15 +117,15 @@ export const AlertDetail = () => {
           </Box>
         </Box>
 
-        <Box sx={getAlertBoxStyles(theme)}>
+        <Box sx={{ ...getAlertBoxStyles(theme), overflow: 'auto' }}>
           <AlertResources
             resourceIds={alertDetails?.resource_ids}
             serviceType={alertDetails?.service_type}
           />
         </Box>
-        <Box sx={getAlertBoxStyles(theme)}>
+        <Box sx={{ ...getAlertBoxStyles(theme), overflow: 'auto' }}>
           <AlertDetailNotification
-            channelIds={alertDetails.channels.map((channel) =>
+            channelIds={alertDetails['alert-channels'].map((channel) =>
               Number(channel.id)
             )}
           />

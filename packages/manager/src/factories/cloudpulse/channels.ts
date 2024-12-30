@@ -15,7 +15,7 @@ export const notificationChannelFactory = Factory.Sync.makeFactory<NotificationC
     channel_type: 'email',
     content: {
       channel_type: {
-        email_addresses: ['test@test.com', 'test2@test.com'],
+        email_addresses: ['testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest@test.com', 'test2@test.com'],
         message: 'You have a new Alert',
         subject: 'Sample Alert',
       },

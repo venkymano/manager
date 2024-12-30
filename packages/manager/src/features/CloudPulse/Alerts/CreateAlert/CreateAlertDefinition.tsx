@@ -32,7 +32,7 @@ const criteriaInitialValues: MetricCriteria[] = [
     dimension_filters: [],
     metric: '',
     operator: '',
-    value: 0,
+    threshold: 0,
   },
 ];
 const initialValues: CreateAlertDefinitionForm = {
