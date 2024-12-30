@@ -17,7 +17,7 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
   description: 'Test Description',
   id: Factory.each(() => Math.floor(Math.random() * 1000000)),
   label: Factory.each((id) => `Alert-${id}`),
-  resource_ids: Array.from({ length: 20 }, (_, i) => (i + 1).toString()),
+  entity_ids: Array.from({ length: 20 }, (_, i) => (i + 1).toString()),
   // resource_ids: [],
   rule_criteria: {
     rules: [

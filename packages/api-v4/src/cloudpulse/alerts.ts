@@ -5,7 +5,7 @@ import Request, {
   setData,
   setParams,
   setXFilter,
-  // setHeaders,
+  setHeaders,
 } from '../request';
 import {
   Alert,
@@ -13,10 +13,10 @@ import {
   EditAlertResourcesPayload,
   NotificationChannel,
 } from './types';
-import { BETA_API_ROOT as API_ROOT } from 'src/constants';
+// import { BETA_API_ROOT as API_ROOT } from 'src/constants';
 import { Params, Filter, ResourcePage } from 'src/types';
 
-// const API_ROOT = 'http://blr-lhvk5r.bangalore.corp.akamai.com:9001/v4beta';
+const API_ROOT = 'http://blr-lhvk5r.bangalore.corp.akamai.com:9001/v4beta';
 
 export const createAlertDefinition = (data: CreateAlertDefinitionPayload) =>
   Request<Alert>(
@@ -46,9 +46,9 @@ export const getAlertDefinitions = (params?: Params, filters?: Filter) =>
     setMethod('GET'),
     setParams(params),
     setXFilter(filters),
-    // setHeaders({
-    //   Authorization: 'Bearer vagrant',
-    // })
+    setHeaders({
+      Authorization: 'Bearer vagrant',
+    })
   );
 
 export const getAlertDefinitionById = (alertId: number, serviceType: string) =>
@@ -59,9 +59,9 @@ export const getAlertDefinitionById = (alertId: number, serviceType: string) =>
       )}/alert-definitions/${encodeURIComponent(alertId)}`
     ),
     setMethod('GET'),
-    // setHeaders({
-    //   Authorization: 'Bearer vagrant',
-    // })
+    setHeaders({
+      Authorization: 'Bearer vagrant',
+    })
   );
 
 export const getNotificationChannels = (params?: Params, filters?: Filter) =>

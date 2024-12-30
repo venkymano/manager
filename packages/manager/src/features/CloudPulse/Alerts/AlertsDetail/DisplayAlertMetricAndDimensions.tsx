@@ -27,7 +27,7 @@ export const DisplayAlertMetricAndDimensions = React.memo(
 
     return ruleCriteria.rules.map(
       (
-        { aggregation_type, dimension_filters, metric, operator, threshold },
+        { aggregation_type, dimension_filters, label, operator, threshold, unit },
         idx
       ) => (
         <React.Fragment key={idx}>
@@ -37,9 +37,10 @@ export const DisplayAlertMetricAndDimensions = React.memo(
                 aggregation_type
                   ? aggregationTypes[aggregation_type]
                   : aggregation_type,
-                metric,
+                label,
                 operator ? operators[operator] : operator,
                 String(threshold),
+                unit,
               ]}
               isJoin
               label={'Metric Threshold'}
@@ -47,13 +48,11 @@ export const DisplayAlertMetricAndDimensions = React.memo(
           </Grid>
           <Grid item xs={12}>
             <DisplayAlertChips
-              chips={dimension_filters.map(
-                ({ dimension_label, operator, value }) => [
-                  dimension_label,
-                  operator,
-                  value,
-                ]
-              )}
+              chips={dimension_filters.map(({ label, operator, value }) => [
+                label,
+                operator,
+                value,
+              ])}
               isJoin
               label={'Dimension Filter'}
             />

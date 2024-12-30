@@ -171,14 +171,17 @@ export interface CreateAlertDefinitionForm
 }
 export interface MetricCriteria {
   metric: string;
+  label: string;
   aggregation_type: MetricAggregationType | '';
   operator: MetricOperatorType | '';
   threshold: number;
   dimension_filters: DimensionFilter[];
+  unit: string;
 }
 
 export interface DimensionFilter {
   dimension_label: string;
+  label: string;
   operator: DimensionFilterOperatorType | '';
   value: string;
 }
@@ -196,7 +199,7 @@ export interface Alert {
   type: AlertDefinitionType;
   severity: AlertSeverityType;
   service_type: string;
-  resource_ids: string[];
+  entity_ids: string[];
   rule_criteria: {
     rules: MetricCriteria[];
   };

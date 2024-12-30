@@ -69,13 +69,13 @@ export const EditAlertResources = () => {
   const isSameResourcesSelected = React.useMemo((): boolean => {
     if (
       !alertDetails ||
-      !alertDetails?.resource_ids ||
-      selectedResources.length !== alertDetails?.resource_ids.length
+      !alertDetails?.entity_ids ||
+      selectedResources.length !== alertDetails?.entity_ids.length
     ) {
       return false;
     }
     return selectedResources.every((resource) =>
-      alertDetails?.resource_ids.includes(String(resource))
+      alertDetails?.entity_ids.includes(String(resource))
     );
   }, [alertDetails, selectedResources]);
 
@@ -183,7 +183,7 @@ export const EditAlertResources = () => {
             alertLabel={alertDetails.label}
             handleResourcesSelection={handleResourcesSelection}
             isSelectionsNeeded
-            resourceIds={alertDetails.resource_ids}
+            resourceIds={alertDetails.entity_ids}
             serviceType={alertDetails.service_type}
           />
         </Box>

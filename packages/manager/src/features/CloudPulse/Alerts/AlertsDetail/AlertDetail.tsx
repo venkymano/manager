@@ -119,7 +119,7 @@ export const AlertDetail = () => {
 
         <Box sx={{ ...getAlertBoxStyles(theme), overflow: 'auto' }}>
           <AlertResources
-            resourceIds={alertDetails?.resource_ids}
+            resourceIds={alertDetails?.entity_ids}
             serviceType={alertDetails?.service_type}
           />
         </Box>
