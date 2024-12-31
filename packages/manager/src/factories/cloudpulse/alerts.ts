@@ -70,6 +70,6 @@ export const alertFactory = Factory.Sync.makeFactory<Alert>({
     trigger_occurrences: 3,
   },
   type: 'user',
-  updated: new Date().toISOString(),
+  updated: '2024-12-30 13:04:52',
   updated_by: 'user1',
 });
