@@ -216,6 +216,9 @@ export const EditAlertResources = () => {
           </Button>
         </Box>
         <ConfirmationDialog
+          sx={{
+            fontSize: '16px',
+          }}
           actions={<ActionsPanel {...saveConfirmationActionProps} />}
           fullWidth
           onClose={() => setShowConfirmation(!showConfirmation)}
