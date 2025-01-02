@@ -195,7 +195,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       <Grid container spacing={3}>
         {isSelectionsNeeded && (
           <Grid item xs={12}>
-            <Typography variant="body1">
+            <Typography fontSize="16px" variant="body1">
               You can enable/disable alerts for resources you have access to.
               Some resources linked to this definition may be hidden due to your
               access restrictions.
@@ -239,7 +239,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
               }}
               checked={selectedOnly}
               data-testid="show_selected_only"
-              disabled={!Boolean(selectedResources.length)}
+              disabled={!(Boolean(selectedResources.length) || selectedOnly)}
               onClick={() => setSelectedOnly(!selectedOnly)}
               text={'Show Selected Only'}
               value={'Show Selected'}
