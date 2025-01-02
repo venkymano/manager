@@ -68,7 +68,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   );
 
   const [selectedResources, setSelectedResources] = React.useState<number[]>(
-    isSelectionsNeeded ? resourceIds.map((id) => Number(id)) : []
+    []
   );
 
   const [selectedOnly, setSelectedOnly] = React.useState<boolean>(false);
@@ -80,6 +80,16 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     isError: isRegionsError,
     isFetching: isRegionsFetching,
   } = useRegionsQuery();
+
+  React.useEffect(() => {
+    if (data && isSelectionsNeeded) {
+      setSelectedResources(
+        data
+          .filter((resource) => resourceIds.includes(String(resource.id)))
+          .map((resource) => Number(resource.id))
+      );
+    }
+  }, [data, isSelectionsNeeded, resourceIds]);
 
   React.useEffect(() => {
     if (handleResourcesSelection) {
