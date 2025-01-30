@@ -54,6 +54,8 @@ export const DimensionFilterField = (props: DimensionFilterFieldProps) => {
       setValue(`${name}.dimension_label`, selected.value, {
         shouldValidate: true,
       });
+      setValue(`${name}.operator`, fieldValue.operator);
+      setValue(`${name}.value`, fieldValue.value);
     } else {
       setValue(name, fieldValue);
     }

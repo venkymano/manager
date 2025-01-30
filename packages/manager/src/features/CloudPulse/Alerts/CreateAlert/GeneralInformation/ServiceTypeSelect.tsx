@@ -1,6 +1,7 @@
 import { Autocomplete } from '@linode/ui';
 import * as React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useLocation } from 'react-router-dom';
 
 import { useCloudPulseServiceTypes } from 'src/queries/cloudpulse/services';
 
@@ -26,7 +27,7 @@ export const CloudPulseServiceSelect = (
     isLoading: serviceTypesLoading,
   } = useCloudPulseServiceTypes(true);
   const { control } = useFormContext<CreateAlertDefinitionForm>();
-
+  const location = useLocation();
   const getServicesList = React.useMemo((): Item<
     string,
     AlertServiceType
@@ -38,7 +39,7 @@ export const CloudPulseServiceSelect = (
         }))
       : [];
   }, [serviceOptions]);
-
+  const isDisabled = location.pathname.includes('edit');
   return (
     <Controller
       render={({ field, fieldState }) => (
@@ -60,11 +61,11 @@ export const CloudPulseServiceSelect = (
             }
           }}
           value={
-            field.value !== null
-              ? getServicesList.find((option) => option.value === field.value)
-              : null
+            getServicesList.find((option) => option.value === field.value) ??
+            null
           }
           data-testid="servicetype-select"
+          disabled={isDisabled}
           fullWidth
           label="Service"
           loading={serviceTypesLoading && !serviceTypesError}

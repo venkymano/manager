@@ -11,7 +11,7 @@ import {
   Alert,
   AlertServiceType,
   CreateAlertDefinitionPayload,
-  EditAlertResourcesPayload,
+  EditAlertDefinitionPayload,
   NotificationChannel,
 } from './types';
 import { BETA_API_ROOT as API_ROOT } from '../constants';
@@ -79,8 +79,8 @@ export const getNotificationChannels = (params?: Params, filters?: Filter) =>
     })
   );
 
-export const editAlertDefinitionEntities = (
-  data: EditAlertResourcesPayload,
+export const editAlertDefinition = (
+  data: EditAlertDefinitionPayload,
   serviceType: string,
   alertId: number
 ) =>

@@ -41,11 +41,9 @@ export const CloudPulseAlertSeveritySelect = (
               'Define a severity level associated with the alert to help you prioritize and manage alerts in the Recent activity tab.',
           }}
           value={
-            field.value !== null
-              ? alertSeverityOptions.find(
-                  (option) => option.value === field.value
-                )
-              : null
+            alertSeverityOptions.find(
+              (option) => option.value === field.value
+            ) ?? null
           }
           data-testid="severity"
           errorText={fieldState.error?.message}

@@ -18,16 +18,16 @@ const regions = regionFactory.buildList(4).map((region, index) => ({
 
 // Mock Queries
 const queryMocks = vi.hoisted(() => ({
-  useAlertDefinitionQuery: vi.fn(),
-  useEditAlertDefinitionEntities: vi.fn(),
+  // useAlertDefinitionQuery: vi.fn(),
+  useEditAlertDefinition: vi.fn(),
   useRegionsQuery: vi.fn(),
   useResourcesQuery: vi.fn(),
 }));
 
 vi.mock('src/queries/cloudpulse/alerts', () => ({
   ...vi.importActual('src/queries/cloudpulse/alerts'),
-  useAlertDefinitionQuery: queryMocks.useAlertDefinitionQuery,
-  useEditAlertDefinitionEntities: queryMocks.useEditAlertDefinitionEntities,
+  // useAlertDefinitionQuery: queryMocks.useAlertDefinitionQuery,
+  useEditAlertDefinition: queryMocks.useEditAlertDefinition,
 }));
 
 vi.mock('src/queries/cloudpulse/resources', () => ({
@@ -48,11 +48,11 @@ beforeAll(() => {
 // Shared Setup
 beforeEach(() => {
   vi.clearAllMocks();
-  queryMocks.useAlertDefinitionQuery.mockReturnValue({
-    data: alertDetails,
-    isError: false,
-    isFetching: false,
-  });
+  // queryMocks.useAlertDefinitionQuery.mockReturnValue({
+  //   data: alertDetails,
+  //   isError: false,
+  //   isFetching: false,
+  // });
   queryMocks.useResourcesQuery.mockReturnValue({
     data: linodes,
     isError: false,
@@ -63,7 +63,7 @@ beforeEach(() => {
     isError: false,
     isFetching: false,
   });
-  queryMocks.useEditAlertDefinitionEntities.mockReturnValue({
+  queryMocks.useEditAlertDefinition.mockReturnValue({
     mutateAsync: vi.fn().mockResolvedValue({}),
     reset: vi.fn(),
   });
@@ -72,7 +72,7 @@ beforeEach(() => {
 describe('EditAlertResources component tests', () => {
   it('Edit alert resources happy path', () => {
     const { getByPlaceholderText, getByTestId } = renderWithTheme(
-      <EditAlertResources />
+      <EditAlertResources alertDetails={alertDetails} serviceType={'linode'} />
     );
 
     expect(
@@ -82,47 +82,46 @@ describe('EditAlertResources component tests', () => {
     expect(getByTestId('show_selected_only')).toBeInTheDocument();
   });
 
-  it('Edit alert resources alert details error and loading path', () => {
-    queryMocks.useAlertDefinitionQuery.mockReturnValue({
-      data: undefined,
-      isError: true, // simulate error
-      isFetching: false,
-    });
+  // it('Edit alert resources alert details error and loading path', () => {
+  //   queryMocks.useAlertDefinitionQuery.mockReturnValue({
+  //     data: undefined,
+  //     isError: true, // simulate error
+  //     isFetching: false,
+  //   });
 
-    const { getByText } = renderWithTheme(<EditAlertResources />);
+  //   const { getByText } = renderWithTheme(<EditAlertResources />);
 
-    expect(
-      getByText(
-        'An error occurred while loading the alerts definitions and resources. Please try again later.'
-      )
-    ).toBeInTheDocument();
+  //   expect(
+  //     getByText(
+  //       'An error occurred while loading the alerts definitions and resources. Please try again later.'
+  //     )
+  //   ).toBeInTheDocument();
 
-    queryMocks.useAlertDefinitionQuery.mockReturnValue({
-      data: undefined,
-      isError: false,
-      isFetching: true, // simulate loading
-    });
+  //   queryMocks.useAlertDefinitionQuery.mockReturnValue({
+  //     data: undefined,
+  //     isError: false,
+  //     isFetching: true, // simulate loading
+  //   });
 
-    const { getByTestId } = renderWithTheme(<EditAlertResources />);
+  //   const { getByTestId } = renderWithTheme(<EditAlertResources />);
 
-    expect(getByTestId('circle-progress')).toBeInTheDocument();
-  });
+  //   expect(getByTestId('circle-progress')).toBeInTheDocument();
+  // });
 
-  it('Edit alert resources alert details empty path', () => {
-    queryMocks.useAlertDefinitionQuery.mockReturnValue({
-      data: undefined, // simulate empty
-      isError: false,
-      isFetching: false,
-    });
+  // it('Edit alert resources alert details empty path', () => {
+  //   queryMocks.useAlertDefinitionQuery.mockReturnValue({
+  //     data: undefined, // simulate empty
+  //     isError: false,
+  //     isFetching: false,
+  //   });
 
-    const { getByText } = renderWithTheme(<EditAlertResources />);
+  //   const { getByText } = renderWithTheme(<EditAlertResources />);
 
-    expect(getByText('No Data to display.')).toBeInTheDocument();
-  });
+  //   expect(getByText('No Data to display.')).toBeInTheDocument();
+  // });
 
   it('Edit alert resources successful edit', async () => {
-    const mutateAsyncSpy = queryMocks.useEditAlertDefinitionEntities()
-      .mutateAsync;
+    const mutateAsyncSpy = queryMocks.useEditAlertDefinition().mutateAsync;
 
     const push = vi.fn();
     const history = createMemoryHistory(); // Create a memory history for testing
@@ -131,7 +130,10 @@ describe('EditAlertResources component tests', () => {
 
     const { getByTestId } = renderWithTheme(
       <Router history={history}>
-        <EditAlertResources />
+        <EditAlertResources
+          alertDetails={alertDetails}
+          serviceType={'linode'}
+        />
       </Router>
     );
 
