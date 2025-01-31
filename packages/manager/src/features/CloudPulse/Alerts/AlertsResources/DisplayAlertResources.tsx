@@ -12,6 +12,8 @@ import { TableRow } from 'src/components/TableRow';
 import { TableRowError } from 'src/components/TableRowError/TableRowError';
 import { TableSortCell } from 'src/components/TableSortCell';
 
+import { engineTypeMap } from '../constants';
+
 import type { Order } from 'src/hooks/useOrder';
 
 export interface AlertInstance {
@@ -20,9 +22,14 @@ export interface AlertInstance {
    */
   checked?: boolean;
   /**
+   * The engine associated with the instance in case of databases
+   */
+  engineType?: string;
+  /**
    * The id of the instance
    */
   id: string;
+
   /**
    * The label of the instance
    */
@@ -63,6 +70,11 @@ export interface DisplayAlertResourceProp {
    * Callback to scroll till the element required on page change change or sorting change
    */
   scrollToElement: () => void;
+
+  /**
+   * The service type associated with the alert
+   */
+  serviceType: string | undefined;
 }
 
 export const DisplayAlertResources = React.memo(
@@ -74,6 +86,7 @@ export const DisplayAlertResources = React.memo(
       isSelectionsNeeded,
       pageSize,
       scrollToElement,
+      serviceType,
     } = props;
 
     const [sorting, setSorting] = React.useState<{
@@ -207,6 +220,20 @@ export const DisplayAlertResources = React.memo(
                   >
                     Region
                   </TableSortCell>
+                  {serviceType === 'dbaas' && (
+                    <TableSortCell
+                      handleClick={(orderBy, order) => {
+                        handleSort(orderBy, order, handlePageChange);
+                      }}
+                      active={sorting.orderBy === 'engineType'}
+                      data-qa-header="engineType"
+                      data-testid="engineType"
+                      direction={sorting.order}
+                      label="engineType"
+                    >
+                      Engine
+                    </TableSortCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody
@@ -214,30 +241,37 @@ export const DisplayAlertResources = React.memo(
                 data-testid="alert_resources_content"
               >
                 {!isDataLoadingError &&
-                  paginatedData.map(({ checked, id, label, region }, index) => (
-                    <TableRow data-qa-alert-row={id} key={`${index}_${id}`}>
-                      {isSelectionsNeeded && (
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            onClick={() => {
-                              handleSelectionChange([id], !checked);
-                            }}
-                            sx={{
-                              padding: 0,
-                            }}
-                            checked={checked}
-                            data-testid={`select_item_${id}`}
-                          />
+                  paginatedData.map(
+                    ({ checked, engineType, id, label, region }, index) => (
+                      <TableRow data-qa-alert-row={id} key={`${index}_${id}`}>
+                        {isSelectionsNeeded && (
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              onClick={() => {
+                                handleSelectionChange([id], !checked);
+                              }}
+                              sx={{
+                                padding: 0,
+                              }}
+                              checked={checked}
+                              data-testid={`select_item_${id}`}
+                            />
+                          </TableCell>
+                        )}
+                        <TableCell data-qa-alert-cell={`${id}_resource`}>
+                          {label}
                         </TableCell>
-                      )}
-                      <TableCell data-qa-alert-cell={`${id}_resource`}>
-                        {label}
-                      </TableCell>
-                      <TableCell data-qa-alert-cell={`${id}_region`}>
-                        {region}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell data-qa-alert-cell={`${id}_region`}>
+                          {region}
+                        </TableCell>
+                        {serviceType === 'dbaas' && engineType && (
+                          <TableCell>
+                            {engineTypeMap[engineType] ?? engineType}
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    )
+                  )}
                 {isDataLoadingError && (
                   <TableRowError
                     colSpan={3}

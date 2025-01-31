@@ -172,6 +172,11 @@ export const alertStatuses: Record<AlertStatusType, string> = {
   enabled: 'Enabled',
 };
 
+export const engineTypeMap: Record<string, string> = {
+  mysql: 'MySQL',
+  postgresql: 'PostgreSQL',
+}
+
 export const alertStatusOptions: Item<
   string,
   AlertStatusType
