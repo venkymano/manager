@@ -14,6 +14,7 @@ import {
   getRegionsIdRegionMap,
   scrollToElement,
 } from '../Utils/AlertResourceUtils';
+import { AlertsEngineOptionFilter } from './AlertsEngineTypeFilter';
 import { AlertsRegionFilter } from './AlertsRegionFilter';
 import { AlertsResourcesNotice } from './AlertsResourcesNotice';
 import { DisplayAlertResources } from './DisplayAlertResources';
@@ -68,6 +69,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   } = props;
   const [searchText, setSearchText] = React.useState<string>();
   const [filteredRegions, setFilteredRegions] = React.useState<string[]>();
+  const [engineType, setEngineType] = React.useState<string | undefined>();
   const [selectedResources, setSelectedResources] = React.useState<string[]>(
     alertResourceIds
   );
@@ -143,6 +145,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   const filteredResources = React.useMemo(() => {
     return getFilteredResources({
       data: resources,
+      engineType,
       filteredRegions,
       isAdditionOrDeletionNeeded: isSelectionsNeeded,
       regionsIdToRegionMap,
@@ -160,6 +163,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
     searchText,
     selectedOnly,
     selectedResources,
+    engineType,
   ]);
 
   const handleAllSelection = React.useCallback(() => {
@@ -196,6 +200,10 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
             : region // Stores filtered regions in the format `region.label (region.id)` that is displayed and filtered in the table
       )
     );
+  };
+
+  const handleEngineOptionChange = (engineType: string | undefined) => {
+    setEngineType(engineType);
   };
 
   const titleRef = React.useRef<HTMLDivElement>(null); // Reference to the component title, used for scrolling to the title when the table's page size or page number changes.
@@ -266,11 +274,18 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
                 regionOptions={regionOptions}
               />
             </Grid>
+            {serviceType === 'dbaas' && (
+              <Grid item md={4} xs={12}>
+                <AlertsEngineOptionFilter
+                  handleSelection={handleEngineOptionChange}
+                />
+              </Grid>
+            )}
             {isSelectionsNeeded && (
               <Grid
                 sx={{
                   ml: {
-                    md: 2,
+                    md: serviceType === 'dbaas' ? 0 : 2,
                     xs: 0,
                   },
                 }}
