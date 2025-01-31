@@ -6,6 +6,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 
 import { ActionsPanel } from 'src/components/ActionsPanel/ActionsPanel';
+import { Breadcrumb } from 'src/components/Breadcrumb/Breadcrumb';
 import { useEditAlertDefinition } from 'src/queries/cloudpulse/alerts';
 
 import { MetricCriteriaField } from '../CreateAlert/Criteria/MetricCriteria';
@@ -48,9 +49,10 @@ export const EditAlertDefinition = (props: EditProps) => {
     ),
   });
 
+  const alertId = alertDetails.id;
   const { mutateAsync: editAlert } = useEditAlertDefinition(
     serviceType,
-    alertDetails.id
+    alertId
   );
   const { control, formState, handleSubmit, setError } = formMethods;
   const [maxScrapeInterval, setMaxScrapeInterval] = React.useState<number>(0);
@@ -61,7 +63,7 @@ export const EditAlertDefinition = (props: EditProps) => {
       enqueueSnackbar('Alert successfully updated', {
         variant: 'success',
       });
-      history.push('/monitor/alerts/definitions');
+      history.push(definitionLanding);
     } catch (errors) {
       for (const error of errors) {
         if (error.field) {
@@ -75,9 +77,28 @@ export const EditAlertDefinition = (props: EditProps) => {
       }
     }
   });
+  const definitionLanding = '/monitor/alerts/definitions';
+
+  const { newPathname, overrides } = React.useMemo(() => {
+    const overrides = [
+      {
+        label: 'Definitions',
+        linkTo: definitionLanding,
+        position: 1,
+      },
+      {
+        label: 'Edit',
+        linkTo: `${definitionLanding}/edit/${serviceType}/${alertId}`,
+        position: 2,
+      },
+    ];
+
+    return { newPathname: '/Definitions/Edit', overrides };
+  }, [serviceType, alertId]);
 
   return (
     <Paper sx={{ paddingLeft: 1, paddingRight: 1, paddingTop: 2 }}>
+      <Breadcrumb crumbOverrides={overrides} pathname={newPathname} />
       <FormProvider {...formMethods}>
         <form onSubmit={onSubmit}>
           <Typography marginTop={2} variant="h2">
@@ -136,7 +157,7 @@ export const EditAlertDefinition = (props: EditProps) => {
             }}
             secondaryButtonProps={{
               label: 'Cancel',
-              onClick: () => history.push('/monitor/alerts/definitions'),
+              onClick: () => history.push(definitionLanding),
             }}
             sx={{ display: 'flex', justifyContent: 'flex-end' }}
           />

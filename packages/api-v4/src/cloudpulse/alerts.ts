@@ -14,7 +14,7 @@ import {
   EditAlertDefinitionPayload,
   NotificationChannel,
 } from './types';
-import { BETA_API_ROOT as API_ROOT } from '../constants';
+// import { BETA_API_ROOT as API_ROOT } from '../constants';
 import { Params, Filter, ResourcePage } from '../types';
 
 const bearer = 'Bearer vagrant';
