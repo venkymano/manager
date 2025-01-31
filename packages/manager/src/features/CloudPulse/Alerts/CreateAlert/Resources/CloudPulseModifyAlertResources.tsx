@@ -62,6 +62,7 @@ export const CloudPulseModifyAlertResources = React.memo(
                     : undefined
                 }
                 alertResourceIds={field.value}
+                alertType="user"
                 handleResourcesSelection={handleResourcesSelection}
                 hideLabel
                 isSelectionsNeeded

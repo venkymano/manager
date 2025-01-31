@@ -4,6 +4,9 @@ import type {
   AlertDefinitionDimensionFilter,
   AlertDefinitionMetricCriteria,
   AlertDefinitionType,
+  CreateAlertDefinitionPayload,
+  MetricCriteria,
+  TriggerCondition,
 } from '@linode/api-v4';
 import type { Alert } from '@linode/api-v4';
 
@@ -29,6 +32,42 @@ export const alertRulesFactory = Factory.Sync.makeFactory<AlertDefinitionMetricC
 );
 
 const alertTypes: AlertDefinitionType[] = ['system', 'user'];
+export const triggerConditionFactory = Factory.Sync.makeFactory<TriggerCondition>(
+  {
+    criteria_condition: 'ALL',
+    evaluation_period_seconds: 300,
+    polling_interval_seconds: 60,
+    trigger_occurrences: 3,
+  }
+);
+export const rulesFactory = Factory.Sync.makeFactory<MetricCriteria>({
+  aggregate_function: 'avg',
+  dimension_filters: [
+    {
+      dimension_label: 'region',
+      operator: 'eq',
+      value: 'us-ord',
+    },
+  ],
+  metric: 'cpu_usage',
+  operator: 'gte',
+  threshold: 1000,
+});
+export const alertDefinitionFactory = Factory.Sync.makeFactory<CreateAlertDefinitionPayload>(
+  {
+    channel_ids: [1, 2, 3],
+    description: 'This is a default alert description.',
+    entity_ids: ['1', '2', '3', '4', '5'],
+    label: 'Default Alert Label',
+    rule_criteria: {
+      rules: [rulesFactory.build()],
+    },
+    severity: 1,
+    tags: ['tag1', 'tag2'],
+    trigger_conditions: triggerConditionFactory.build(),
+  }
+);
+
 export const alertFactory = Factory.Sync.makeFactory<Alert>({
   alert_channels: [
     {
