@@ -36,7 +36,7 @@ export const triggerConditionFactory = Factory.Sync.makeFactory<TriggerCondition
   {
     criteria_condition: 'ALL',
     evaluation_period_seconds: 300,
-    polling_interval_seconds: 60,
+    polling_interval_seconds: 600,
     trigger_occurrences: 3,
   }
 );
@@ -44,12 +44,12 @@ export const rulesFactory = Factory.Sync.makeFactory<MetricCriteria>({
   aggregate_function: 'avg',
   dimension_filters: [
     {
-      dimension_label: 'region',
+      dimension_label: 'state',
       operator: 'eq',
-      value: 'us-ord',
+      value: 'idle',
     },
   ],
-  metric: 'cpu_usage',
+  metric: 'system_cpu_utilization_percent',
   operator: 'gte',
   threshold: 1000,
 });
