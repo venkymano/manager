@@ -178,7 +178,7 @@ export const convertAlertDefinitionValues = (
 ): EditAlertDefinitionForm => {
   return {
     channel_ids: alert.alert_channels.map((channel) => channel.id),
-    description: alert.description,
+    description: alert.description || undefined,
     entity_ids: alert.entity_ids,
     label: alert.label,
     rule_criteria: {

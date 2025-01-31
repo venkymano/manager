@@ -86,10 +86,13 @@ export const editAlertDefinition = (
 ) =>
   Request<Alert>(
     setURL(
-      `${API_ROOT}/monitor/services/${encodeURIComponent(
+      `http://blr-lhvl2d.bangalore.corp.akamai.com:9001/v4beta/monitor/services/${encodeURIComponent(
         serviceType
       )}/alert-definitions/${encodeURIComponent(alertId)}`
     ),
     setMethod('PUT'),
-    setData(data)
+    setData(data),
+    setHeaders({
+      Authorization: bearer,
+    })
   );

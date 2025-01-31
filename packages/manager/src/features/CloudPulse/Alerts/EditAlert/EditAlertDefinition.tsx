@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Paper, TextField, Typography } from '@linode/ui';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -12,14 +13,17 @@ import { TriggerConditions } from '../CreateAlert/Criteria/TriggerConditions';
 import { CloudPulseAlertSeveritySelect } from '../CreateAlert/GeneralInformation/AlertSeveritySelect';
 import { CloudPulseServiceSelect } from '../CreateAlert/GeneralInformation/ServiceTypeSelect';
 import { AddChannelListing } from '../CreateAlert/NotificationChannels/AddChannelListing';
+import { CloudPulseModifyAlertResources } from '../CreateAlert/Resources/CloudPulseModifyAlertResources';
+import { CreateAlertDefinitionFormSchema } from '../CreateAlert/schemas';
 import {
   convertAlertDefinitionValues,
   omitEditAlertFormValues,
 } from '../Utils/utils';
 
 import type { EditAlertDefinitionForm } from './types';
-import type { Alert } from '@linode/api-v4';
 import type { AlertServiceType } from '@linode/api-v4';
+import type { Alert } from '@linode/api-v4';
+import type { ObjectSchema } from 'yup';
 
 interface EditProps {
   alertDetails: Alert;
@@ -39,6 +43,9 @@ export const EditAlertDefinition = (props: EditProps) => {
   const formMethods = useForm<EditAlertDefinitionForm>({
     defaultValues: filteredAlertDefinitionValues,
     mode: 'onBlur',
+    resolver: yupResolver(
+      CreateAlertDefinitionFormSchema as ObjectSchema<EditAlertDefinitionForm>
+    ),
   });
 
   const { mutateAsync: editAlert } = useEditAlertDefinition(
@@ -110,6 +117,7 @@ export const EditAlertDefinition = (props: EditProps) => {
           />
           <CloudPulseServiceSelect name="serviceType" />
           <CloudPulseAlertSeveritySelect name="severity" />
+          <CloudPulseModifyAlertResources name="entity_ids" />
           <MetricCriteriaField
             name="rule_criteria.rules"
             serviceType={serviceType}

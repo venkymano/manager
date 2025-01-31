@@ -9,15 +9,15 @@ import { getAlertBoxStyles } from '../../Utils/utils';
 import type { CreateAlertDefinitionForm } from '../types';
 import type { FieldPathByValue } from 'react-hook-form';
 
-export interface CreateAlertResourcesProp {
+export interface CloudPulseModifyAlertResourcesProp {
   /**
    * name used for the component in the form
    */
   name: FieldPathByValue<CreateAlertDefinitionForm, string[]>;
 }
 
-export const CreateAlertResources = React.memo(
-  (props: CreateAlertResourcesProp) => {
+export const CloudPulseModifyAlertResources = React.memo(
+  (props: CloudPulseModifyAlertResourcesProp) => {
     const { name } = props;
 
     const theme = useTheme();
@@ -62,6 +62,7 @@ export const CreateAlertResources = React.memo(
                     : undefined
                 }
                 alertResourceIds={field.value}
+                alertType="user"
                 handleResourcesSelection={handleResourcesSelection}
                 hideLabel
                 isSelectionsNeeded

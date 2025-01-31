@@ -147,6 +147,7 @@ export const EditAlertResources = (props: EditAlertResourcesProps) => {
           <AlertResources
             alertLabel={alertDetails.label}
             alertResourceIds={alertDetails.entity_ids}
+            alertType={alertDetails.type}
             handleResourcesSelection={handleResourcesSelection}
             isSelectionsNeeded
             serviceType={alertDetails.service_type}
