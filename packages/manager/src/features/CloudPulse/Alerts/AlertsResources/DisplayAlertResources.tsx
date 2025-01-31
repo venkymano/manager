@@ -231,7 +231,7 @@ export const DisplayAlertResources = React.memo(
                       direction={sorting.order}
                       label="engineType"
                     >
-                      Engine
+                      Database Engine
                     </TableSortCell>
                   )}
                 </TableRow>

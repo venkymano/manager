@@ -275,12 +275,6 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
                 value={searchText || ''}
               />
             </Grid>
-            <Grid item md={4} xs={12}>
-              <AlertsRegionFilter
-                handleSelectionChange={handleFilteredRegionsChange}
-                regionOptions={regionOptions}
-              />
-            </Grid>
             {serviceType === 'dbaas' && (
               <Grid item md={4} xs={12}>
                 <AlertsEngineOptionFilter
@@ -288,6 +282,12 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
                 />
               </Grid>
             )}
+            <Grid item md={4} xs={12}>
+              <AlertsRegionFilter
+                handleSelectionChange={handleFilteredRegionsChange}
+                regionOptions={regionOptions}
+              />
+            </Grid>
             {isSelectionsNeeded && (
               <Grid
                 sx={{

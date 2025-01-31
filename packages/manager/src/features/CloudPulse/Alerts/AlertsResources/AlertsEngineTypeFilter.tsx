@@ -36,7 +36,7 @@ export const AlertsEngineOptionFilter = React.memo(
         label="Engine Type"
         onChange={(e, engineOption) => handleSelection(engineOption?.id)}
         options={engineOptions}
-        placeholder="Select Engine Type"
+        placeholder="Select a Database Engine"
       />
     );
   }
