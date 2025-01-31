@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Paper, TextField, Typography } from '@linode/ui';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -13,6 +14,7 @@ import { CloudPulseAlertSeveritySelect } from '../CreateAlert/GeneralInformation
 import { CloudPulseServiceSelect } from '../CreateAlert/GeneralInformation/ServiceTypeSelect';
 import { AddChannelListing } from '../CreateAlert/NotificationChannels/AddChannelListing';
 import { CloudPulseModifyAlertResources } from '../CreateAlert/Resources/CloudPulseModifyAlertResources';
+import { CreateAlertDefinitionFormSchema } from '../CreateAlert/schemas';
 import {
   convertAlertDefinitionValues,
   omitEditAlertFormValues,
@@ -21,10 +23,7 @@ import {
 import type { EditAlertDefinitionForm } from './types';
 import type { AlertServiceType } from '@linode/api-v4';
 import type { Alert } from '@linode/api-v4';
-import { CreateAlertDefinitionForm } from '../CreateAlert/types';
-import { CreateAlertDefinitionFormSchema } from '../CreateAlert/schemas';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { ObjectSchema } from 'yup';
+import type { ObjectSchema } from 'yup';
 
 interface EditProps {
   alertDetails: Alert;
