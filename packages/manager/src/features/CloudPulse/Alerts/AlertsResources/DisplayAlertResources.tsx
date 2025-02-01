@@ -12,7 +12,7 @@ import { TableRow } from 'src/components/TableRow';
 import { TableRowError } from 'src/components/TableRowError/TableRowError';
 import { TableSortCell } from 'src/components/TableSortCell';
 
-import { engineTypeMap } from '../constants';
+import { serviceColumns } from './constants';
 
 import type { Order } from 'src/hooks/useOrder';
 
@@ -161,6 +161,8 @@ export const DisplayAlertResources = React.memo(
       );
     };
 
+    const columns = serviceColumns[serviceType ?? 'linode'] ?? [];
+
     return (
       <Paginate data={sortedData ?? []} pageSize={pageSize}>
         {({
@@ -196,44 +198,20 @@ export const DisplayAlertResources = React.memo(
                       />
                     </TableCell>
                   )}
-                  <TableSortCell
-                    handleClick={(orderBy, order) => {
-                      handleSort(orderBy, order, handlePageChange);
-                    }}
-                    active={sorting.orderBy === 'label'}
-                    data-qa-header="resource"
-                    data-testid="resource"
-                    direction={sorting.order}
-                    label="label"
-                  >
-                    Resource
-                  </TableSortCell>
-                  <TableSortCell
-                    handleClick={(orderBy, order) => {
-                      handleSort(orderBy, order, handlePageChange);
-                    }}
-                    active={sorting.orderBy === 'region'}
-                    data-qa-header="region"
-                    data-testid="region"
-                    direction={sorting.order}
-                    label="region"
-                  >
-                    Region
-                  </TableSortCell>
-                  {serviceType === 'dbaas' && (
+                  {columns.map(({ label, sortingKey }) => (
                     <TableSortCell
-                      handleClick={(orderBy, order) => {
-                        handleSort(orderBy, order, handlePageChange);
-                      }}
-                      active={sorting.orderBy === 'engineType'}
-                      data-qa-header="engineType"
-                      data-testid="engineType"
+                      handleClick={(orderBy, order) =>
+                        handleSort(orderBy, order, handlePageChange)
+                      }
+                      active={sorting.orderBy === sortingKey}
+                      data-testid={label.toLowerCase()}
                       direction={sorting.order}
-                      label="engineType"
+                      key={label}
+                      label={sortingKey ?? ''}
                     >
-                      Database Engine
+                      {label}
                     </TableSortCell>
-                  )}
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody
@@ -241,37 +219,38 @@ export const DisplayAlertResources = React.memo(
                 data-testid="alert_resources_content"
               >
                 {!isDataLoadingError &&
-                  paginatedData.map(
-                    ({ checked, engineType, id, label, region }, index) => (
-                      <TableRow data-qa-alert-row={id} key={`${index}_${id}`}>
-                        {isSelectionsNeeded && (
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              onClick={() => {
-                                handleSelectionChange([id], !checked);
-                              }}
-                              sx={{
-                                padding: 0,
-                              }}
-                              checked={checked}
-                              data-testid={`select_item_${id}`}
-                            />
-                          </TableCell>
-                        )}
-                        <TableCell data-qa-alert-cell={`${id}_resource`}>
-                          {label}
+                  paginatedData.map((resource, index) => (
+                    <TableRow
+                      data-qa-alert-row={resource.id}
+                      key={`${index}_${resource.id}`}
+                    >
+                      {isSelectionsNeeded && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            onClick={() => {
+                              handleSelectionChange(
+                                [resource.id],
+                                !resource.checked
+                              );
+                            }}
+                            sx={{
+                              padding: 0,
+                            }}
+                            checked={resource.checked}
+                            data-testid={`select_item_${resource.id}`}
+                          />
                         </TableCell>
-                        <TableCell data-qa-alert-cell={`${id}_region`}>
-                          {region}
+                      )}
+                      {columns.map(({ accessor, label }) => (
+                        <TableCell
+                          data-qa-alert-cell={`${resource.id}_${label}`}
+                          key={label}
+                        >
+                          {accessor(resource)}
                         </TableCell>
-                        {serviceType === 'dbaas' && engineType && (
-                          <TableCell>
-                            {engineTypeMap[engineType] ?? engineType}
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    )
-                  )}
+                      ))}
+                    </TableRow>
+                  ))}
                 {isDataLoadingError && (
                   <TableRowError
                     colSpan={3}
