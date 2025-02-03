@@ -137,12 +137,20 @@ export const channelTypes: Record<ChannelType, string> = {
   webhook: 'Webhook',
 };
 
-export const channelTypeOptions: Item<string, ChannelType>[] = Object.entries(
-  channelTypes
-).map(([key, label]) => ({
-  label,
-  value: key as ChannelType,
-}));
+// export const channelTypeOptions: Item<string, ChannelType>[] = Object.entries(
+//   channelTypes
+// ).map(([key, label]) => ({
+//   label,
+//   value: key as ChannelType,
+// }));
+
+export const channelTypeOptions: Item<string, ChannelType>[] = [
+  {
+    label: 'Email',
+    value: 'email',
+  },
+];
+
 export const metricOperatorTypeMap: Record<MetricOperatorType, string> = {
   eq: '=',
   gt: '>',
