@@ -36,7 +36,7 @@ export const CloudPulseModifyAlertResources = React.memo(
     };
 
     React.useEffect(() => {
-      if (!serviceTypeWatcher) {
+      if (serviceTypeWatcher) {
         setValue('entity_ids', [], { shouldValidate: true });
       }
     }, [serviceTypeWatcher, setValue]);
