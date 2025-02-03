@@ -252,9 +252,9 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
       {isSelectionsNeeded &&
         (alertType === 'system' || alertType === 'default') && (
           <Typography ref={titleRef} variant="body1">
-            You can enable/disable alerts for resources you have access to. Some
-            resources linked to this definition may be hidden due to your access
-            restrictions.
+            You can enable or disable this system alert for each resource you
+            have access to. Select the resources listed below you want to enable
+            the alert for.
           </Typography>
         )}
       {(isDataLoadingError ||
@@ -275,12 +275,6 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
                 value={searchText || ''}
               />
             </Grid>
-            <Grid item md={4} xs={12}>
-              <AlertsRegionFilter
-                handleSelectionChange={handleFilteredRegionsChange}
-                regionOptions={regionOptions}
-              />
-            </Grid>
             {serviceType === 'dbaas' && (
               <Grid item md={4} xs={12}>
                 <AlertsEngineOptionFilter
@@ -288,6 +282,12 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
                 />
               </Grid>
             )}
+            <Grid item md={4} xs={12}>
+              <AlertsRegionFilter
+                handleSelectionChange={handleFilteredRegionsChange}
+                regionOptions={regionOptions}
+              />
+            </Grid>
             {isSelectionsNeeded && (
               <Grid
                 sx={{
@@ -347,6 +347,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
               isSelectionsNeeded={isSelectionsNeeded}
               pageSize={pageSize}
               scrollToElement={() => scrollToElement(titleRef.current)}
+              serviceType={serviceType}
             />
           </Grid>
         </Grid>
