@@ -13,30 +13,30 @@ type ServiceColumns<T> = Record<string, ColumnConfig<T>[]>;
 export const serviceColumns: ServiceColumns<AlertInstance> = {
   dbaas: [
     {
-      accessor: (data) => data.label,
+      accessor: ({ label }) => label,
       label: 'Resource',
       sortingKey: 'label',
     },
     {
-      accessor: (data) => data.region,
+      accessor: ({ region }) => region,
       label: 'Region',
       sortingKey: 'region',
     },
     {
-      accessor: (data) =>
-        engineTypeMap[data.engineType ?? ''] ?? data.engineType,
+      accessor: ({ engineType }) =>
+        engineTypeMap[engineType ?? ''] ?? engineType,
       label: 'Database Engine',
       sortingKey: 'engineType',
     },
   ],
   linode: [
     {
-      accessor: (data) => data.label,
+      accessor: ({ label }) => label,
       label: 'Resource',
       sortingKey: 'label',
     },
     {
-      accessor: (data) => data.region,
+      accessor: ({ region }) => region,
       label: 'Region',
       sortingKey: 'region',
     },
