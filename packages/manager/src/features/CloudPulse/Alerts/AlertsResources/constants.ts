@@ -18,15 +18,15 @@ export const serviceColumns: ServiceColumns<AlertInstance> = {
       sortingKey: 'label',
     },
     {
-      accessor: ({ region }) => region,
-      label: 'Region',
-      sortingKey: 'region',
-    },
-    {
       accessor: ({ engineType }) =>
         engineTypeMap[engineType ?? ''] ?? engineType,
       label: 'Database Engine',
       sortingKey: 'engineType',
+    },
+    {
+      accessor: ({ region }) => region,
+      label: 'Region',
+      sortingKey: 'region',
     },
   ],
   linode: [
